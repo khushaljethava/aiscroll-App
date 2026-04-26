@@ -1,0 +1,342 @@
+{
+    "track": {
+      "emoji": "✨",
+      "name": "Generative AI & LLMs",
+      "description": "How to actually build with large language models — prompting, RAG, fine-tuning, agents, and the practical knowledge to ship real Gen AI products.",
+      "level": "advanced",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "What is Gen AI",
+        "title": "What generative AI actually is",
+        "emoji": "✨",
+        "explanation": "Generative AI is the family of models that produce new content — text, images, audio, video, code — rather than just classifying or predicting. The current wave is driven by foundation models: massive transformers trained on huge datasets that can be prompted or fine-tuned for almost any task. Gen AI didn't invent text generation, but scale plus instruction tuning turned 'autocomplete on steroids' into something that can write code, draft emails, summarize research, and reason through problems. The practical impact is that one model now does what dozens of specialized systems used to do.",
+        "takeaway": "Gen AI = foundation models that produce new content, prompted to do any task.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "What is Gen AI",
+        "title": "LLMs vs traditional ML",
+        "emoji": "🔄",
+        "explanation": "Traditional ML required labeled training data for every task — a sentiment classifier needed thousands of labeled reviews, a translator needed parallel sentences, etc. LLMs flip the script: one pre-trained model can do all those tasks zero-shot, just by being asked in natural language. You no longer 'train a model'; you 'design a prompt' or, at most, fine-tune lightly. This shift collapses the time from idea to working prototype from months to hours, which is why every product team is suddenly an AI team.",
+        "takeaway": "LLMs replaced 'train a model per task' with 'prompt one model for any task'.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "What is Gen AI",
+        "title": "The model landscape",
+        "emoji": "🗺️",
+        "explanation": "Closed models (Claude from Anthropic, GPT from OpenAI, Gemini from Google) lead on raw capability and ship behind APIs. Open-weight models (Llama, Mistral, Qwen, DeepSeek) you can download and run yourself, trading some capability for control, privacy, and cost predictability. Smaller specialized models (Phi, Gemma, smaller Qwen variants) run locally or at the edge for narrow tasks. Picking between them is now a real engineering decision — not just 'which is best' but 'which is best for this task at this cost with this latency'.",
+        "takeaway": "Closed models lead capability; open models win on control and cost.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Prompting",
+        "title": "Anatomy of a good prompt",
+        "emoji": "📝",
+        "explanation": "A strong prompt usually has four parts: a clear role or context ('You are a careful technical reviewer'), the actual task with specific instructions, any input data the model needs to work with, and the desired output format. Vague prompts produce vague answers — 'summarize this' is worse than 'write a 3-bullet executive summary, each bullet under 15 words, focused on financial risk'. The biggest prompting mistake beginners make is being too short; the second-biggest is burying the actual task under setup. Good prompts read like clear instructions to a smart but literal coworker.",
+        "takeaway": "Role + task + input + format. Be specific, not chatty.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Prompting",
+        "title": "Zero-shot, few-shot, and in-context learning",
+        "emoji": "🎯",
+        "explanation": "Zero-shot prompting just asks the task directly — 'classify this review as positive or negative'. Few-shot prompting includes a handful of input/output examples in the prompt, showing the model exactly the pattern you want. This works because LLMs do 'in-context learning' — they pick up the pattern from examples without any weight updates. Few-shot is wildly powerful for format consistency (always JSON, always this structure) and for tasks where the exact behavior is hard to describe but easy to demonstrate.",
+        "takeaway": "Examples in the prompt teach the model the pattern, no training needed.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Prompting",
+        "title": "Chain-of-thought prompting",
+        "emoji": "🧠",
+        "explanation": "Asking a model to 'think step by step' before answering produces measurably better results on reasoning, math, and multi-step problems. The model uses its own intermediate output as scratch space — each token of reasoning gives it more compute to work with before committing to a final answer. Modern reasoning models (like o1, Claude with extended thinking, DeepSeek R1) do this internally and were trained specifically to be good at it. For older or smaller models, explicit chain-of-thought instructions still meaningfully improve accuracy.",
+        "takeaway": "'Think step by step' isn't magic — it gives the model room to reason.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Prompting",
+        "title": "System prompts vs user prompts",
+        "emoji": "🎭",
+        "explanation": "Most modern LLM APIs separate the system prompt (high-level instructions, persona, rules) from user messages (the actual conversation). System prompts persist across the entire conversation and tend to be weighted more heavily for behavioral instructions. Use the system prompt to define what the assistant is, how it should behave, and any hard rules — then keep user messages focused on the actual request. Cramming everything into the first user message works but makes prompts harder to maintain and reuse.",
+        "takeaway": "System prompt = who the assistant is. User prompts = what to do right now.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Prompting",
+        "title": "Structured outputs",
+        "emoji": "📋",
+        "explanation": "Most production use cases need machine-readable output, not prose. JSON mode, structured output APIs, and function calling let you constrain the model to produce valid JSON matching a schema you define. Modern APIs (Anthropic, OpenAI, Gemini) all support this natively, eliminating the brittle 'parse the model's reply with regex' era. When integrating LLMs into pipelines, always reach for structured outputs first — it makes the boundary between LLM and the rest of your code clean and reliable.",
+        "takeaway": "Structured outputs replace regex parsing with schema-validated JSON.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Limitations",
+        "title": "Hallucinations",
+        "emoji": "👻",
+        "explanation": "LLMs sometimes confidently produce information that's plausible but false — citing papers that don't exist, inventing API methods, misstating historical facts. This isn't a bug in the usual sense; it's a side effect of next-token prediction with no native concept of 'I don't know'. Hallucinations are most dangerous when they sound authoritative and the user can't easily verify. The main mitigations: ground the model with retrieved documents (RAG), instruct it to say 'I don't know' when uncertain, and never deploy LLMs for high-stakes factual claims without human verification.",
+        "takeaway": "LLMs hallucinate confidently. Ground them with retrieval and verify claims.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Limitations",
+        "title": "Knowledge cutoffs",
+        "emoji": "📅",
+        "explanation": "Every LLM has a training cutoff — the date past which it has no information. A model trained on 2024 data will confidently answer questions about 2025 events but make things up. Some models have built-in web search to address this; others rely on you providing fresh information via RAG or tool use. Always check a model's cutoff before deploying it for time-sensitive use cases, and be wary of users asking about recent events. 'When was the cutoff?' is a question you should ask before any factual deployment.",
+        "takeaway": "LLMs frozen at training time. Bring your own fresh data when freshness matters.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Limitations",
+        "title": "Context rot and the 'lost in the middle' problem",
+        "emoji": "🕳️",
+        "explanation": "Even when models support 200K+ token contexts, they don't use all that space equally — performance often degrades when key information sits in the middle of long inputs. Models pay more attention to the beginning and end. This 'lost in the middle' effect means that simply dumping more context isn't always better; sometimes targeted retrieval of the most relevant 5K tokens beats stuffing 100K tokens. Test your specific use case rather than assuming bigger context wins automatically.",
+        "takeaway": "Long context isn't free attention — important info can get lost in the middle.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "RAG",
+        "title": "What RAG actually is",
+        "emoji": "📚",
+        "explanation": "Retrieval-Augmented Generation pairs an LLM with a search system: when a user asks a question, you first retrieve relevant documents from your knowledge base, then feed them to the LLM along with the question. The model answers grounded in those retrieved documents instead of relying solely on its training data. This is how you give an LLM access to your company docs, recent data, or anything outside its training. RAG is the single most common production pattern in Gen AI today — far more common than fine-tuning.",
+        "takeaway": "RAG: retrieve relevant docs, then let the LLM answer based on them.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "RAG",
+        "title": "Chunking strategies",
+        "emoji": "✂️",
+        "explanation": "RAG starts by splitting documents into chunks small enough to fit into context — typically 200 to 1000 tokens. Chunk too small and you lose context; too large and you retrieve irrelevant noise alongside relevant content. Smart chunking respects natural boundaries: paragraphs, sections, code functions, slide breaks. Overlap between chunks (10-20%) helps preserve context across boundaries. Chunking quality often matters more than the embedding model — bad chunks make retrieval bad no matter how smart the rest of the pipeline is.",
+        "takeaway": "Good chunks respect document structure. Bad chunks ruin RAG.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "RAG",
+        "title": "Vector databases",
+        "emoji": "💾",
+        "explanation": "After embedding your chunks, you need to store the vectors somewhere that supports fast similarity search. Vector databases — Pinecone, Weaviate, Chroma, Qdrant, Milvus, FAISS — are built for this: given a query vector, find the K nearest chunks in milliseconds across millions of entries. They use approximate nearest neighbor algorithms (HNSW, IVF) that trade tiny accuracy losses for huge speed gains. Pick based on hosting model (managed vs self-hosted), scale, and how well it integrates with the rest of your stack.",
+        "takeaway": "Vector DBs find the K closest chunks fast. The retrieval engine of RAG.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "RAG",
+        "title": "Hybrid search and re-ranking",
+        "emoji": "🔍",
+        "explanation": "Pure vector search finds semantically similar chunks but can miss exact-keyword matches that obviously belong. Hybrid search combines vector search with traditional keyword search (BM25), getting the best of both. Re-ranking goes further: retrieve 50 candidates with fast methods, then use a cross-encoder model (like Cohere Rerank) to precisely score each one against the query and keep the top 5. Hybrid + re-ranking is the difference between mediocre RAG and great RAG, and most production systems do both.",
+        "takeaway": "Hybrid search + re-ranking turns mediocre RAG into great RAG.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "RAG",
+        "title": "Evaluating RAG systems",
+        "emoji": "📊",
+        "explanation": "RAG can fail in two distinct places: retrieval (we didn't find the right docs) or generation (we found them but the LLM didn't use them well). You evaluate them separately. For retrieval: measure recall — did the relevant chunks make it into the top K? For generation: measure faithfulness (does the answer match the docs?), relevance (does it answer the question?), and groundedness (does every claim cite a source?). Frameworks like Ragas, DeepEval, and TruLens automate this. Without evaluation, RAG quality silently degrades over time.",
+        "takeaway": "RAG evaluation: measure retrieval and generation separately.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Customization",
+        "title": "Fine-tuning vs RAG vs prompting",
+        "emoji": "⚖️",
+        "explanation": "Three ways to customize an LLM, with very different tradeoffs. Prompting is fastest and free — use it when capable models can do the task with the right instructions. RAG is the answer when you need fresh data or proprietary knowledge — facts change, but the model doesn't have to. Fine-tuning is for behavior, style, and domain reasoning — when you need the model to consistently 'sound like X' or follow patterns no prompt can express. Most production apps lean prompt + RAG; fine-tuning is the last resort, not the first.",
+        "takeaway": "Knowledge → RAG. Behavior → fine-tune. Everything else → prompt better.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Customization",
+        "title": "LoRA and parameter-efficient fine-tuning",
+        "emoji": "🪶",
+        "explanation": "Full fine-tuning updates every weight in a large model — expensive and storage-heavy. LoRA (Low-Rank Adaptation) freezes the base model and adds small trainable matrices that capture the adjustment, reducing trainable parameters by 99%+ while matching full fine-tuning quality on most tasks. QLoRA goes further by quantizing the base model to 4-bit, letting you fine-tune giant models on a single consumer GPU. LoRA + QLoRA democratized fine-tuning — what used to require a cluster now runs on a laptop.",
+        "takeaway": "LoRA: fine-tune giant models with tiny resources. QLoRA goes even further.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Customization",
+        "title": "Quantization",
+        "emoji": "📉",
+        "explanation": "Models train in 16- or 32-bit floats but can usually run in 8-bit, 4-bit, or even lower precision with minimal quality loss. Quantization shrinks memory use 4-8× and speeds up inference, letting big models run on smaller hardware. Formats like GGUF (for llama.cpp), GPTQ, and AWQ each have their tradeoffs in speed, accuracy, and tool support. For self-hosted Gen AI, quantization is often the difference between 'runs on my laptop' and 'requires a cloud GPU'.",
+        "takeaway": "Quantization: smaller, faster models with almost no quality loss.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Agents",
+        "title": "What an AI agent is",
+        "emoji": "🤖",
+        "explanation": "An AI agent is an LLM in a loop — observe, decide, act, repeat — pursuing a goal across multiple steps rather than answering once and stopping. The model decides what to do next, calls tools to do it, sees the results, and decides what's next based on those results. This loop turns a chatbot into something that can book meetings, research topics across the web, or fix bugs in a codebase. Agents are the core paradigm of 2025-2026 AI applications, replacing one-shot Q&A in many products.",
+        "takeaway": "Agent = LLM + tools + loop. Acts toward goals, not just answers questions.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Agents",
+        "title": "Tool use and function calling",
+        "emoji": "🔧",
+        "explanation": "Tool use is what makes agents useful — letting LLMs call external functions like search, code execution, database queries, or APIs. You describe each tool's name, purpose, and parameters in a structured schema; the model picks which to call and with what arguments. The framework executes the tool and feeds results back to the model, which decides what to do next. Modern LLM APIs (Claude, GPT, Gemini) all support function calling natively — it's no longer a research project, it's a basic feature.",
+        "takeaway": "Tool use lets LLMs do things, not just talk about them.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Agents",
+        "title": "Memory in agents",
+        "emoji": "🧩",
+        "explanation": "Agents often need memory beyond the current context window — remembering past conversations, accumulated facts, or user preferences across sessions. Short-term memory is just the conversation in context. Long-term memory typically means storing summaries, facts, or vectors in a database and retrieving them when relevant — essentially RAG over the agent's own history. Memory is one of the trickiest parts of agent design: too much and you waste context, too little and the agent forgets users between sessions.",
+        "takeaway": "Memory: short-term in context, long-term in databases retrieved as needed.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Agents",
+        "title": "Multi-agent systems",
+        "emoji": "👥",
+        "explanation": "Multi-agent systems split a task across specialized agents — one researches, one writes, one critiques, one coordinates. The pattern resembles a team of human specialists handing off work. Frameworks like CrewAI, AutoGen, and LangGraph orchestrate these collaborations with defined roles, handoff rules, and shared memory. Multi-agent setups can outperform single agents on complex tasks, but they're also slower, costlier, and harder to debug — single capable agents are still the right starting point for most problems.",
+        "takeaway": "Multi-agent: divide and conquer with specialized roles. Powerful but heavier.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Agents",
+        "title": "Model Context Protocol (MCP)",
+        "emoji": "🔌",
+        "explanation": "MCP is an open standard introduced by Anthropic for connecting LLMs to tools and data sources — basically USB for AI agents. Instead of writing custom integrations for each model, you build an MCP server once and any MCP-compatible client (Claude Desktop, IDEs, agent frameworks) can use it. MCP servers exist for Slack, GitHub, Google Drive, databases, and hundreds of other systems. As of 2026, MCP is becoming the de facto interoperability layer for serious agent work.",
+        "takeaway": "MCP: build once, connect to any AI client. The USB-C of agent tools.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Frameworks",
+        "title": "LangChain and LlamaIndex",
+        "emoji": "🦜",
+        "explanation": "LangChain and LlamaIndex are the two dominant Python frameworks for building LLM applications. LangChain is the broader 'do everything' toolkit — chains, agents, memory, RAG, integrations. LlamaIndex started focused on RAG and remains the cleaner choice for retrieval-heavy apps. Both have devoted fans and loud critics; many production teams use them for prototyping and replace them with custom code for production. Knowing what they offer is useful even if you choose to roll your own.",
+        "takeaway": "LangChain = broad LLM toolkit. LlamaIndex = RAG specialist.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Frameworks",
+        "title": "DSPy: prompts as code",
+        "emoji": "🎼",
+        "explanation": "DSPy takes a different angle on prompting — instead of hand-tuning prompts as strings, you declare what you want as code, and DSPy optimizes the prompts automatically using examples. It's compiler-style thinking applied to LLMs: write the program once, let the framework search for the prompt that makes it work best. For complex multi-step LLM pipelines, this can produce better and more reproducible results than manual prompt engineering. It's a different mental model than LangChain, and it's gaining traction for production systems.",
+        "takeaway": "DSPy: declare LLM behavior in code, let the framework optimize prompts.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Multimodal",
+        "title": "Vision-language models",
+        "emoji": "👁️",
+        "explanation": "Modern frontier models accept images alongside text — Claude, GPT-4 with vision, and Gemini all natively understand pictures, screenshots, diagrams, and documents. This unlocks a huge class of applications: extracting data from PDFs, analyzing charts, describing scenes for accessibility, or visual coding from sketches. The model still produces text output, but the input can mix words and pixels freely. Vision-language is increasingly the default; text-only models are starting to feel limited.",
+        "takeaway": "Vision-language models read images and text together. Default for new apps.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Multimodal",
+        "title": "Image generation: diffusion models",
+        "emoji": "🎨",
+        "explanation": "Image generators (Stable Diffusion, Flux, Midjourney, DALL-E, Imagen) are diffusion models — they learn to denoise random pixels into images guided by text prompts. Training teaches them how to gradually transform noise into a coherent picture matching a description. Modern diffusion produces photorealistic images, illustrations, and art at quality that fooled most people in 2023 and only gets better. The same technology is now extending to video (Sora, Veo, Runway) and 3D generation.",
+        "takeaway": "Image generators denoise random pixels into pictures, guided by your prompt.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Multimodal",
+        "title": "Speech: TTS and STT",
+        "emoji": "🎙️",
+        "explanation": "Text-to-speech (TTS) generates spoken audio from text — modern models like ElevenLabs and OpenAI's voice models produce voices nearly indistinguishable from humans. Speech-to-text (STT, e.g. Whisper) does the reverse, transcribing audio with high accuracy across many languages. Together they enable voice-first AI applications: phone agents, real-time translation, accessibility tools, and conversational assistants. Voice is increasingly first-class in Gen AI products, not an afterthought.",
+        "takeaway": "TTS speaks, STT listens. Together they make voice AI possible.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Production",
+        "title": "Cost and latency optimization",
+        "emoji": "💰",
+        "explanation": "LLM costs add up fast in production — every API call charges by tokens in and out. The main optimization tools: cache responses for repeated queries, route easy questions to smaller cheaper models and hard ones to flagship models (the 'router' pattern), trim system prompts ruthlessly, and stream responses to reduce perceived latency. For high-volume use cases, batch processing and prompt caching (where the model caches large fixed prefixes) can cut costs by 10× or more. Treat token usage as a budget you actively manage.",
+        "takeaway": "Cache, route to cheaper models, trim prompts, batch when possible.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Observability and tracing",
+        "emoji": "🔭",
+        "explanation": "Production LLM apps fail in weird ways — bad outputs, slow responses, unexpected costs, prompt regressions. Observability tools like LangSmith, Braintrust, Helicone, and Langfuse log every prompt, response, latency, and cost so you can debug and improve. Tracing is especially critical for agents and multi-step pipelines, where one bad tool call can derail the whole flow. Without observability, LLM apps are black boxes; with it, you can actually see what's happening and fix what's broken.",
+        "takeaway": "You can't improve LLM apps you can't see. Trace everything in production.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Prompt injection and security",
+        "emoji": "🛡️",
+        "explanation": "Prompt injection is the LLM equivalent of SQL injection — attackers craft input that hijacks the model's instructions. A malicious email can tell an email-summarizing agent to forward all messages elsewhere; a poisoned web page can manipulate a browsing agent. There's no perfect defense yet, but mitigations include separating instructions from untrusted data, sandboxing tool access, requiring human confirmation for sensitive actions, and using guardrail models to filter inputs and outputs. Security can't be an afterthought once an LLM has tools.",
+        "takeaway": "Prompt injection is real. Sandbox tools and confirm sensitive actions.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Evals and quality gates",
+        "emoji": "✅",
+        "explanation": "Software has unit tests; LLM apps need evals — automated test suites that score outputs across cases that matter. Evals can be deterministic (regex match), LLM-as-judge (ask a model to grade), or human-rated (sample for review). You run them on every prompt change, every model upgrade, and continuously in production. Without evals, you ship by vibes and regress silently when models or prompts change. Strong eval discipline is what separates demo-quality LLM apps from production-grade ones.",
+        "takeaway": "No evals, no production. Score outputs systematically before shipping changes.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      }
+    ]
+  }

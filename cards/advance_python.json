@@ -1,0 +1,282 @@
+{
+    "track": {
+      "emoji": "🐍",
+      "name": "Advanced Python",
+      "description": "The features that separate scripting from real Python engineering — comprehensions, decorators, generators, OOP, typing, and the patterns pros actually use.",
+      "level": "advanced",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "Pythonic Code",
+        "title": "List comprehensions",
+        "emoji": "📝",
+        "explanation": "A list comprehension builds a list in one line: `[x*2 for x in nums if x > 0]`. It's faster than a manual for-loop with `.append()` and reads more like the intent — 'doubled positives' instead of 'create list, loop, check, append'.",
+        "takeaway": "Comprehensions: build lists by intent, not by steps.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pythonic Code",
+        "title": "Dict and set comprehensions",
+        "emoji": "🗂️",
+        "explanation": "The same syntax works for dicts (`{k: v for ...}`) and sets (`{x for ...}`). Great for inverting a dict, deduplicating while transforming, or building lookup tables in a single expression.",
+        "takeaway": "Comprehensions work for dicts and sets too.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pythonic Code",
+        "title": "Unpacking and starred expressions",
+        "emoji": "📦",
+        "explanation": "Python lets you unpack iterables into variables: `a, b, *rest = [1, 2, 3, 4]`. The same `*` and `**` work for merging lists and dicts, spreading args into functions, and pulling apart return values cleanly.",
+        "takeaway": "`*` and `**` unpack and spread almost anything.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Functions Deep Dive",
+        "title": "*args and **kwargs",
+        "emoji": "🎯",
+        "explanation": "`*args` collects extra positional arguments into a tuple; `**kwargs` collects extra keyword arguments into a dict. They let a function accept any number of inputs — useful for wrappers, decorators, and flexible APIs.",
+        "takeaway": "*args = extra positionals; **kwargs = extra keywords.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Functions Deep Dive",
+        "title": "Lambdas: tiny inline functions",
+        "emoji": "λ",
+        "explanation": "A lambda is a one-line anonymous function: `lambda x: x * 2`. They shine when passed to `sorted`, `map`, or `filter` — but if you'd need a docstring or more than one expression, write a real `def` instead.",
+        "takeaway": "Lambdas for one-liners; def for everything else.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Functions Deep Dive",
+        "title": "Closures",
+        "emoji": "🔒",
+        "explanation": "When a function defined inside another function remembers variables from the outer scope, that's a closure. It's how you build function factories — like a `make_multiplier(n)` that returns a function which always multiplies by `n`.",
+        "takeaway": "Inner functions remember their outer scope.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Decorators",
+        "title": "What is a decorator?",
+        "emoji": "🎀",
+        "explanation": "A decorator is a function that wraps another function to add behavior — logging, timing, caching, auth checks — without touching the original code. You apply one with `@decorator_name` right above a function definition.",
+        "takeaway": "Decorators add behavior without editing the function.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Decorators",
+        "title": "Writing your own decorator",
+        "emoji": "🛠️",
+        "explanation": "A decorator is just a function that takes a function and returns a new one — usually wrapping it with extra logic via `*args, **kwargs`. Use `functools.wraps` so the wrapped function keeps its original name and docstring.",
+        "takeaway": "Wrap, return, and use functools.wraps.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Generators",
+        "title": "yield and lazy iteration",
+        "emoji": "🌀",
+        "explanation": "A function with `yield` becomes a generator — it produces values one at a time and pauses between them, instead of building the whole list in memory. Perfect for streaming files, infinite sequences, or anything large.",
+        "takeaway": "yield = produce values lazily, one at a time.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Generators",
+        "title": "Generator expressions",
+        "emoji": "🔄",
+        "explanation": "Swap the `[]` of a list comprehension for `()` and you get a generator expression — same syntax, but it produces items on demand. Use it inside `sum()`, `any()`, or `max()` to avoid building a throwaway list.",
+        "takeaway": "() instead of [] = lazy version of a comprehension.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "OOP",
+        "title": "Classes and __init__",
+        "emoji": "🏛️",
+        "explanation": "A class is a blueprint for objects; `__init__` is the constructor that runs when you create one. `self` refers to the instance — it's how methods access and modify the object's own data.",
+        "takeaway": "Class = blueprint; __init__ = setup; self = this instance.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "OOP",
+        "title": "Inheritance",
+        "emoji": "🧬",
+        "explanation": "A subclass inherits attributes and methods from a parent class and can override or extend them. Use `super().__init__(...)` to call the parent's setup so you don't duplicate logic.",
+        "takeaway": "Subclasses extend parents — call super() to reuse.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "OOP",
+        "title": "Dunder methods",
+        "emoji": "✨",
+        "explanation": "Methods like `__str__`, `__repr__`, `__len__`, `__eq__`, and `__add__` let your objects work with Python's built-in operators and functions. Implement them and your class can be printed, compared, added, or measured naturally.",
+        "takeaway": "Dunders make your class feel native.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "OOP",
+        "title": "@classmethod vs @staticmethod",
+        "emoji": "🏷️",
+        "explanation": "A `@classmethod` takes the class as its first arg (`cls`) and is great for alternative constructors. A `@staticmethod` takes neither `self` nor `cls` — it's just a function living inside the class for organization.",
+        "takeaway": "classmethod knows the class; staticmethod knows nothing.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "OOP",
+        "title": "Dataclasses",
+        "emoji": "📋",
+        "explanation": "Decorate a class with `@dataclass` and Python auto-generates `__init__`, `__repr__`, and `__eq__` from the type-annotated fields. It's the cleanest way to write data-holding classes without 20 lines of boilerplate.",
+        "takeaway": "@dataclass = free __init__ and __repr__.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Error Handling",
+        "title": "try / except / finally",
+        "emoji": "🛡️",
+        "explanation": "Wrap risky code in `try`, catch specific errors with `except SomeError`, and use `finally` for cleanup that must always run. Catching bare `except:` hides bugs — always name the exception you actually expect.",
+        "takeaway": "Catch specific errors; use finally for cleanup.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Error Handling",
+        "title": "Custom exceptions",
+        "emoji": "🚨",
+        "explanation": "Subclass `Exception` to define your own error types like `PaymentFailedError`. Custom exceptions make error handling readable — callers can catch exactly what they care about instead of parsing error messages.",
+        "takeaway": "Custom exceptions let callers catch by meaning.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Context Managers",
+        "title": "The with statement",
+        "emoji": "🔓",
+        "explanation": "`with open(...) as f:` automatically closes the file when the block ends — even if an error happens. Any object with `__enter__` and `__exit__` works the same way: open a resource, use it, guarantee cleanup.",
+        "takeaway": "with = guaranteed setup and cleanup.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Context Managers",
+        "title": "Build one with @contextmanager",
+        "emoji": "🧰",
+        "explanation": "The `contextlib.contextmanager` decorator turns a generator into a context manager — code before `yield` is setup, code after is cleanup. Way less ceremony than writing a class with `__enter__` and `__exit__`.",
+        "takeaway": "@contextmanager: setup, yield, cleanup.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Type Hints",
+        "title": "Type hints basics",
+        "emoji": "🏷️",
+        "explanation": "Annotate variables and function signatures with types: `def greet(name: str) -> str:`. Python doesn't enforce them at runtime, but tools like mypy and your IDE use them to catch bugs before you run the code.",
+        "takeaway": "Type hints catch bugs at edit time, not runtime.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Type Hints",
+        "title": "Optional, Union, and generics",
+        "emoji": "🔗",
+        "explanation": "Use `list[int]`, `dict[str, User]`, `X | None` (or `Optional[X]`), and `X | Y` (or `Union`) to describe richer types. They make APIs self-documenting — the signature alone tells you what's allowed.",
+        "takeaway": "Richer hints = signatures that explain themselves.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Iteration & Itertools",
+        "title": "enumerate and zip",
+        "emoji": "🔢",
+        "explanation": "`enumerate(items)` gives you `(index, item)` pairs; `zip(a, b)` walks two iterables in parallel. Together they replace 90% of the manual index-juggling you might be tempted to write.",
+        "takeaway": "Reach for enumerate/zip before tracking indexes by hand.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Iteration & Itertools",
+        "title": "itertools essentials",
+        "emoji": "♾️",
+        "explanation": "The `itertools` module gives you `chain`, `groupby`, `combinations`, `product`, `accumulate`, and more — all lazy and memory-efficient. Anytime you're nesting loops to combine or group things, check itertools first.",
+        "takeaway": "Nested loops? Check itertools first.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Modules & Performance",
+        "title": "functools.lru_cache",
+        "emoji": "⚡",
+        "explanation": "Slap `@lru_cache` on a pure function and Python automatically caches its results — repeat calls with the same args become instant. Perfect for recursive functions, expensive lookups, or memoizing API parsers.",
+        "takeaway": "@lru_cache: free memoization for pure functions.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Modules & Performance",
+        "title": "Mutable default arguments trap",
+        "emoji": "⚠️",
+        "explanation": "Writing `def f(items=[])` looks innocent but the list is created once and shared across every call — leading to ghost data leaking between invocations. Use `None` as the default and create the list inside the function.",
+        "takeaway": "Never use mutable defaults — use None instead.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Concurrency",
+        "title": "async and await",
+        "emoji": "⏱️",
+        "explanation": "`async def` defines a coroutine; `await` pauses it until something finishes — usually I/O like a network call. It lets one thread juggle thousands of slow operations at once, instead of blocking on each.",
+        "takeaway": "async/await: handle many slow I/O calls in one thread.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Concurrency",
+        "title": "Threads vs processes vs async",
+        "emoji": "🧵",
+        "explanation": "Threads are good for I/O but limited by Python's GIL for CPU work. Multiprocessing sidesteps the GIL by spawning real processes. Async is the lightweight champion for huge numbers of I/O tasks. Pick by bottleneck, not by habit.",
+        "takeaway": "I/O-bound → async/threads. CPU-bound → processes.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      }
+    ]
+  }

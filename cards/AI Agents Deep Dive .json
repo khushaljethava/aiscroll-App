@@ -1,0 +1,342 @@
+{
+    "track": {
+      "emoji": "🤖",
+      "name": "AI Agents Deep Dive",
+      "description": "How to actually design, build, and ship AI agents — architectures, planning patterns, tool design, memory, and the hard-won lessons from production agent systems.",
+      "level": "advanced",
+      "isPremium": true,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "Agent Foundations",
+        "title": "What separates an agent from a chatbot",
+        "emoji": "🎯",
+        "explanation": "A chatbot answers one question at a time and stops; an agent pursues a goal across multiple steps, deciding what to do next based on what it's learned so far. The key difference is the loop: observe → think → act → observe again. An agent that books a flight might search options, compare prices, check your calendar, and only then make the booking — adapting at each step. The line between 'chatbot with tools' and 'agent' isn't sharp, but the loop and the goal-orientation are what most people mean by 'agent'.",
+        "takeaway": "Agents loop toward goals; chatbots answer once and stop.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Agent Foundations",
+        "title": "The agent loop",
+        "emoji": "🔄",
+        "explanation": "Every agent runs some variant of the same loop: receive the current state and goal, decide on an action, execute it (usually via a tool), observe the result, then repeat until the goal is reached or a stopping condition is hit. The 'decide' step is where the LLM lives — it generates the next action based on history and current observations. Stopping conditions matter as much as the loop itself: a max-step limit, a 'task complete' signal, or a confidence check. Without a stopping condition, agents loop forever or get stuck retrying the same broken action.",
+        "takeaway": "Loop = observe, decide, act, repeat. Always have a stopping condition.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Agent Foundations",
+        "title": "When agents are the wrong choice",
+        "emoji": "🚫",
+        "explanation": "Agents are flashy but often overkill — many tasks are better handled by a single LLM call, a structured pipeline, or a deterministic workflow. Use agents when the task genuinely needs adaptive multi-step reasoning, dynamic tool selection, or handling of unknown branches. Don't use them when the steps are predictable, when latency matters, when cost is tight, or when reliability is critical and you can't afford agent loops going off-script. The 2026 wisdom: 'workflow if you can, agent if you must'.",
+        "takeaway": "Agents are powerful but slow, costly, and unreliable — use only when you must.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "ReAct: reason then act",
+        "emoji": "💭",
+        "explanation": "ReAct ('Reasoning and Acting') is the foundational agent pattern: at each step, the LLM produces a thought ('I need to find recent news about X'), then an action ('search for X'), then sees the observation, then thinks again. The interleaved reasoning makes the agent's behavior more reliable and debuggable than just outputting actions. ReAct works well with smaller models because the reasoning compensates for limited capability. It's the simplest pattern that actually works, and most modern agent frameworks use a variant of it under the hood.",
+        "takeaway": "ReAct: think out loud between every action. The default agent pattern.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "Plan-and-Execute",
+        "emoji": "📋",
+        "explanation": "Plan-and-Execute splits the work into two phases: first, the LLM produces a complete plan ('1. search for X, 2. summarize results, 3. draft email'), then a separate phase executes each step. The advantage is that plans are easier to inspect, modify, and reuse than emergent step-by-step decisions. The disadvantage is rigidity — plans made before seeing results often need revision mid-execution. Modern variants combine the two: plan first, but allow re-planning when execution surprises happen.",
+        "takeaway": "Plan first, execute second. More structured, less adaptive than ReAct.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "Reflexion and self-critique",
+        "emoji": "🪞",
+        "explanation": "Reflexion adds a critique step: after each attempt or at the end, the agent reviews its own work, identifies mistakes, and tries again with that feedback in context. It works because LLMs are often better at spotting errors than avoiding them in the first place — generation and verification are different cognitive jobs. Useful for tasks with verifiable success criteria, like code that has to pass tests, or summaries that have to cover specific points. Critique adds latency and cost, so use it where the quality lift justifies the overhead.",
+        "takeaway": "Reflexion: critique your own output, retry with feedback. Quality over speed.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "Tree of Thoughts",
+        "emoji": "🌳",
+        "explanation": "Tree of Thoughts (ToT) lets the agent explore multiple reasoning paths in parallel — at each step, generate several candidate next-thoughts, evaluate them, and keep exploring the best ones. It's like beam search applied to chain-of-thought reasoning. Useful for problems with large solution spaces and clear success signals — puzzles, code generation, planning. The tradeoff is dramatic: ToT can multiply LLM calls by 10× or more, so it's reserved for hard problems where standard ReAct fails.",
+        "takeaway": "ToT: explore multiple reasoning paths, prune the bad ones. Powerful but expensive.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "Workflows vs agents",
+        "emoji": "⚖️",
+        "explanation": "Anthropic's influential 2024 essay drew a sharp line: workflows are systems where LLM steps are connected via predefined code paths, while agents are systems where the LLM dynamically directs its own actions. Workflows are predictable, debuggable, and cheap; agents are flexible but unpredictable and costly. The right answer is almost always a workflow with one or two agentic steps where genuinely needed — not full agency from start to finish. This framing has reshaped how serious teams build LLM systems.",
+        "takeaway": "Workflows for predictability, agents for adaptability. Mostly use workflows.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Tool Design",
+        "title": "Designing tools for LLMs",
+        "emoji": "🔧",
+        "explanation": "Tools are the agent's hands — but bad tool design tanks even the best LLM. Good tools have clear, distinct purposes (no overlap), descriptive names ('search_emails' not 'email_func'), well-typed parameters with sensible defaults, and unambiguous descriptions in their schema. The model decides which tool to call by reading these descriptions, so they're effectively prompts in disguise. Spend real time on tool descriptions — vague ones cause the model to either miss tools entirely or call them with garbage arguments.",
+        "takeaway": "Tool descriptions are prompts. Write them carefully.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Tool Design",
+        "title": "Tool granularity",
+        "emoji": "🪜",
+        "explanation": "Too few coarse tools and the model can't compose them flexibly; too many fine-grained tools and the model gets overwhelmed and picks wrong. The sweet spot is somewhere around 5-15 well-designed tools for most agents. If you find yourself with 30 tools, consider grouping them under a smaller number of higher-level tools that take an action parameter. If you have 3 tools and they're not enough, your agent probably needs split coverage of common workflows. Tool count is a signal worth watching.",
+        "takeaway": "5-15 well-designed tools is the sweet spot. More isn't better.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Tool Design",
+        "title": "Error messages as tool feedback",
+        "emoji": "⚠️",
+        "explanation": "When tools fail, the error message goes back to the LLM — and how it's worded directly determines whether the agent recovers gracefully or spirals. Bad: '500 Internal Server Error'. Good: 'The query timed out. Try a more specific search or split the request into smaller parts.' Treat error messages as instructions to the model, not as developer logs. Agents that recover well from errors usually do so because someone wrote helpful, actionable error messages.",
+        "takeaway": "Error messages tell the agent what to do next. Write them like instructions.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Tool Design",
+        "title": "Read-only vs write tools",
+        "emoji": "🔒",
+        "explanation": "Read-only tools (search, query, fetch) are safe — worst case, they return useless data. Write tools (send email, charge card, delete file) cause real-world side effects that can't be undone. Treat them differently: require explicit confirmation, log every call, rate-limit aggressively, and consider human-in-the-loop approval for high-stakes ones. Many agent failures in production come from agents that confidently did the wrong destructive thing because nothing stopped them. Default to read-only; earn write access carefully.",
+        "takeaway": "Read tools are safe; write tools need guardrails. Don't conflate them.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Memory",
+        "title": "Short-term vs long-term memory",
+        "emoji": "🧠",
+        "explanation": "Short-term memory is just the agent's current context window — what it can see right now. Long-term memory is anything stored externally and retrieved when relevant: past conversations, user preferences, learned facts, accumulated experience. Short-term is fast but bounded; long-term is unbounded but requires retrieval. Most production agents use both — short-term for the immediate task, long-term for everything that should persist across sessions or grow over time.",
+        "takeaway": "Short-term = context. Long-term = retrieved storage. Use both.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Memory",
+        "title": "Conversation summarization",
+        "emoji": "📝",
+        "explanation": "Long conversations exceed context windows and get expensive to keep verbatim. Summarization compresses old turns into a running summary, keeping recent turns verbatim and the summary at the top. The tradeoff is information loss — summaries discard details, sometimes the ones that mattered. Hybrid approaches keep critical facts (user preferences, decisions made) verbatim while summarizing chitchat. Done well, summarization extends effective conversation length tenfold without users noticing.",
+        "takeaway": "Summarize old turns, keep recent ones verbatim. Watch for lost details.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Memory",
+        "title": "Episodic and semantic memory",
+        "emoji": "📚",
+        "explanation": "Episodic memory stores specific past events ('user asked about pricing on March 3'); semantic memory stores extracted facts ('user prefers email summaries on Mondays'). Both are useful, and serious agents use both — episodic for accurate recall, semantic for fast lookups of stable preferences. The hard part is deciding what to extract into semantic memory and when, since aggressive extraction creates noise and lazy extraction misses patterns. Most teams start with simple episodic memory and add semantic extraction later.",
+        "takeaway": "Episodic = events that happened. Semantic = facts learned from them.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Multi-Agent",
+        "title": "Why use multiple agents",
+        "emoji": "👥",
+        "explanation": "Single agents struggle when tasks require very different skills, when context windows can't hold all relevant info, or when parallelism would dramatically speed things up. Multi-agent setups split the work — a researcher gathers info, a writer drafts, a reviewer critiques. Each agent has a focused role, smaller context, and clearer responsibility. The tradeoff: more orchestration, harder debugging, and coordination overhead that can eat any speed benefits if not designed carefully.",
+        "takeaway": "Multiple agents shine on diverse tasks; single agents win on simple ones.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Multi-Agent",
+        "title": "Orchestration patterns",
+        "emoji": "🎼",
+        "explanation": "Common patterns: hierarchical (one orchestrator agent delegates to specialists), peer-to-peer (agents negotiate among themselves), pipeline (linear handoff between stages), and debate (agents argue different sides toward a conclusion). Hierarchical is the most common in production because it's the easiest to debug and control. Peer-to-peer is more flexible but unpredictable. Pick the pattern that matches your task structure — don't force a complex pattern on a simple flow.",
+        "takeaway": "Hierarchical for control, pipeline for clarity, debate for tough calls.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Multi-Agent",
+        "title": "Frameworks: CrewAI, AutoGen, LangGraph",
+        "emoji": "🛠️",
+        "explanation": "CrewAI emphasizes role-based teams with simple syntax — define agents with roles and goals, watch them collaborate. AutoGen (Microsoft) is more flexible and code-heavy, great for custom orchestration. LangGraph (LangChain's graph-based agent framework) treats agents as state machines, which makes complex flows explicit and debuggable. Each has tradeoffs in learning curve and flexibility. As of 2026, LangGraph is gaining ground for serious production work because the explicit state-machine model is easier to reason about than implicit collaboration.",
+        "takeaway": "CrewAI for simplicity, AutoGen for flexibility, LangGraph for production.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Browser & Computer Use",
+        "title": "Browser-use agents",
+        "emoji": "🌐",
+        "explanation": "Browser-use agents control a real web browser to complete tasks — navigate sites, click buttons, fill forms, scrape data. They work by combining a vision-capable LLM with tools to take screenshots, read the DOM, and trigger interactions. This unlocks any task involving websites without requiring an API: booking travel, researching across sites, filling out applications. The tradeoffs are obvious — slow (browsers are slow), brittle (sites change), and expensive (long sessions burn tokens).",
+        "takeaway": "Browser agents handle any website but are slow, brittle, and pricey.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Browser & Computer Use",
+        "title": "Computer-use agents",
+        "emoji": "🖥️",
+        "explanation": "Computer-use agents go a step further — controlling an entire desktop environment, not just a browser. They take screenshots, move the mouse, click, type, and read screens to operate any application: spreadsheets, IDEs, design tools. Anthropic's Claude introduced production computer use in 2024, and several agentic IDE products have followed. They're powerful but raise serious safety concerns: an agent that can use any app can also break things in ways no API-based agent could. Sandbox aggressively.",
+        "takeaway": "Computer use = full desktop control. Powerful, dangerous, sandbox-required.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Browser & Computer Use",
+        "title": "Coding agents",
+        "emoji": "💻",
+        "explanation": "Coding agents (Claude Code, Cursor's agent mode, Devin, Aider, Codex) read codebases, plan changes, edit multiple files, run tests, and iterate based on output. They're the most successful agent category as of 2026 because code has clear feedback loops — tests pass or fail, code compiles or doesn't. The best coding agents combine deep code understanding, careful tool design (file edit tools, test runners, search), and strong evaluation discipline. Coding is the proving ground where agent techniques mature before spreading to other domains.",
+        "takeaway": "Coding agents are the most mature agent category — clear feedback loops help.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Reliability",
+        "title": "Why agents fail",
+        "emoji": "💥",
+        "explanation": "Agents fail in distinctive ways: getting stuck in loops (calling the same tool repeatedly), losing track of the goal mid-task, using tools incorrectly, hallucinating tool capabilities, ignoring observations, and accumulating errors over long sequences. Most failures aren't catastrophic — they just produce subtly wrong outputs that look reasonable. Diagnosing requires tracing every step: what was the input, what did the model decide, what tool was called, what came back, what happened next. Without traces, agent debugging is impossible.",
+        "takeaway": "Agents fail subtly. Trace every step or you'll never know why.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Reliability",
+        "title": "Stopping conditions",
+        "emoji": "🛑",
+        "explanation": "Every agent needs explicit stopping conditions, or it will loop forever or burn through your budget. Standard stops: max iteration count (e.g. 25 steps), max token budget, time limit, explicit 'task complete' signal from the model, or detected repetition (calling the same tool with same args twice). Combine multiple — relying on just 'task complete' lets stuck agents loop until they hit max iterations. Stopping conditions are the seatbelt of agent design; check them first when an agent misbehaves.",
+        "takeaway": "Always combine multiple stop conditions. The model alone can't be trusted.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Reliability",
+        "title": "Human-in-the-loop checkpoints",
+        "emoji": "✋",
+        "explanation": "For high-stakes actions, don't let agents run unsupervised — add human approval checkpoints before destructive operations: sending emails to external recipients, making payments, deleting data, deploying code. The cost is interactivity (the agent pauses for approval); the benefit is that one bad LLM decision doesn't become one bad real-world action. Modern frameworks support this natively with 'pause and wait for human' patterns. As autonomy grows, human checkpoints are how trust gets earned step by step.",
+        "takeaway": "Risky actions need human approval. Autonomy is earned, not assumed.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Reliability",
+        "title": "Determinism where you can",
+        "emoji": "🎯",
+        "explanation": "Every step you delegate to the LLM is a step that can fail unpredictably; every step coded deterministically is a step that always works. Look at agent flows critically and ask: 'Does the LLM really need to decide this, or can code handle it?' Routing by intent? Code. Picking which database to query? Code. Drafting natural language? LLM. The most reliable agent systems do as little LLM work as possible — using LLMs only where their flexibility is genuinely needed.",
+        "takeaway": "Use LLMs sparingly. Every LLM step is a possible failure point.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "Evaluating agents is hard",
+        "emoji": "📏",
+        "explanation": "Evaluating one-shot LLM outputs is already hard; evaluating agents is harder because there are many valid paths to a goal and many ways to fail along the way. Did the agent solve the task? (Outcome.) Did it take a reasonable path? (Process.) How many steps? Tools? Tokens? Two agents that both succeed can have wildly different cost profiles. Good agent evals score both outcome and process — and the process scores are often what reveal the real quality differences.",
+        "takeaway": "Evaluate outcome AND process. Cheap success beats expensive success.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "Trajectory analysis",
+        "emoji": "🛤️",
+        "explanation": "A trajectory is the full sequence of an agent's thoughts, tool calls, and observations on a task. Analyzing trajectories reveals patterns: which tools get called too often, where agents get stuck, which prompts produce sloppy reasoning. You learn far more from inspecting 20 trajectories carefully than from staring at aggregate metrics. Build trajectory viewers early in any serious agent project — the productivity gain from seeing exactly what the agent did pays back the engineering time many times over.",
+        "takeaway": "Read trajectories. Aggregate metrics hide the actual problems.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "Benchmarks vs your evals",
+        "emoji": "🏆",
+        "explanation": "Public agent benchmarks (SWE-bench, GAIA, WebArena) measure progress on standardized tasks and are useful for comparing models. They're not a substitute for your own evals, which measure how well an agent does *your* tasks with *your* tools and *your* user base. A model that crushes SWE-bench might flop on your specific codebase, and vice versa. Treat benchmarks as priors and your own evals as ground truth.",
+        "takeaway": "Public benchmarks are priors. Your own evals are truth.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Cost in agentic workflows",
+        "emoji": "💸",
+        "explanation": "Agents are expensive — every step is a full LLM call, every tool result feeds back into context, and long agent runs can burn through tokens fast. A single browsing task can cost more than 100 chat messages. Cost controls: hard token budgets per run, prompt caching for stable system prompts, smaller models for routing/planning while reserving frontier models for hard reasoning, and aggressive context trimming after each step. Agents that don't manage cost will get cut even if they work.",
+        "takeaway": "Agents burn tokens. Budget per run, cache prompts, trim context aggressively.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Latency in agentic workflows",
+        "emoji": "⏱️",
+        "explanation": "Agent runs are slow — sequential LLM calls, tool calls, and observations stack up to seconds or even minutes. For interactive use cases, this is a UX problem you have to design around: streaming intermediate updates, showing what the agent is doing live, and breaking long tasks into resumable steps. Where possible, parallelize: independent tool calls can run concurrently, and multiple agents can work simultaneously on subtasks. Latency budgets are as important as cost budgets.",
+        "takeaway": "Show progress, parallelize where possible, design for slowness.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Sandboxing and safety",
+        "emoji": "🧱",
+        "explanation": "Agents that can take real-world actions need real-world safety. Run code execution in containers with no network and tight resource limits. Restrict file system access to scoped directories. Limit network access to allow-listed domains. Log everything. Require approval for irreversible actions. The principle is least-privilege: give the agent exactly the permissions it needs and nothing more. The cost of strong sandboxing is small; the cost of an agent gone wrong without it can be catastrophic.",
+        "takeaway": "Sandbox everything. Least-privilege isn't optional for capable agents.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Prompt injection in agents",
+        "emoji": "🛡️",
+        "explanation": "Agents are uniquely vulnerable to prompt injection because they consume external content — web pages, emails, documents — that can carry hidden instructions. A poisoned web page tells a browsing agent to email your data to an attacker; a malicious document tells a coding agent to insert a backdoor. Defenses: separate trusted instructions from untrusted data, never give agents access they don't need, require human approval for sensitive actions, and use guardrail models to filter inputs and outputs. Assume external content is hostile.",
+        "takeaway": "External content can hijack agents. Treat all of it as untrusted input.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Production",
+        "title": "Building toward autonomy gradually",
+        "emoji": "🪜",
+        "explanation": "The mature path to autonomous agents isn't 'turn them loose and hope' — it's earning autonomy step by step. Start fully supervised: every action requires human approval. As trust builds, expand autonomy to low-stakes actions, then medium, then high. Track failure rates at each level and pull back when they spike. This pattern lets agents prove themselves in production while limiting damage from mistakes. The teams shipping reliable agents in 2026 all do this — the ones that don't tend to learn the hard way.",
+        "takeaway": "Autonomy is earned in stages. Start supervised, expand carefully.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      }
+    ]
+  }

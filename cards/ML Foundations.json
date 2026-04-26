@@ -1,0 +1,242 @@
+{
+    "track": {
+      "emoji": "🎓",
+      "name": "ML Foundations",
+      "description": "The mental models every ML practitioner needs before touching an algorithm — what learning means, why models fail, and how to measure if you're actually getting better.",
+      "level": "beginner",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "What is ML",
+        "title": "ML in one sentence",
+        "emoji": "🎯",
+        "explanation": "Machine learning is the practice of getting a program to improve at a task by learning patterns from data, instead of being given explicit rules. Traditional code says 'if email contains lottery, mark as spam' — ML says 'here are 10,000 spam and 10,000 non-spam emails, figure it out yourself'. The output of training is a model: a math object that takes new inputs and produces predictions based on what it learned. The whole field is essentially clever ways to make this learn-from-data process faster, more accurate, and more reliable.",
+        "takeaway": "ML = learn patterns from data instead of writing rules.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "What is ML",
+        "title": "Supervised vs unsupervised vs reinforcement",
+        "emoji": "🗂️",
+        "explanation": "Supervised learning trains on labeled examples — input X with the correct answer Y — and learns to predict Y for new X. Unsupervised learning gets only inputs and finds structure on its own, like clusters or low-dimensional patterns. Reinforcement learning has an agent take actions in an environment and learn from rewards over time. Most real-world ML you'll meet is supervised, because labeled data is what businesses tend to have and predictions are what they tend to want.",
+        "takeaway": "Supervised learns from answers; unsupervised finds structure; RL learns from rewards.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "What is ML",
+        "title": "Classification vs regression",
+        "emoji": "📊",
+        "explanation": "Classification predicts a category — spam or not, cat or dog, churn or stay — while regression predicts a number, like price or temperature. Same data can power either depending on what you ask: predicting exact age is regression, predicting age bracket is classification. The distinction matters because each uses different loss functions, evaluation metrics, and even different algorithms. The first question on any ML problem is always 'is this classification or regression?'.",
+        "takeaway": "Categories → classification. Numbers → regression.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Core Vocabulary",
+        "title": "Features, labels, and samples",
+        "emoji": "🏷️",
+        "explanation": "A sample is one row of your data — one customer, one image, one transaction. Features are the input columns the model sees (age, income, pixel values), and the label is the target column it's trying to predict. The convention is `X` for the feature matrix and `y` for the label vector, and you'll see this notation everywhere from textbooks to scikit-learn. Getting these names straight matters because every ML conversation assumes you already speak in X and y.",
+        "takeaway": "Sample = row. Features = X. Label = y.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Core Vocabulary",
+        "title": "Model, parameters, and hyperparameters",
+        "emoji": "⚙️",
+        "explanation": "A model is a math function shaped by parameters — numbers learned from data, like the weights in a linear regression or the splits in a decision tree. Hyperparameters are knobs *you* set before training, like learning rate, tree depth, or number of neighbors in KNN. Training tunes parameters; you tune hyperparameters. Mixing the two up is one of the most common confusions for newcomers, and it shapes how every ML pipeline is structured.",
+        "takeaway": "Parameters: model learns. Hyperparameters: you set.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Core Vocabulary",
+        "title": "Training, inference, and the loss function",
+        "emoji": "📉",
+        "explanation": "Training is the phase where the model sees data, makes predictions, measures how wrong it is, and adjusts its parameters to do better. The 'how wrong' measurement is the loss function — squared error for regression, cross-entropy for classification, and many others. Inference is what happens after training: feed in new inputs, get predictions out, no learning happening. Every ML algorithm boils down to 'pick a model, pick a loss, minimize it on training data'.",
+        "takeaway": "Training minimizes loss; inference just predicts.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Data Splits",
+        "title": "Train, validation, and test sets",
+        "emoji": "✂️",
+        "explanation": "You split your data into at least two parts — training and test — and ideally three: training, validation, and test. The model learns from the training set, you tune hyperparameters on the validation set, and the test set is touched once at the end to estimate real-world performance. Mixing these up corrupts your results: any data the model has seen, even indirectly, can't honestly judge it. A common ratio is 70/15/15 or 80/10/10, but the sizes matter less than the discipline of keeping them separate.",
+        "takeaway": "Train to learn, validate to tune, test to judge — no overlap.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Data Splits",
+        "title": "Why random splitting matters",
+        "emoji": "🎲",
+        "explanation": "If you split chronologically when data has a time pattern, your training set might miss recent trends and your test set will look artificially hard. If you split without shuffling and your data is sorted by class, training might see only one category. Random shuffling spreads the patterns evenly, but you set a `random_state` so results are reproducible. For time series specifically, you actually *don't* shuffle — you split by time so future never leaks into the past.",
+        "takeaway": "Shuffle for IID data, split by time for time series.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Data Splits",
+        "title": "Cross-validation",
+        "emoji": "🔄",
+        "explanation": "K-fold cross-validation splits the training data into K equal parts, trains on K-1 of them, and validates on the leftover — repeating K times so every part gets a turn as validation. The average score across all folds is a far more reliable estimate than a single train/val split. K=5 or K=10 is standard, with stratified versions used for classification to keep class ratios balanced. It costs more compute but it's the difference between 'I think it works' and 'I'm pretty sure it works'.",
+        "takeaway": "Cross-validation: average across folds for trustworthy scores.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Data Splits",
+        "title": "Data leakage",
+        "emoji": "💧",
+        "explanation": "Data leakage is when information from outside the training set sneaks in and inflates your scores — like fitting a scaler on the full dataset before splitting, or including a feature that's a near-copy of the label. Leaked models look amazing in evaluation and fall apart in production. The fix is strict ordering: split first, then fit any preprocessing only on training data, then transform validation and test. If a result looks too good, suspect leakage before celebrating.",
+        "takeaway": "Split first, fit second, or you're cheating yourself.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Bias-Variance",
+        "title": "Underfitting",
+        "emoji": "📉",
+        "explanation": "Underfitting happens when the model is too simple to capture the patterns in the data — think fitting a straight line to a clearly curved relationship. Symptoms are high error on both training and test sets, since it can't even nail what it's already seen. The fix is more capacity: a more flexible model, more features, or fewer regularization constraints. Underfit models have high bias — they're systematically wrong in the same way.",
+        "takeaway": "Bad on train AND test = underfitting.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Bias-Variance",
+        "title": "Overfitting",
+        "emoji": "📈",
+        "explanation": "Overfitting is the opposite — the model memorizes the training data, including its noise, and fails to generalize to new examples. The classic symptom is low training error and high test error, with a big gap between them. Fixes include more training data, simpler models, regularization, dropout, or early stopping. Overfit models have high variance — they swing wildly based on which exact examples they happened to see.",
+        "takeaway": "Great on train but bad on test = overfitting.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Bias-Variance",
+        "title": "The bias-variance tradeoff",
+        "emoji": "⚖️",
+        "explanation": "Total prediction error breaks down into bias (how wrong on average), variance (how much predictions swing across different training sets), and irreducible noise. Simpler models have high bias and low variance; complex ones flip it. The art of ML is finding the sweet spot — enough flexibility to capture real patterns, not so much that you fit noise. Almost every regularization technique, every ensemble method, every cross-validation choice is really about navigating this tradeoff.",
+        "takeaway": "Every modeling choice trades bias for variance.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "Why accuracy can lie",
+        "emoji": "🎭",
+        "explanation": "Accuracy is the fraction of correct predictions and feels intuitive — until your dataset is imbalanced. If 99% of transactions are legitimate, a model that always predicts 'legitimate' scores 99% accuracy while catching zero fraud. This is why imbalanced problems need precision, recall, F1, or ROC-AUC instead. Always check your class balance before trusting an accuracy number.",
+        "takeaway": "Imbalanced data + accuracy = misleading scores.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "Confusion matrix",
+        "emoji": "🔢",
+        "explanation": "A confusion matrix is a 2×2 table for binary classification showing true positives, true negatives, false positives, and false negatives. Every classification metric — accuracy, precision, recall, F1 — is just a different formula over these four numbers. Looking at the matrix tells you *how* a model is wrong, not just how often: false positives versus false negatives have very different costs in fraud, medicine, or moderation. Always check the matrix, not just the headline metric.",
+        "takeaway": "The confusion matrix shows how you're wrong, not just how often.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "Precision vs recall",
+        "emoji": "🎯",
+        "explanation": "Precision asks: of everything I flagged as positive, how much was actually positive? Recall asks: of everything that was actually positive, how much did I catch? Spam filters care about precision (don't trash real mail), cancer screening cares about recall (don't miss any case). F1-score is their harmonic mean and balances the two. The tradeoff is real — pushing one usually hurts the other, and you pick based on what's costlier to get wrong.",
+        "takeaway": "Precision = don't cry wolf. Recall = don't miss the wolf.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "ROC-AUC",
+        "emoji": "📐",
+        "explanation": "Most classifiers output probabilities and you pick a threshold (usually 0.5) to turn them into yes/no. The ROC curve plots true positive rate vs false positive rate across all possible thresholds, and AUC (area under the curve) summarizes it as a single number from 0.5 (random) to 1.0 (perfect). AUC is threshold-independent, which makes it great for comparing models without committing to one operating point. It's not perfect for heavily imbalanced data — PR-AUC often tells you more there.",
+        "takeaway": "AUC: how well the model ranks positives over negatives.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Evaluation",
+        "title": "Regression metrics",
+        "emoji": "📏",
+        "explanation": "For regression, MAE (mean absolute error) is the average of absolute errors and is easy to interpret. MSE (mean squared error) penalizes big mistakes more heavily, and RMSE is its square root, putting the units back in the same scale as the target. R² tells you what fraction of variance the model explains, with 1.0 being perfect and 0 meaning 'no better than predicting the mean'. Pick MAE when outliers shouldn't dominate, MSE/RMSE when big errors are especially bad.",
+        "takeaway": "MAE for robustness, RMSE when big errors hurt more.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Workflow",
+        "title": "The end-to-end ML pipeline",
+        "emoji": "🔄",
+        "explanation": "A real ML project flows through: define problem → collect data → clean and explore → engineer features → split → train → evaluate → tune → deploy → monitor. Each stage feeds the next, and skipping or rushing any of them shows up as bad model performance later. Most beginners spend 90% of their time on training, but pros spend it on data and features — that's where the wins actually come from. The pipeline isn't linear either; you loop back constantly as you learn what your data is really telling you.",
+        "takeaway": "Models are 10% of the work. Data and features are the other 90%.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Workflow",
+        "title": "Baselines come first",
+        "emoji": "🏁",
+        "explanation": "Before training any fancy model, build a dumb baseline — predict the mean for regression, or the majority class for classification. If your fancy model can't beat that baseline by a meaningful margin, something is wrong with the features, the data, or the problem framing. Baselines also catch leakage: a 'too good' result against a sensible baseline is a red flag. Skipping baselines is how teams burn weeks on models that turn out to be barely better than guessing.",
+        "takeaway": "No model ships without beating a baseline.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Workflow",
+        "title": "Garbage in, garbage out",
+        "emoji": "🗑️",
+        "explanation": "No algorithm can rescue bad data — wrong labels, biased samples, or missing key features all cap your model's ceiling no matter how sophisticated it gets. A simple model on great data almost always beats a complex model on messy data. This is why senior ML engineers spend most of their time on data quality, label audits, and understanding where the data came from. When a model isn't working, suspect the data first and the algorithm last.",
+        "takeaway": "Better data beats fancier models, almost every time.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Workflow",
+        "title": "No free lunch",
+        "emoji": "🍱",
+        "explanation": "The 'no free lunch' theorem says no single algorithm is best across all possible problems — every model embeds assumptions that fit some datasets and clash with others. Linear models love linear relationships, trees love thresholds and interactions, neural nets love huge data. This is why practitioners try multiple algorithms and let validation scores pick the winner, rather than betting on one tool for everything. The corollary: stay suspicious of anyone claiming their algorithm is universally best.",
+        "takeaway": "No model wins every problem — try a few, let the data pick.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Workflow",
+        "title": "Train-serve skew",
+        "emoji": "⚠️",
+        "explanation": "Train-serve skew is when production data looks different from training data — different distributions, different preprocessing, different feature definitions. Models can score 95% in evaluation and 70% in production because of subtle mismatches like a missing scaler, a different timezone, or a feature computed slightly differently in the live pipeline. The fix is reusing the exact same preprocessing code in training and serving, ideally via a shared pipeline object. Production monitoring catches what evaluation can't.",
+        "takeaway": "Models drift when training and production data don't match.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      }
+    ]
+  }

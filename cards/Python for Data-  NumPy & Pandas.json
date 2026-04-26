@@ -1,0 +1,252 @@
+{
+    "track": {
+      "emoji": "📊",
+      "name": "Python for Data: NumPy & Pandas",
+      "description": "The two libraries every data, ML, and AI workflow runs on — NumPy for fast numeric arrays, Pandas for tables you can actually clean, slice, and analyze.",
+      "level": "intermediate",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "Why NumPy",
+        "title": "Why NumPy beats Python lists",
+        "emoji": "🚀",
+        "explanation": "Python lists are flexible but slow for math — every element is a full Python object, and looping over millions of them is painful. NumPy stores numbers in a tight, contiguous block of memory of a single type, which lets it use CPU-level optimizations under the hood. The result is array operations that run 10–100× faster than equivalent loops, with way less memory used. This is why nearly every ML, scientific, and data library is built on top of NumPy.",
+        "takeaway": "NumPy: same data, way less memory, way more speed.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Why NumPy",
+        "title": "The ndarray",
+        "emoji": "🔢",
+        "explanation": "The core object in NumPy is the `ndarray` — an N-dimensional grid of values, all of the same type. A 1D array is a vector, 2D is a matrix, 3D and higher show up constantly in images, audio, and tensors. Every array carries a `shape` (size in each dimension) and a `dtype` (like int32 or float64), and almost every NumPy function reads or reshapes those two attributes. Once you start thinking in shapes, NumPy code stops feeling magical.",
+        "takeaway": "ndarray = grid of one type, defined by shape and dtype.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "NumPy Basics",
+        "title": "Creating arrays",
+        "emoji": "🧱",
+        "explanation": "You can build arrays from Python lists with `np.array([...])`, or generate them directly with helpers like `np.zeros`, `np.ones`, `np.arange`, and `np.linspace`. For random data, `np.random.rand` and `np.random.randn` are the workhorses for uniform and normal distributions. Picking the right constructor matters because it sets the shape, dtype, and memory layout you'll work with from then on. In practice, most real arrays come from loading a file or being returned by a library — but you'll generate test arrays constantly.",
+        "takeaway": "Build arrays from data, ranges, zeros, or randomness.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "NumPy Basics",
+        "title": "Vectorized operations",
+        "emoji": "⚡",
+        "explanation": "Vectorization means applying an operation to a whole array at once instead of looping element by element. Writing `a + b` adds two arrays in a single C-level call, and `a * 2` doubles every element without a single Python loop. This isn't just shorter — it's the entire reason NumPy is fast, because the loop happens in compiled code instead of the interpreter. Whenever you catch yourself writing `for i in range(len(arr))`, stop and look for a vectorized version.",
+        "takeaway": "If you're looping over an array, you're doing it wrong.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "NumPy Basics",
+        "title": "Indexing and slicing",
+        "emoji": "✂️",
+        "explanation": "NumPy slicing looks like list slicing but works in N dimensions: `arr[1:3, :, 0]` picks rows 1–2, all columns, and the first depth slice. You can also pass arrays of indices (fancy indexing) or boolean masks (`arr[arr > 0]`) to grab arbitrary subsets. Critically, basic slices return *views* into the original array, not copies — modifying the slice modifies the source. When in doubt, use `.copy()` to avoid silent surprises.",
+        "takeaway": "Slices are views; mutate carefully or use .copy().",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "NumPy Basics",
+        "title": "Reshape, transpose, axis",
+        "emoji": "🔄",
+        "explanation": "`reshape` rearranges an array's shape without changing its data — turning a 1D array of 12 elements into a 3×4 matrix, for example. `transpose` (or `.T`) flips dimensions, which is constant in linear algebra and ML. The `axis` argument controls which dimension an operation works along: `axis=0` collapses rows, `axis=1` collapses columns. Misreading axis is one of the top sources of silent bugs, so always sanity-check your shapes.",
+        "takeaway": "Master shape, axis, and transpose — most NumPy bugs hide there.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "NumPy Basics",
+        "title": "Broadcasting",
+        "emoji": "📡",
+        "explanation": "Broadcasting is how NumPy handles operations between arrays of different shapes by stretching the smaller one across the larger. Adding a vector of shape (3,) to a matrix of shape (4, 3) automatically applies the vector to every row — no manual tiling needed. The rules align shapes from the right and require each dimension to match or be 1. Once it clicks, broadcasting replaces tons of explicit loops and tile-and-repeat tricks.",
+        "takeaway": "Broadcasting: stretch smaller arrays to fit, no loops needed.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "NumPy Math",
+        "title": "Aggregations",
+        "emoji": "∑",
+        "explanation": "Functions like `sum`, `mean`, `std`, `min`, `max`, `argmin`, and `argmax` reduce arrays to summary values. By default they collapse the entire array, but passing `axis=0` or `axis=1` keeps one dimension and aggregates the others. The `arg*` versions return *positions* instead of values — essential when you need to know *where* the max happened, not just what it was. Almost every data exploration starts by throwing a few aggregations at the array.",
+        "takeaway": "Aggregate over all, by row, or by column with axis.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "NumPy Math",
+        "title": "Linear algebra essentials",
+        "emoji": "🧮",
+        "explanation": "NumPy ships a full linear algebra toolkit under `np.linalg` and the `@` operator. Matrix multiply with `A @ B`, invert with `np.linalg.inv`, solve linear systems with `np.linalg.solve`, and decompose with `eig`, `svd`, or `qr`. Every neural network forward pass, every regression, and every PCA boils down to these operations. You don't need to memorize the math, but you should recognize the function names — they show up everywhere.",
+        "takeaway": "@ for matmul, np.linalg for everything heavier.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Why Pandas",
+        "title": "Why Pandas",
+        "emoji": "🐼",
+        "explanation": "NumPy is great for numbers, but real-world data has labels, dates, missing values, and mixed types — that's Pandas territory. It gives you DataFrames (labeled tables) and Series (labeled 1D arrays) with thousands of methods for cleaning, filtering, joining, and summarizing. If you've used SQL or Excel, Pandas feels like that — but programmable, scriptable, and built on NumPy speed underneath. It's the de facto standard for data wrangling in Python.",
+        "takeaway": "Pandas = NumPy with labels, types, and table superpowers.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pandas Basics",
+        "title": "Series vs DataFrame",
+        "emoji": "📑",
+        "explanation": "A Series is a 1D labeled array — basically a column with an index attached. A DataFrame is a 2D table where each column is a Series, sharing a row index. Most operations work on both, but DataFrames add column-aware tricks like selecting `df['col']`, joining on keys, and pivoting. The mental model: Series is one column, DataFrame is the whole spreadsheet.",
+        "takeaway": "Series = column. DataFrame = table.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pandas Basics",
+        "title": "Reading and writing data",
+        "emoji": "📂",
+        "explanation": "`pd.read_csv`, `read_excel`, `read_json`, `read_parquet`, and `read_sql` cover almost every source you'll meet. Each has loads of options — `sep`, `dtype`, `parse_dates`, `nrows` — that save hours when files are messy. The matching `to_*` methods write data back out in the same formats. Parquet is worth knowing about: it's far smaller and faster than CSV for anything over a few MB.",
+        "takeaway": "read_* in, to_* out — and prefer Parquet over CSV for big data.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pandas Basics",
+        "title": "Selecting rows and columns",
+        "emoji": "🎯",
+        "explanation": "Use `df['col']` for a single column and `df[['a', 'b']]` for several. For rows, `.loc[label]` selects by label and `.iloc[position]` selects by integer position — mixing them up is a classic beginner trap. Boolean indexing like `df[df['age'] > 30]` filters rows by condition and is the workhorse of Pandas analysis. Once `.loc`, `.iloc`, and boolean masks click, you can express almost any selection cleanly.",
+        "takeaway": ".loc by label, .iloc by position, masks by condition.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pandas Basics",
+        "title": "Inspecting a DataFrame",
+        "emoji": "🔍",
+        "explanation": "After loading data, your first moves are almost always `df.head()`, `df.shape`, `df.info()`, and `df.describe()`. They show you the first rows, the table size, the dtypes and null counts, and the summary stats for numeric columns. `df.dtypes` and `df['col'].value_counts()` round out the toolkit for spotting weird types and category distributions. Skipping this step is how you end up debugging models trained on garbage.",
+        "takeaway": "Always inspect: head, shape, info, describe.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Cleaning Data",
+        "title": "Handling missing values",
+        "emoji": "🕳️",
+        "explanation": "Missing data shows up as `NaN` (or `NaT` for dates) and Pandas has specific tools for it. `df.isna().sum()` tells you where the holes are; `dropna` removes affected rows or columns; `fillna` replaces them with a value, mean, median, or forward/backward fill. The right choice depends on the situation — dropping is safe when missing rows are rare, filling is better when they're common. Imputation is a whole field, but these basics handle 80% of real cases.",
+        "takeaway": "isna to find, dropna to remove, fillna to replace.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Cleaning Data",
+        "title": "Type conversion and parsing",
+        "emoji": "🔧",
+        "explanation": "Real data arrives with numbers stored as strings, dates as text, and categories as inconsistent labels. `astype` casts a column to a new dtype, `pd.to_numeric` and `pd.to_datetime` are smarter about messy input, and `.str` and `.dt` accessors unlock string and date methods. Setting good dtypes upfront makes everything later faster and safer — especially `category` for low-cardinality strings, which can shrink memory dramatically. A few minutes spent fixing dtypes saves hours of weird bugs.",
+        "takeaway": "Fix dtypes early — your future self will thank you.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Transforming Data",
+        "title": "apply, map, and vectorized ops",
+        "emoji": "🔁",
+        "explanation": "`map` transforms a Series element by element, `apply` works on rows, columns, or whole groups, and built-in vectorized methods like `+`, `*`, and `.str.upper()` are usually fastest. Reach for vectorized methods first, then `map` for simple lookups, and only fall back to `apply` when nothing else fits. `apply` with a Python lambda is convenient but slow on big DataFrames — it loops in Python under the hood. Knowing the speed order saves you when datasets grow.",
+        "takeaway": "Vectorized > map > apply, in that order.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transforming Data",
+        "title": "groupby: split, apply, combine",
+        "emoji": "📊",
+        "explanation": "`df.groupby('col')` splits the table into groups by a column's values, lets you apply an operation to each group, and combines the results back into a DataFrame. `df.groupby('city')['sales'].mean()` gives you average sales per city in one line — equivalent to a SQL GROUP BY. You can chain `agg` with multiple functions, `transform` to broadcast results back to original shape, or `filter` to keep only groups matching a condition. groupby is the single most important Pandas pattern for analysis.",
+        "takeaway": "groupby = SQL GROUP BY, but more flexible.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transforming Data",
+        "title": "merge and join",
+        "emoji": "🔗",
+        "explanation": "`pd.merge(left, right, on='key', how='inner')` combines two DataFrames the way SQL joins tables — inner, left, right, and outer joins all supported. `how` controls which rows survive when keys don't match on both sides. Watch out for unintended row explosions when keys aren't unique on both sides — a many-to-many merge can multiply your data fast. `concat` is the simpler cousin for stacking DataFrames vertically or horizontally without key matching.",
+        "takeaway": "merge for keyed joins, concat for stacking.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transforming Data",
+        "title": "Pivot and reshape",
+        "emoji": "🔃",
+        "explanation": "`pivot_table` reshapes long data into wide summaries — rows become row labels, columns become column labels, and values get aggregated. `melt` does the opposite, turning wide tables back into long format with one row per observation. Long format is what most plotting and ML libraries actually want, while wide format is what humans like to read. Knowing how to flip between the two unlocks half of data analysis.",
+        "takeaway": "pivot widens, melt lengthens.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Time Series",
+        "title": "Working with dates",
+        "emoji": "📅",
+        "explanation": "Convert columns to datetime with `pd.to_datetime`, then unlock the `.dt` accessor for `.dt.year`, `.dt.month`, `.dt.dayofweek`, and dozens more. Setting a datetime column as the index enables time-based slicing like `df['2024-01']` to grab a whole month. `resample` aggregates by time frequency (daily → monthly), and `rolling` computes moving windows for smoothing or trend detection. Time-aware indexing is one of Pandas' most underused superpowers.",
+        "takeaway": "Datetime index unlocks slicing, resample, and rolling.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Performance",
+        "title": "Avoiding common slowdowns",
+        "emoji": "🐢",
+        "explanation": "The biggest performance traps in Pandas are looping with `iterrows`, growing a DataFrame in a loop with `append`, and using `apply` where vectorized methods would do. `iterrows` returns Python objects per row and is roughly 100× slower than vectorized code. Building DataFrames row-by-row reallocates memory every time — collect dicts in a list, then `pd.DataFrame(list)` once at the end. As a rule, if your code feels slow, the answer is almost always 'do it without a Python loop'.",
+        "takeaway": "Vectorize, don't iterate. iterrows is a code smell.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Performance",
+        "title": "Memory and dtypes",
+        "emoji": "💾",
+        "explanation": "Pandas defaults to 64-bit types, which is wasteful when your data fits in 32 or 16 bits. Downcasting integers and floats with `pd.to_numeric(downcast=...)` can halve memory in seconds. Converting low-cardinality string columns to `category` dtype often shrinks them by 10× or more. On big data, these tweaks are the difference between 'fits in RAM' and 'crashes the kernel'.",
+        "takeaway": "Right-size dtypes — categories and downcasting buy huge wins.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Plotting",
+        "title": "Quick plots from Pandas",
+        "emoji": "📈",
+        "explanation": "Every Series and DataFrame has a `.plot()` method that wraps Matplotlib for instant charts — line, bar, hist, box, scatter, and more. `df.plot(kind='bar')` or `df['col'].hist()` get you a chart in one line for quick exploration. For polished output, you'll move to Matplotlib, Seaborn, or Plotly directly — but Pandas plots are perfect for the 'what does this look like?' phase. Don't underestimate how much insight one quick `.plot()` can deliver.",
+        "takeaway": "df.plot() for fast exploration; switch tools for production charts.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      }
+    ]
+  }

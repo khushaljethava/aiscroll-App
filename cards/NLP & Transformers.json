@@ -1,0 +1,312 @@
+{
+    "track": {
+      "emoji": "💬",
+      "name": "NLP & Transformers",
+      "description": "How machines actually understand language — from tokens and embeddings to attention and the transformer architecture powering every modern LLM.",
+      "level": "advanced",
+      "isPremium": false,
+      "status": "draft"
+    },
+    "cards": [
+      {
+        "topicTag": "What is NLP",
+        "title": "What NLP actually is",
+        "emoji": "💬",
+        "explanation": "Natural Language Processing is the field of getting computers to understand, generate, and reason about human language. Classic NLP tasks include classification (spam detection, sentiment), extraction (named entities, relationships), translation, summarization, and question answering. Until 2017, each task had its own specialized models and tricks; after the transformer arrived, one architecture started winning everything. Modern NLP is essentially 'apply a transformer, fine-tune if needed' — and that simplicity is exactly what made it explode.",
+        "takeaway": "NLP went from task-specific tools to one architecture to rule them all.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "What is NLP",
+        "title": "Why language is hard for machines",
+        "emoji": "🧩",
+        "explanation": "Language is messy in ways images and numbers aren't — words have multiple meanings, grammar bends, sarcasm flips intent, and context spans paragraphs or whole conversations. 'I left my phone at the bank' is ambiguous without context, and humans resolve it instantly while older NLP systems flailed. Compounding the difficulty: rare words, slang, typos, idioms, and 7000+ languages each with their own quirks. The breakthroughs of the last decade are largely about giving models enough context and capacity to handle this messiness.",
+        "takeaway": "Language is ambiguous, contextual, and infinitely varied — that's what makes NLP hard.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Tokenization",
+        "title": "Tokens: the atoms of NLP",
+        "emoji": "🔤",
+        "explanation": "Models don't read text — they read tokens, which are integer IDs representing chunks of text. A token can be a whole word, part of a word (subword), or even a single character, depending on the tokenizer. The phrase 'unbelievable' might become one token in one model and ['un', 'believ', 'able'] in another. Token counts directly determine cost (LLM APIs charge per token), context limits (models have token-count windows), and what the model can even represent.",
+        "takeaway": "Models see token IDs, not text — and tokens cost money and context.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Tokenization",
+        "title": "Subword tokenization: BPE and friends",
+        "emoji": "✂️",
+        "explanation": "Pure word tokenization breaks on rare or unseen words ('cryptocurrency' wasn't in 2010 vocabularies); pure character tokenization makes sequences too long. Subword tokenization splits the difference: common words stay whole, rare words break into known pieces. Byte-Pair Encoding (BPE), WordPiece, and SentencePiece are the three popular algorithms, used by GPT, BERT, and most modern models respectively. The win: any word in any language can be represented as a sequence of subwords, so the model never sees a true 'unknown' token.",
+        "takeaway": "Subword tokenization handles every word by splitting rare ones into pieces.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Tokenization",
+        "title": "Why token counts matter in practice",
+        "emoji": "🪙",
+        "explanation": "When you call an LLM API, every token in your input and output costs money — at scale, this dominates real-world AI budgets. Context windows are also measured in tokens: a 'million-token context' might fit a long book, but only if your tokens are efficient. Different languages tokenize differently — English is roughly 4 characters per token, while Chinese, Japanese, and code can be very different. Knowing how to count tokens (with libraries like `tiktoken`) is a basic operational skill for anyone shipping LLM applications.",
+        "takeaway": "Tokens = cost + context limit. Always know your token counts.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Embeddings",
+        "title": "Word embeddings",
+        "emoji": "📍",
+        "explanation": "Word embeddings map each word to a dense vector — typically 100 to 1000 numbers — where similar meanings sit close together in space. Famously, vector arithmetic works: `king - man + woman ≈ queen`. Word2Vec and GloVe pioneered this in the 2010s, training embeddings on raw text by predicting neighboring words. Embeddings turned words from arbitrary IDs into geometric objects that capture meaning — and that geometric structure is what makes everything downstream work.",
+        "takeaway": "Embeddings: words as vectors, where geometry encodes meaning.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Embeddings",
+        "title": "Static vs contextual embeddings",
+        "emoji": "🔄",
+        "explanation": "Static embeddings (Word2Vec, GloVe) assign each word one vector, no matter the context — 'bank' has the same embedding whether you mean a river or a financial institution. Contextual embeddings (from BERT, GPT, modern models) generate a different vector for each occurrence based on surrounding text, so the two 'banks' end up far apart in vector space. This shift, around 2018, was a bigger deal than it sounds — almost every NLP task improved by a huge margin overnight. Modern embeddings used in RAG and semantic search are all contextual.",
+        "takeaway": "Contextual embeddings know that 'bank' means different things in different sentences.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Embeddings",
+        "title": "Sentence and document embeddings",
+        "emoji": "📄",
+        "explanation": "Sometimes you need a single vector for a whole sentence, paragraph, or document — for search, clustering, or classification. Models like Sentence-BERT, the OpenAI/Cohere embedding APIs, and BGE produce one vector per piece of text, optimized so similar meanings sit close together. These power semantic search ('find docs that mean the same thing, not just share keywords'), retrieval-augmented generation, and clustering at scale. Document embeddings are the workhorse of every modern RAG system.",
+        "takeaway": "Document embeddings = one vector per chunk. The fuel of semantic search.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pre-Transformer",
+        "title": "Bag-of-words and TF-IDF",
+        "emoji": "🗃️",
+        "explanation": "The classical way to represent text was bag-of-words — count word frequencies and ignore order. TF-IDF improved this by down-weighting words that appear everywhere ('the', 'and') and up-weighting distinctive ones. These methods are old-school but still useful as fast baselines, especially for small data or when interpretability matters. They lose meaning entirely though — 'great product' and 'product great' look identical, and synonyms like 'happy' and 'glad' are unrelated dimensions.",
+        "takeaway": "TF-IDF: count words, weight by distinctiveness. Fast but meaning-blind.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pre-Transformer",
+        "title": "RNNs and LSTMs",
+        "emoji": "🔁",
+        "explanation": "Before transformers, RNNs and their improved variant LSTMs were the default for sequences. They processed text one token at a time, carrying a hidden state forward to remember earlier context. They worked but had two killer limitations: they're sequential (no parallel training) and they struggle to remember things from far back in the sequence. The 2017 transformer paper specifically attacked both problems, which is why it took over so completely.",
+        "takeaway": "RNNs/LSTMs: sequential, forget long-range context. Replaced by transformers.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Pre-Transformer",
+        "title": "Seq2seq and the attention idea",
+        "emoji": "👀",
+        "explanation": "Sequence-to-sequence models (encoder-decoder RNNs) handled tasks like translation by encoding the input into a single vector, then decoding into the output. The bottleneck was obvious — squeezing an entire sentence into one vector lost information. Attention, introduced in 2014, let the decoder look back at every position in the input as needed, weighting them by relevance. This was the seed of the transformer: 'attention is what we needed all along' — though it took three more years for someone to throw out the RNN entirely and keep only attention.",
+        "takeaway": "Attention let decoders look anywhere in the input — the seed of transformers.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transformers",
+        "title": "The transformer revolution",
+        "emoji": "⚡",
+        "explanation": "The 2017 paper 'Attention Is All You Need' introduced the transformer — a model that ditched recurrence entirely and used only attention to process sequences. The key win was parallelism: where RNNs had to process tokens one at a time, transformers process the whole sequence at once on a GPU. This unlocked training on massive datasets, which led directly to BERT, GPT, and everything since. Every modern LLM, vision model, audio model, and multimodal model is a transformer or a close descendant.",
+        "takeaway": "Transformers: parallel, attention-only, and the foundation of every modern AI.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transformers",
+        "title": "Self-attention",
+        "emoji": "🎯",
+        "explanation": "Self-attention is the transformer's core trick — every token computes how relevant every other token in the sequence is to itself, and forms a weighted combination of their values. For each token, the model produces three vectors: a query (what am I looking for?), a key (what do I contain?), and a value (what info do I carry?). Attention scores come from query-key dot products, get softmaxed to weights, then weight the values. The result: every token's new representation is shaped by the entire sequence, all in parallel.",
+        "takeaway": "Self-attention: every token looks at every other token, in parallel.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transformers",
+        "title": "Multi-head attention",
+        "emoji": "🧠",
+        "explanation": "A single attention mechanism can only focus on one kind of relationship at a time. Multi-head attention runs several attention computations in parallel, each with its own learned query/key/value projections, then concatenates the results. Different heads end up specializing — some attend to syntax, some to coreference, some to topic — without being told to. This is why transformers are so expressive: they're effectively doing multiple kinds of relational reasoning simultaneously at every layer.",
+        "takeaway": "Multi-head: multiple attention patterns in parallel, each specializing.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transformers",
+        "title": "Positional encoding",
+        "emoji": "📐",
+        "explanation": "Self-attention is permutation-invariant — it sees a bag of tokens, not a sequence. To restore order, transformers add positional encodings to each token's embedding before the first layer. Original transformers used fixed sine/cosine waves; modern ones often use learned embeddings or relative position schemes like RoPE (used in Llama and many recent models). Without positional encoding, 'dog bites man' and 'man bites dog' look identical to the model — which would obviously be a problem.",
+        "takeaway": "Positional encoding tells transformers what comes first, second, third.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transformers",
+        "title": "Encoder, decoder, and both",
+        "emoji": "🏗️",
+        "explanation": "Transformers come in three flavors. Encoder-only (BERT) processes input and outputs representations — great for classification, embedding, and understanding tasks. Decoder-only (GPT, Claude, Llama) generates text token by token — what every modern chat LLM uses. Encoder-decoder (T5, original transformer) maps input sequences to output sequences — used for translation and summarization. The decoder-only variant has won most modern applications because it's simpler and scales beautifully.",
+        "takeaway": "Encoder = understand. Decoder = generate. Both = transform.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Transformers",
+        "title": "Causal vs bidirectional attention",
+        "emoji": "🔭",
+        "explanation": "Bidirectional attention (BERT-style encoders) lets every token see every other token, including future ones — fine for understanding tasks where you have the whole input upfront. Causal attention (GPT-style decoders) masks future tokens during training and generation, so each token can only see what came before it. This 'no peeking' constraint is what lets the same model train and generate, since at generation time future tokens literally don't exist yet. The mask is the only structural difference between BERT-style and GPT-style transformers.",
+        "takeaway": "Causal masking: don't let tokens cheat by looking at the future.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Pre-Training",
+        "title": "Pre-training: learning language at scale",
+        "emoji": "🌍",
+        "explanation": "Pre-training is where a transformer learns language by reading massive amounts of text — typically hundreds of billions of tokens scraped from the web, books, and code. The objective is simple: predict the next token (for GPT-style) or fill in masked tokens (for BERT-style). Doing this at scale forces the model to learn grammar, facts, reasoning patterns, and even some emergent capabilities. The result is a 'foundation model' — broadly capable, ready to be fine-tuned or prompted for specific tasks.",
+        "takeaway": "Pre-training: predict tokens at massive scale, learn everything in the process.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Pre-Training",
+        "title": "Masked vs causal language modeling",
+        "emoji": "🎭",
+        "explanation": "BERT-style models train with masked language modeling — randomly hide 15% of tokens and predict them from surrounding context. GPT-style models train with causal language modeling — predict the next token given everything before. Masking gives bidirectional context (good for understanding), while causal trains the model to generate naturally (good for chat and writing). Modern frontier models are almost all causal because text generation is the most flexible interface — it can simulate classification, summarization, and even structured output through prompting alone.",
+        "takeaway": "MLM = fill blanks (BERT). CLM = predict next (GPT). CLM won.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Pre-Training",
+        "title": "Scaling laws",
+        "emoji": "📈",
+        "explanation": "Researchers discovered that model performance improves predictably as you scale three things: parameters, data, and compute. Double them roughly together, and loss drops smoothly along a power-law curve — no plateau in sight. The Chinchilla paper refined this, showing models had been undertrained: optimal performance comes from balancing model size and data volume, not just making the model bigger. Scaling laws are why labs invested billions in ever-larger models — and why those investments kept paying off.",
+        "takeaway": "Bigger model + more data + more compute = better. Predictably.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Adaptation",
+        "title": "Fine-tuning",
+        "emoji": "🎚️",
+        "explanation": "Fine-tuning takes a pre-trained model and continues training on your task-specific data — sentiment labels, support tickets, your company's writing style. The model already knows language; you're just nudging it toward your particular use case. It works because pre-training gives a strong starting point, so even small datasets can produce strong task-specific models. Full fine-tuning is expensive for big LLMs, which is why parameter-efficient methods like LoRA have become the modern default.",
+        "takeaway": "Fine-tune: adapt a pre-trained model to your specific task.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Adaptation",
+        "title": "Instruction tuning and RLHF",
+        "emoji": "🎓",
+        "explanation": "Pre-trained models predict text well but don't naturally follow instructions or behave helpfully — they'll happily continue 'How do I bake a cake?' with another question instead of an answer. Instruction tuning fine-tunes models on (instruction, response) pairs to teach them to actually answer. RLHF (Reinforcement Learning from Human Feedback) goes further, using human preference data to shape outputs that humans actually want. This pipeline — pretrain → instruction tune → RLHF — is roughly how every modern chat model (ChatGPT, Claude, Gemini) gets made.",
+        "takeaway": "Instruction tuning + RLHF turn raw LLMs into helpful assistants.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Adaptation",
+        "title": "Prompting vs fine-tuning",
+        "emoji": "⚖️",
+        "explanation": "Modern LLMs are so capable that you often don't need to fine-tune at all — prompting alone steers them to your task. Prompting is faster, cheaper, and easier to iterate; fine-tuning is more powerful when you need consistent behavior, specific style, or knowledge of private data. The decision tree: try prompting first, add few-shot examples if needed, do RAG for knowledge, and only fine-tune when none of those reach your bar. Many teams ship complete LLM products without ever fine-tuning.",
+        "takeaway": "Prompt first, fine-tune last. Most use cases never need to fine-tune.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Modern Models",
+        "title": "BERT and the encoder family",
+        "emoji": "📚",
+        "explanation": "BERT (2018) was the first transformer to truly take over a sub-field — it set new state-of-the-art on nearly every NLP benchmark by pre-training a bidirectional encoder, then fine-tuning. Variants like RoBERTa, DeBERTa, and DistilBERT followed, optimizing for accuracy, speed, or size. BERT-style models are still the default for classification, named entity recognition, and producing embeddings for semantic search. They're not flashy like generative models but they quietly power half the NLP in production today.",
+        "takeaway": "BERT: bidirectional encoder. Still the workhorse for understanding tasks.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Modern Models",
+        "title": "GPT and the decoder family",
+        "emoji": "✍️",
+        "explanation": "The GPT family pioneered scaled decoder-only transformers — GPT-2 showed surprisingly fluent generation, GPT-3 showed in-context learning, and GPT-4+ ushered in mainstream chat AI. Llama (Meta), Mistral, Qwen, and DeepSeek are open-weight cousins, while Claude (Anthropic) and Gemini (Google) are closed competitors. All share the same recipe: massive decoder-only transformer + instruction tuning + RLHF. The differences come down to data, training tricks, and alignment work — the architecture itself is remarkably similar across all of them.",
+        "takeaway": "GPT, Claude, Gemini, Llama: all decoder-only transformers, scaled and aligned.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Modern Models",
+        "title": "T5 and instruction-style models",
+        "emoji": "🔄",
+        "explanation": "T5 ('Text-to-Text Transfer Transformer') reframed every NLP task as text-in, text-out — translation, classification, summarization, all the same interface. This unified framing turned out to be prophetic: it's exactly how modern LLMs work, where you 'prompt' the model in plain language and get text back. T5 used an encoder-decoder architecture and is still strong for translation and summarization. The text-to-text idea is more important than the model itself — it predicted the prompting era.",
+        "takeaway": "T5: every task as text-in, text-out. The blueprint for modern prompting.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Generation",
+        "title": "How LLMs generate text",
+        "emoji": "🪄",
+        "explanation": "LLMs generate text one token at a time: given the prompt and everything generated so far, predict a probability distribution over the next token, sample one, append it, repeat. This is autoregressive generation, and it's why LLMs sometimes drift — each token depends on the previous output, so an early mistake compounds. Generation continues until the model emits an end-of-sequence token, hits a length limit, or you stop it. Despite the simplicity, this loop produces everything from poetry to code to detailed reasoning.",
+        "takeaway": "LLMs generate one token at a time, sampling from a probability distribution.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Generation",
+        "title": "Temperature, top-k, and top-p",
+        "emoji": "🌡️",
+        "explanation": "When sampling the next token, you can control randomness with three knobs. Temperature scales the probability distribution — low temperature (0.2) makes outputs deterministic and focused, high temperature (1.2) makes them creative and surprising. Top-k restricts sampling to the k highest-probability tokens; top-p (nucleus sampling) restricts to tokens making up the top p% of probability mass. Most chat applications use temperature around 0.7 with top-p of 0.9 — enough creativity without going off the rails.",
+        "takeaway": "Temperature controls creativity; top-k and top-p control how wild it gets.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Generation",
+        "title": "Context windows",
+        "emoji": "🪟",
+        "explanation": "The context window is the maximum number of tokens an LLM can process at once — input plus output combined. Early GPT-3 had 2K tokens; modern models like Claude and Gemini reach 200K to over a million. The window matters because everything the model knows about your specific task lives there: instructions, examples, retrieved documents, conversation history. Long context isn't free though — costs and latency grow with input length, and models can lose attention to information buried in the middle of very long inputs.",
+        "takeaway": "Context window = how much the model can see at once. Bigger isn't always better.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Tooling",
+        "title": "Hugging Face: the NLP hub",
+        "emoji": "🤗",
+        "explanation": "Hugging Face is the de facto platform for open NLP — thousands of pre-trained models, datasets, and a `transformers` Python library that makes loading any of them a one-liner. Their model hub hosts BERT variants, Llama, Mistral, embedding models, and basically every open-weight transformer worth using. For most NLP work that isn't 'call an LLM API', the workflow is: pick a model from Hugging Face, fine-tune or use directly, deploy. Knowing your way around the hub is a basic NLP skill in 2026.",
+        "takeaway": "Hugging Face: GitHub for NLP models. Learn the `transformers` library.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      }
+    ]
+  }

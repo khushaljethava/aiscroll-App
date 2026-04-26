@@ -1,0 +1,292 @@
+{
+    "track": {
+      "emoji": "🧠",
+      "name": "Deep Learning Foundations",
+      "description": "How neural networks actually work — neurons, layers, backprop, and the training tricks that make them learn — without skipping the intuition.",
+      "level": "intermediate",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "What is DL",
+        "title": "What deep learning actually is",
+        "emoji": "🧠",
+        "explanation": "Deep learning is machine learning using neural networks with many layers, where each layer learns increasingly abstract features from the previous one's output. The 'deep' just means stacking lots of layers — early layers might detect edges, middle ones detect shapes, later ones detect entire objects. Unlike classical ML where you hand-craft features, neural networks learn the features themselves directly from raw data. This is why DL dominates images, audio, and text but is often overkill for tabular problems where gradient boosting wins.",
+        "takeaway": "Deep learning: stack layers that learn features automatically.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "What is DL",
+        "title": "Why now: data, compute, and tricks",
+        "emoji": "⚡",
+        "explanation": "Neural networks have existed since the 1950s, but only took off after 2012 — three things had to align. First, massive datasets (ImageNet, the web) gave networks enough examples to learn from. Second, GPUs and later TPUs delivered the parallel compute needed to train big models in reasonable time. Third, training tricks like ReLU, batch normalization, and Adam fixed the optimization problems that had stalled the field for decades. Take any one away and the deep learning era doesn't happen.",
+        "takeaway": "DL took off because data, GPUs, and training tricks finally aligned.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Building Blocks",
+        "title": "The artificial neuron",
+        "emoji": "💡",
+        "explanation": "An artificial neuron takes a list of inputs, multiplies each by a weight, adds them up with a bias term, and runs the result through a non-linear activation function. That's it — the whole computation is `output = activation(weights · inputs + bias)`. Stack thousands of these together in layers and you have a neural network. The network's intelligence lives entirely in the weights, which are what training adjusts.",
+        "takeaway": "A neuron is just a weighted sum plus a non-linear squish.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Building Blocks",
+        "title": "Layers and the forward pass",
+        "emoji": "➡️",
+        "explanation": "A layer is a group of neurons that process the same inputs in parallel — each one learns to detect something different. The forward pass is just running data through the network: input → layer 1 → layer 2 → ... → output. Each layer's output becomes the next layer's input, with weights and activations transforming the signal at every step. The forward pass is what produces predictions; everything else in training is about figuring out how wrong those predictions were and adjusting weights to fix it.",
+        "takeaway": "Forward pass: data flows layer by layer, weights transform it each step.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Building Blocks",
+        "title": "Why we need non-linear activations",
+        "emoji": "🌀",
+        "explanation": "Without non-linear activation functions, a 100-layer network would mathematically collapse into a single linear transformation — no matter how deep, it could only learn straight-line relationships. Non-linearities like ReLU, sigmoid, and tanh let the network bend, fold, and twist its decision boundaries to fit complex patterns. ReLU (`max(0, x)`) is the modern default because it's simple, fast, and avoids vanishing gradients in deep networks. Without activations, you don't have deep learning — you just have expensive linear regression.",
+        "takeaway": "Without non-linear activations, depth gives you nothing.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Building Blocks",
+        "title": "Common activation functions",
+        "emoji": "📈",
+        "explanation": "ReLU (`max(0, x)`) is the workhorse for hidden layers — fast, simple, and trains well. Sigmoid squashes outputs to (0, 1) and is used for binary classification at the output layer. Softmax extends sigmoid to multi-class outputs, turning logits into probabilities that sum to 1. Tanh is sigmoid's zero-centered cousin, popular in older RNNs. Modern variants like GELU and Swish edge out ReLU in transformers, but ReLU is still the safe default for most networks.",
+        "takeaway": "ReLU for hidden layers, sigmoid/softmax for outputs.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "How They Learn",
+        "title": "The loss function",
+        "emoji": "📉",
+        "explanation": "The loss function measures how wrong the network's predictions are — a single number summarizing the gap between predicted and actual outputs. For regression, mean squared error is standard; for classification, cross-entropy is the default. The network's whole job during training is to minimize this number by adjusting its weights. The choice of loss function isn't cosmetic — it shapes what 'good' means and directly determines what the network learns to optimize.",
+        "takeaway": "Loss tells the network how wrong it is — minimizing it is the whole game.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "How They Learn",
+        "title": "Gradient descent",
+        "emoji": "🏔️",
+        "explanation": "Gradient descent is the algorithm that adjusts weights to reduce loss. For each weight, it computes the gradient — the direction of steepest increase in loss — then takes a small step in the opposite direction. The learning rate controls step size: too large and training diverges, too small and it crawls. Repeat across millions of examples and the network slowly walks downhill toward weights that produce good predictions.",
+        "takeaway": "Gradient descent: compute slope, step downhill, repeat.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "How They Learn",
+        "title": "Backpropagation",
+        "emoji": "🔙",
+        "explanation": "Backpropagation is how gradients get computed efficiently in deep networks — using the chain rule from calculus to propagate error gradients backwards from the output layer to every earlier layer. Without backprop, computing gradients in a 100-layer network would be intractable; with it, the cost is roughly the same as a forward pass. Modern frameworks like PyTorch and TensorFlow handle backprop automatically through autograd — you just define the forward pass and call `.backward()`. Understanding it conceptually still matters, because it explains vanishing gradients, dead neurons, and why certain architectures train better than others.",
+        "takeaway": "Backprop = chain rule applied backwards through the network.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "How They Learn",
+        "title": "Stochastic gradient descent and batches",
+        "emoji": "📦",
+        "explanation": "Pure gradient descent uses the entire dataset to compute one update — slow and memory-heavy. Stochastic gradient descent (SGD) updates after every single example — fast but noisy. Mini-batch SGD splits the difference: process a batch of (typically 32-256) examples, average their gradients, then update. Batches give you stable gradients while still fitting in GPU memory and making good use of parallelism. Batch size is one of the first hyperparameters you'll tune.",
+        "takeaway": "Mini-batches: stable gradients, GPU-friendly, fast progress.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "How They Learn",
+        "title": "Optimizers beyond plain SGD",
+        "emoji": "🎢",
+        "explanation": "Plain SGD works but stalls in tricky loss landscapes — flat plateaus, narrow valleys, saddle points. Modern optimizers add momentum (carry velocity from previous steps so you blast through plateaus) and adaptive learning rates (different step sizes per parameter based on history). Adam combines both and is the default in most modern code; AdamW is its slightly improved cousin used heavily in transformers. SGD with momentum still wins in some computer vision setups, so don't assume Adam is always best.",
+        "takeaway": "Adam is the default; SGD+momentum still shines in vision.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "How They Learn",
+        "title": "Epochs, iterations, and batch size",
+        "emoji": "🔄",
+        "explanation": "An iteration is one weight update — one forward pass, one backward pass, one optimizer step on a single batch. An epoch is one complete pass through the entire training dataset. With 10,000 examples and a batch size of 100, one epoch is 100 iterations. You typically train for many epochs, watching validation loss to know when to stop — too few and the network underfits, too many and it overfits.",
+        "takeaway": "Epoch = full pass over data; iteration = one batch update.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Training Tricks",
+        "title": "Why initialization matters",
+        "emoji": "🎰",
+        "explanation": "Starting all weights at zero breaks training — every neuron in a layer would compute the same thing and learn the same thing. Random initialization breaks symmetry, but you have to pick the scale carefully: too small and signals vanish through the layers, too large and they explode. Modern schemes like Xavier (for tanh) and He initialization (for ReLU) pick scales based on layer width, so signals propagate cleanly. Frameworks set sensible defaults, but bad initialization is still a common reason networks fail to train.",
+        "takeaway": "Initialize randomly with the right scale, or training stalls.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Training Tricks",
+        "title": "Vanishing and exploding gradients",
+        "emoji": "💥",
+        "explanation": "In deep networks, gradients can shrink toward zero or blow up to huge values as they're backpropagated through many layers. Vanishing gradients (caused by sigmoid/tanh in deep nets) make early layers stop learning. Exploding gradients destabilize training and produce NaNs. Fixes: use ReLU, batch normalization, residual connections, and gradient clipping. These problems used to kill deep networks until residual connections (ResNets) and normalization made 100+ layer networks routine.",
+        "takeaway": "Deep networks need ReLU, normalization, and skip connections to train.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Training Tricks",
+        "title": "Batch normalization",
+        "emoji": "📊",
+        "explanation": "Batch normalization standardizes the inputs to each layer (zero mean, unit variance) using statistics from the current batch, then learns optimal scale and shift parameters. The result is faster training, less sensitivity to initialization, and a mild regularization effect — networks with batch norm just train better. It's standard in CNNs and has variants like layer norm (used in transformers) and group norm. Conceptually: keep the signals flowing through the network at a stable scale, and everything works better.",
+        "takeaway": "Batch norm: keep signals stable, train faster, tune less.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Training Tricks",
+        "title": "Dropout",
+        "emoji": "🎲",
+        "explanation": "Dropout randomly disables a fraction of neurons during training — typically 20-50% — forcing the network to not rely on any single neuron and instead learn redundant, robust representations. At inference time, all neurons are active and outputs scale appropriately. It's one of the most effective regularization techniques ever invented for deep networks, especially for fully-connected layers. Modern architectures with batch norm and large datasets often need less dropout, but it's still a go-to fix for overfitting.",
+        "takeaway": "Dropout: randomly turn off neurons during training to fight overfitting.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Training Tricks",
+        "title": "Learning rate schedules",
+        "emoji": "📐",
+        "explanation": "A constant learning rate is a compromise — too high late in training, too low early. Schedules adjust it dynamically: step decay drops it at fixed milestones, cosine annealing smoothly ramps it down, and warmup ramps it up at the start to stabilize training. The most modern recipe — used in most transformer training — is linear warmup followed by cosine decay. A well-tuned schedule often improves accuracy more than a more sophisticated optimizer.",
+        "takeaway": "Schedule the learning rate: warmup, then decay.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Training Tricks",
+        "title": "Early stopping",
+        "emoji": "🛑",
+        "explanation": "Early stopping monitors validation loss during training and halts when it stops improving — preventing the network from overfitting by training for too many epochs. The standard pattern: track validation loss every epoch, stop after N epochs without improvement, and restore the weights from the best epoch. It's free regularization, easy to implement, and almost always worth using. Pair it with a generous max-epoch budget and you don't have to guess how long to train.",
+        "takeaway": "Early stopping: train until validation stops improving, then halt.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Training Tricks",
+        "title": "Data augmentation",
+        "emoji": "🔁",
+        "explanation": "Data augmentation creates new training examples by transforming existing ones — flipping, rotating, cropping, or color-shifting images, paraphrasing text, adding noise to audio. The model sees a constantly varying stream of data and learns invariances that improve generalization. It's especially powerful for computer vision, where a single labeled image can produce dozens of useful variants. Augmentation is one of the cheapest, highest-leverage tricks in deep learning — often worth more than a bigger model.",
+        "takeaway": "Augmentation: free training data via transformations.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "MLPs: the starting point",
+        "emoji": "📐",
+        "explanation": "A multilayer perceptron (MLP) is the simplest neural network — fully-connected layers stacked one after another, each neuron connected to every neuron in the previous layer. MLPs work fine for tabular data, simple regression, and classification tasks but struggle with structured data like images or sequences. They ignore the spatial structure in images and the order in text, which is why CNNs and transformers exist. MLPs are the foundation; everything else specializes them for specific data types.",
+        "takeaway": "MLP: dense layers stacked. The baseline neural network.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "CNNs for vision",
+        "emoji": "🖼️",
+        "explanation": "Convolutional Neural Networks slide small filters across images, detecting local patterns like edges, textures, and shapes regardless of position. Stacking convolutional layers builds a hierarchy: early layers detect edges, middle layers combine them into parts, deep layers recognize whole objects. CNNs share weights across spatial positions and use far fewer parameters than equivalent MLPs, which is why they dominate vision. They're the architecture behind every modern image classifier, object detector, and medical imaging system before vision transformers started catching up.",
+        "takeaway": "CNN: filters slide over images, learning patterns hierarchically.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "RNNs for sequences",
+        "emoji": "📜",
+        "explanation": "Recurrent Neural Networks process sequences one step at a time, maintaining a hidden state that carries context from previous steps. They were the standard for text, speech, and time series until transformers took over. LSTMs and GRUs are RNN variants designed to handle long-range dependencies that vanilla RNNs forget. RNNs are still useful for streaming data and small-data sequence tasks, but for any serious NLP work, transformers have replaced them.",
+        "takeaway": "RNN: process sequences step by step with memory. Mostly replaced by transformers.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Architectures",
+        "title": "Transformers: the modern default",
+        "emoji": "⚡",
+        "explanation": "Transformers process entire sequences in parallel using attention — a mechanism that lets each position look at every other position and decide what's relevant. This solved the slow, sequential bottleneck of RNNs and enabled training on massive datasets, which is why every modern LLM (GPT, Claude, Gemini) is a transformer. The same architecture works for images (Vision Transformers), audio, and multimodal tasks. Transformers dominate modern deep learning so completely that 'foundation model' has become almost synonymous with 'big transformer'.",
+        "takeaway": "Transformers: attention-based, parallel, and behind every modern LLM.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Frameworks",
+        "title": "PyTorch vs TensorFlow",
+        "emoji": "🛠️",
+        "explanation": "PyTorch and TensorFlow are the two dominant deep learning frameworks. PyTorch favors a Pythonic, dynamic style — define the network as code, debug like normal Python — and has won research and most newer production work. TensorFlow (especially via Keras) was the early industry standard with stronger deployment tooling, though that gap has narrowed. As of now, PyTorch is the safer bet for new projects: it's what Hugging Face, Meta, and most research papers use. Pick one, learn it deeply, and the other becomes easy to read.",
+        "takeaway": "PyTorch is the modern default; TensorFlow still strong in production.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Frameworks",
+        "title": "Tensors and autograd",
+        "emoji": "🔢",
+        "explanation": "A tensor is the fundamental data structure in deep learning — basically a multi-dimensional NumPy array that runs on GPUs and tracks gradients. Frameworks like PyTorch wrap tensors with autograd: every operation builds a computation graph, and calling `.backward()` walks it backwards to compute gradients automatically. This is what lets you focus on defining the forward pass — the framework handles the math of training. Once you grasp tensors and autograd, the rest of the framework is just convenience layers on top.",
+        "takeaway": "Tensors + autograd = define forward, framework handles backward.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Practical",
+        "title": "Transfer learning",
+        "emoji": "♻️",
+        "explanation": "Training a deep network from scratch needs huge data and compute, which most projects don't have. Transfer learning sidesteps this: take a model pre-trained on a massive dataset (ImageNet, GPT, BERT) and fine-tune it on your smaller task-specific data. The pre-trained model already knows useful features — edges, words, grammar — so your fine-tuning teaches it the specifics of your problem. Transfer learning is how 99% of real-world deep learning gets done; training from scratch is the exception, not the rule.",
+        "takeaway": "Don't train from scratch — fine-tune a pre-trained model.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Practical",
+        "title": "GPU vs CPU vs TPU",
+        "emoji": "🖥️",
+        "explanation": "CPUs are great for general computing but slow at the matrix multiplications neural networks need. GPUs do thousands of parallel multiplications at once, making training 10-100× faster than on CPU. TPUs are Google's purpose-built deep learning chips, faster still on supported workloads. For learning and small projects, a single consumer GPU (or Google Colab's free tier) is plenty; large-scale training uses clusters of high-end GPUs or TPUs.",
+        "takeaway": "GPUs are essential for serious deep learning; CPUs are for inference and toys.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Practical",
+        "title": "When NOT to use deep learning",
+        "emoji": "🚫",
+        "explanation": "Deep learning isn't always the right answer. On small tabular datasets, gradient boosting beats neural networks consistently. When interpretability is required for regulatory or business reasons, linear models or trees win. When inference latency must be milliseconds on a CPU, a small classical model often wins. Deep learning shines on unstructured data — images, audio, text — at scale, but for many tabular business problems, classical ML is faster, cheaper, and just as accurate.",
+        "takeaway": "DL wins on unstructured data at scale; classical ML wins almost everywhere else.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      }
+    ]
+  }

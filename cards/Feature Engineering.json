@@ -1,0 +1,232 @@
+{
+    "track": {
+      "emoji": "🛠️",
+      "name": "Feature Engineering",
+      "description": "The unglamorous craft that decides whether your model wins or loses — turning raw columns into features that algorithms can actually learn from.",
+      "level": "intermediate",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "Why It Matters",
+        "title": "Why feature engineering matters",
+        "emoji": "💎",
+        "explanation": "Two teams using the same algorithm on the same data can have wildly different results — and the gap is almost always feature engineering. Algorithms can only learn from what's in the columns, so transforming raw fields into informative features is what actually moves accuracy. Senior ML engineers spend most of their time here, not on tuning models, because a good feature is worth more than a fancier algorithm. The unglamorous truth: better features beat better models on tabular data, almost every time.",
+        "takeaway": "Features decide model performance more than algorithm choice.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Why It Matters",
+        "title": "Feature engineering vs feature learning",
+        "emoji": "🔀",
+        "explanation": "Classical ML needs you to hand-craft features — extract day-of-week from a date, compute ratios, create flags for categories. Deep learning learns features automatically from raw data, which is why neural networks dominate images, audio, and text. But on tabular data — rows and columns of business data — handcrafted features still beat neural networks most of the time, because the signals are sparse and the data volumes are smaller. Knowing which world you're in tells you how much effort to invest in feature work.",
+        "takeaway": "Tabular: hand-craft features. Images/text: let the network learn them.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Scaling",
+        "title": "Why scale features",
+        "emoji": "📐",
+        "explanation": "Many algorithms — KNN, SVM, linear models with regularization, neural networks — care about the magnitude of features. If income (in dollars) ranges to 100,000 and age ranges to 100, the algorithm thinks income is a thousand times more important purely because of units. Scaling puts all features on comparable footing so the algorithm can weigh them on merit. Trees and tree ensembles are the exception: they split on thresholds, so they don't care about scale at all.",
+        "takeaway": "Scale features for distance and gradient methods. Trees don't care.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Scaling",
+        "title": "Standardization vs normalization",
+        "emoji": "📊",
+        "explanation": "Standardization (StandardScaler) subtracts the mean and divides by the standard deviation, giving each feature mean 0 and std 1. Normalization (MinMaxScaler) rescales features to a fixed range like [0, 1], which is useful when bounds matter — like for image pixels. RobustScaler uses median and IQR instead of mean and std, making it resistant to outliers. Standardization is the safe default for most algorithms; normalization is great when you need bounded values.",
+        "takeaway": "StandardScaler by default; MinMax for bounds; Robust for outliers.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Scaling",
+        "title": "Fit on train, transform on test",
+        "emoji": "🚧",
+        "explanation": "Scalers learn statistics — mean, std, min, max — from the data they're fit on, and a classic mistake is fitting on the full dataset before splitting. That leaks test-set information into training and inflates your scores. The right pattern is: split first, fit the scaler on training data only, then transform both training and test sets using those training-set statistics. The scikit-learn Pipeline enforces this automatically, which is why pros wrap preprocessing in pipelines instead of running steps ad-hoc.",
+        "takeaway": "Fit scalers on train only, transform everything else.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Categorical",
+        "title": "One-hot encoding",
+        "emoji": "🔤",
+        "explanation": "One-hot encoding turns a categorical column into a set of binary columns — one per category — with exactly one '1' per row. It's the safe default for nominal categories with no inherent order, and it works with virtually any algorithm. The downside is dimension explosion: a column with 1000 unique values becomes 1000 columns, which can blow up memory and overwhelm linear models. For very high-cardinality categories, target encoding or embeddings usually work better.",
+        "takeaway": "One-hot for low-cardinality categories without natural order.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Categorical",
+        "title": "Label and ordinal encoding",
+        "emoji": "🔢",
+        "explanation": "Label encoding maps each category to an integer (red→0, green→1, blue→2). It's compact but introduces a fake ordering, which fools linear models and KNN into thinking 'blue is twice red'. Trees and tree ensembles handle label-encoded categories fine because they split on thresholds, not magnitudes. Use ordinal encoding (with a deliberate order) when the categories really do have a natural ranking, like 'low < medium < high'.",
+        "takeaway": "Label encoding for trees; ordinal when order is real.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Categorical",
+        "title": "Target encoding",
+        "emoji": "🎯",
+        "explanation": "Target encoding replaces each category with a statistic of the target variable — usually the mean — computed from training data. A 'city' column becomes 'average sale price by city', collapsing high-cardinality features into one informative number. It's powerful for high-cardinality categoricals like ZIP codes or product IDs, but it's also a leakage minefield: naive target encoding leaks the target into the features. Use cross-fold target encoding or smoothing to avoid that, or let CatBoost handle it natively.",
+        "takeaway": "Target encoding: powerful but leakage-prone — use folds or CatBoost.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Categorical",
+        "title": "High-cardinality categories",
+        "emoji": "🌐",
+        "explanation": "Some categorical columns have thousands or millions of unique values — user IDs, product SKUs, URLs, ZIP codes. One-hot encoding explodes, and label encoding loses meaning for tree ensembles too once cardinality is huge. Common fixes: group rare values into an 'other' bucket, use frequency encoding (replace each category with how often it appears), use target encoding with cross-fold protection, or learn embeddings via a neural network. The right choice depends on the algorithm and how rich the signal in the category is.",
+        "takeaway": "High cardinality? Bucket, frequency-encode, target-encode, or embed.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Numeric",
+        "title": "Binning continuous features",
+        "emoji": "🪣",
+        "explanation": "Binning chops a continuous variable into discrete buckets — age into 'young/middle/old', or income into deciles. It can help linear models capture non-linear effects without polynomial features, and it makes results easier to explain to non-technical stakeholders. The cost is information loss — two values in the same bin become identical to the model. Trees don't usually need binning since they find their own thresholds, but linear and rule-based models often benefit.",
+        "takeaway": "Binning trades precision for non-linearity and interpretability.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Numeric",
+        "title": "Log and power transforms",
+        "emoji": "📈",
+        "explanation": "Skewed numeric features — income, page views, prices — often have a long tail that distorts linear models and distance metrics. Applying `log(1 + x)` (use log1p to handle zeros) compresses the long tail and makes distributions more symmetric. Box-Cox and Yeo-Johnson transforms are more flexible variants that find the optimal power transformation automatically. After log-transforming, what was a heavy-tailed mess often becomes a clean, near-normal distribution that linear models love.",
+        "takeaway": "Log skewed features to make them well-behaved.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Numeric",
+        "title": "Polynomial and interaction features",
+        "emoji": "✖️",
+        "explanation": "Linear models can only learn linear relationships unless you hand them non-linear features. Polynomial features add `x²`, `x³`, etc., letting linear regression fit curves. Interaction features multiply two columns together (`age × income`), capturing combined effects neither captures alone. Use them sparingly — every new feature can overfit, and feature explosion happens fast — but a few well-chosen interactions can dramatically lift a linear model's performance.",
+        "takeaway": "Polynomials and interactions teach linear models non-linearity.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Dates",
+        "title": "Extracting features from dates",
+        "emoji": "📅",
+        "explanation": "A raw datetime column is nearly useless to most algorithms — but it's a goldmine of features waiting to be extracted. Pull out year, month, day, day-of-week, hour, quarter, and is_weekend; those alone often unlock huge accuracy gains. For cyclical features like hour or month, encode them as `sin` and `cos` pairs so December and January feel close, not far. Time-since-event features — 'days since last purchase' — are often the strongest predictors of churn, conversion, or fraud.",
+        "takeaway": "Dates aren't features; the parts you extract from them are.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Dates",
+        "title": "Lag and rolling features",
+        "emoji": "📉",
+        "explanation": "For time-series and sequential problems, the past is your best predictor of the future. Lag features capture previous values — yesterday's sales, last week's traffic — and rolling features compute summary statistics over a window like 'mean sales last 7 days'. These features are how non-time-series algorithms (XGBoost, Random Forest) compete with dedicated time-series models. The catch: never use future information when computing them — that's leakage.",
+        "takeaway": "Lags and rolling windows turn time-series problems into tabular ones.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Text",
+        "title": "Bag-of-words and TF-IDF",
+        "emoji": "📝",
+        "explanation": "The classical way to turn text into features is bag-of-words — count how often each word appears in a document, ignoring order. TF-IDF improves on this by down-weighting words that appear in nearly every document (like 'the') and boosting rare, distinctive ones. The result is a sparse matrix where each row is a document and each column is a word's importance. It's old-school but still fast, interpretable, and surprisingly competitive on classification tasks like spam detection or topic labeling.",
+        "takeaway": "TF-IDF: count words, weighted by how distinctive they are.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Text",
+        "title": "Embeddings replace bag-of-words",
+        "emoji": "🧠",
+        "explanation": "Bag-of-words ignores meaning — 'great' and 'excellent' are unrelated columns. Embeddings map each word, sentence, or document to a dense vector where similar meanings sit close together in space. Pre-trained models like Word2Vec, BERT, or modern OpenAI/Cohere embeddings produce vectors you feed straight into your classifier. For most modern text problems, embeddings are the default — you only fall back to TF-IDF when speed, interpretability, or tiny data demands it.",
+        "takeaway": "Embeddings: dense vectors that capture meaning, not just word counts.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Selection",
+        "title": "Why feature selection matters",
+        "emoji": "✂️",
+        "explanation": "More features isn't always better — irrelevant or redundant ones add noise, slow training, and increase overfitting risk. Feature selection narrows the input down to the most useful columns, which often improves accuracy and always improves interpretability and speed. Three main families: filter methods (rank features by stats like correlation), wrapper methods (try subsets and measure model performance), and embedded methods (let the algorithm select during training, like Lasso). Start simple and add complexity only when it pays off.",
+        "takeaway": "Fewer good features beat lots of mediocre ones.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Selection",
+        "title": "Feature importance from models",
+        "emoji": "🏆",
+        "explanation": "Tree ensembles like Random Forest and XGBoost give free feature importance scores out of the box — based on how much each feature reduced impurity across all splits. They're useful for spotting useless features and explaining model behavior, but they have known biases: high-cardinality features and correlated features can game the score. For more reliable importance, use permutation importance or SHAP values. Either way, importance is a guide, not gospel.",
+        "takeaway": "Built-in importance is fast but biased — SHAP and permutation are sharper.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Leakage",
+        "title": "Feature leakage in disguise",
+        "emoji": "💧",
+        "explanation": "A leaked feature is one that contains information from the target — directly or indirectly — that wouldn't be available at prediction time. Classic examples: using 'discount_applied' to predict whether a sale happened, or 'days_since_account_closed' to predict churn. Leaked features make training scores look spectacular and production performance collapse. The defense is asking 'would I actually have this value at the moment of prediction?' for every feature, every time.",
+        "takeaway": "Always ask: would I really have this feature in production?",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Leakage",
+        "title": "Leakage from preprocessing",
+        "emoji": "🚰",
+        "explanation": "Even with clean features, preprocessing itself can leak information. Computing the mean for imputation across the full dataset before splitting? Leakage. Fitting a target encoder on all data? Leakage. Picking features based on correlation with the target across the entire dataset? Leakage. The cure is brutally simple: split first, fit any preprocessing only on training data, and use scikit-learn pipelines so cross-validation refits everything inside each fold.",
+        "takeaway": "Preprocessing is part of the model — fit it inside the split.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Workflow",
+        "title": "Feature engineering is iterative",
+        "emoji": "🔄",
+        "explanation": "Feature engineering isn't a one-shot step before modeling — it's a feedback loop. Build features, train a model, look at its errors, ask 'what feature would have helped here?', and add it. Look at feature importances and remove deadweight. Look at residuals and find patterns suggesting missing interactions. The teams that win on tabular ML aren't using secret algorithms; they're running this loop more times, more carefully, than anyone else.",
+        "takeaway": "Feature engineering is a loop with the model, not a step before it.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Workflow",
+        "title": "Domain knowledge wins",
+        "emoji": "🧑‍🏫",
+        "explanation": "The single best source of features is understanding the problem itself. A domain expert can tell you 'fraudulent accounts often share a billing address but different shipping addresses' or 'churn spikes 30 days after billing changes' — and that becomes a feature you'd never engineer from a generic toolkit. This is why fraud, healthcare, and finance ML teams pair data scientists with domain experts. Generic feature tools get you 60%; domain knowledge gets you the rest.",
+        "takeaway": "The best features come from understanding the problem, not the data.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      }
+    ]
+  }

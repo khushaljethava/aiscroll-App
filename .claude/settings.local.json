@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze *)",
+      "Bash(flutter pub *)",
+      "Bash(flutter test *)",
+      "Bash(flutter build *)",
+      "Bash(flutter devices *)",
+      "Bash(adb logcat *)",
+      "Read(//c/Users/ADMIN/.claude/**)",
+      "Read(//c/Users/ADMIN/.claude/.ccg/**)",
+      "Bash(./gradlew --stop)",
+      "Bash(./gradlew clean *)",
+      "Bash(./gradlew :app:assembleDebug --no-build-cache --rerun-tasks)",
+      "Bash(grep -n \"401\\\\|fetch failed\\\\|getValidToken\\\\|HTTP \\\\${\" C:/Users/ADMIN/random/test3/aiscroll/lib/data/remote/news_service.dart)",
+      "Read(//c/Users/ADMIN/random/test3/**)"
+    ]
+  }
+}

@@ -1,0 +1,222 @@
+{
+    "track": {
+      "emoji": "🧮",
+      "name": "Classical ML Algorithms",
+      "description": "The core algorithms that solve 80% of real ML problems — linear models, trees, neighbors, and ensembles — and the intuition for when to reach for each.",
+      "level": "intermediate",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "Linear Models",
+        "title": "Linear regression",
+        "emoji": "📏",
+        "explanation": "Linear regression fits the best straight line (or hyperplane in multiple dimensions) through your data, predicting a number as a weighted sum of features plus a bias term. Training finds the weights that minimize squared error between predicted and actual values, with a clean closed-form solution for small data and gradient descent for large. It's interpretable — each weight directly tells you how much the prediction changes per unit of that feature. Despite being the simplest model in ML, it's still the right answer for many regression problems and the baseline against which everything else gets judged.",
+        "takeaway": "Linear regression: weighted sum of features, minimizing squared error.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Linear Models",
+        "title": "Logistic regression",
+        "emoji": "📊",
+        "explanation": "Despite the name, logistic regression is for classification — it takes a linear combination of features and squashes the output through a sigmoid into a probability between 0 and 1. You then pick a threshold (usually 0.5) to convert that probability into a class prediction. It's trained by minimizing log loss (cross-entropy), which rewards confident correct predictions and punishes confident wrong ones harshly. For binary classification, it's the natural baseline — fast, interpretable, and surprisingly hard to beat on tabular data with good features.",
+        "takeaway": "Logistic regression: linear model + sigmoid = probability.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Linear Models",
+        "title": "Regularization: Ridge and Lasso",
+        "emoji": "🪢",
+        "explanation": "Plain linear regression can overfit when features are many or correlated, so we add a penalty on weight size to the loss function. Ridge (L2) penalizes the sum of squared weights and shrinks them toward zero without quite reaching it. Lasso (L1) penalizes the sum of absolute weights and actually drives some to exactly zero — making it a built-in feature selector. ElasticNet mixes both; the strength of the penalty (alpha) is the key hyperparameter you tune via cross-validation.",
+        "takeaway": "Ridge shrinks weights; Lasso also kills the useless ones.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Linear Models",
+        "title": "When linear models shine",
+        "emoji": "✨",
+        "explanation": "Linear models aren't fancy, but they're the right pick more often than people think — especially when you have lots of features and not much data, or when interpretability matters for stakeholders. They train fast, generalize well with regularization, and their coefficients are directly readable. They struggle when relationships are non-linear or feature interactions matter — that's when trees and neural nets pull ahead. A good rule: always fit a regularized linear model as your baseline before reaching for anything heavier.",
+        "takeaway": "Linear models: fast, interpretable, and hard to beat on small or wide data.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Distance-Based",
+        "title": "K-Nearest Neighbors",
+        "emoji": "👥",
+        "explanation": "KNN is the simplest possible 'algorithm': to predict for a new point, look at the K closest training points and take the majority vote (classification) or average (regression). There's no real training phase — the model just memorizes the dataset, which makes inference slow on large data. K is the key hyperparameter: small K overfits to noise, large K oversmooths and misses local patterns. KNN is wildly sensitive to feature scale, so always standardize features first or distances become meaningless.",
+        "takeaway": "KNN: predict by looking at nearby neighbors. Scale your features.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Distance-Based",
+        "title": "The curse of dimensionality",
+        "emoji": "🌌",
+        "explanation": "In high dimensions, all points become roughly equidistant from each other — a quirk of geometry that breaks distance-based methods like KNN. With 1000 features, your 'nearest neighbor' isn't meaningfully closer than your 'farthest' one, and predictions get noisy. The fix is dimensionality reduction (PCA), feature selection, or switching to algorithms that don't lean on raw distance. This is why distance-based methods work great on tabular data with dozens of features and poorly on raw images or text.",
+        "takeaway": "More dimensions break distance — reduce or pick a different algorithm.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Probabilistic",
+        "title": "Naive Bayes",
+        "emoji": "📨",
+        "explanation": "Naive Bayes applies Bayes' theorem with one big assumption — that all features are independent given the class — to compute the probability of each class for a given input. The 'naive' part is that independence assumption, which is almost never true in practice but works surprisingly well anyway. It's blazingly fast to train and predict, handles high-dimensional data gracefully, and is a classic choice for text classification like spam filtering or sentiment analysis. When the naive assumption fits roughly, it's hard to beat for the cost.",
+        "takeaway": "Naive Bayes: fast, simple, weirdly good at text.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Margin-Based",
+        "title": "Support Vector Machines",
+        "emoji": "🛡️",
+        "explanation": "SVMs find the boundary that separates classes with the widest possible margin — the gap between the boundary and the nearest training points (the 'support vectors'). The kernel trick lets SVMs draw non-linear boundaries by implicitly projecting data into higher-dimensional spaces, with RBF and polynomial kernels being the most common. They were the gold standard for tabular data before gradient boosting took over and are still strong on small-to-medium datasets. They scale poorly to huge data, though — training cost grows roughly with the square of the sample count.",
+        "takeaway": "SVM: maximum-margin classifier, with kernels for non-linear boundaries.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Trees",
+        "title": "Decision trees",
+        "emoji": "🌳",
+        "explanation": "A decision tree splits data on feature thresholds in a series of yes/no questions, building a tree where each leaf gives a prediction. It picks splits to maximize information gain (or minimize Gini impurity) at each node, recursing until some stopping criterion. Trees are highly interpretable — you can literally print and read them — and they handle mixed feature types and missing values gracefully. Their fatal flaw alone is overfitting: a fully-grown tree memorizes training data, which is why we almost always use them inside ensembles.",
+        "takeaway": "Trees: readable yes/no splits, but they overfit alone.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Trees",
+        "title": "Why trees love non-linearity",
+        "emoji": "🪜",
+        "explanation": "Trees naturally model non-linear relationships and feature interactions because each split is conditional on the previous ones — no feature engineering required for things like 'age over 30 AND income under 50K'. They don't need scaled features either, since splits compare against thresholds, not distances. This is why they dominate on tabular data with messy, mixed-type features that linear models struggle with. The catch: they can't extrapolate beyond the range of the training data, since every leaf is a constant prediction.",
+        "takeaway": "Trees model interactions for free, but don't extrapolate.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Ensembles",
+        "title": "Why ensembles work",
+        "emoji": "🎼",
+        "explanation": "An ensemble combines many models to outperform any single one — the rough idea being that diverse weak models cancel out each other's errors. Two main families dominate: bagging trains models in parallel on different data subsets and averages their predictions, while boosting trains models sequentially with each one fixing the previous one's mistakes. Ensembles win nearly every tabular ML competition, and gradient boosting libraries are now the default starting point for serious work. The cost is slower training and harder interpretation than a single model.",
+        "takeaway": "Ensembles: many models > one, by averaging or correcting.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Ensembles",
+        "title": "Random Forest",
+        "emoji": "🌲",
+        "explanation": "Random Forest is bagging applied to decision trees: train many trees on bootstrap samples of the data, with each split considering only a random subset of features. The randomness decorrelates the trees, and averaging their predictions cuts variance dramatically. It's the algorithm that 'just works' — minimal tuning, handles missing values, gives free feature importance estimates, and rarely overfits hard. For most tabular problems where you want a strong baseline in 5 minutes, Random Forest is the right answer.",
+        "takeaway": "Random Forest: many decorrelated trees, averaged. Forgiving and strong.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Ensembles",
+        "title": "Gradient boosting",
+        "emoji": "🚀",
+        "explanation": "Gradient boosting builds trees sequentially, with each new tree trained to predict the residual errors of the ensemble so far. The result is a powerful additive model that captures subtle patterns linear models and Random Forest miss. It's more sensitive to hyperparameters than Random Forest — learning rate, number of trees, and tree depth all matter — but tuned well, it dominates tabular benchmarks. The downside is overfitting risk if you boost too long, which is why early stopping based on validation loss is essential.",
+        "takeaway": "Gradient boosting: trees that fix the previous trees' mistakes.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Ensembles",
+        "title": "XGBoost, LightGBM, CatBoost",
+        "emoji": "🏆",
+        "explanation": "These three are the production-grade gradient boosting libraries — all faster, more accurate, and more tunable than scikit-learn's built-in implementation. XGBoost was the original game-changer and remains a Kaggle staple. LightGBM is faster on big data thanks to histogram-based splits and leaf-wise tree growth. CatBoost handles categorical features natively without manual encoding and tends to need less hyperparameter tuning. For tabular data with more than a few thousand rows, one of these three is almost always the right starting point.",
+        "takeaway": "XGBoost, LightGBM, CatBoost: the tabular ML champions.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Unsupervised",
+        "title": "K-Means clustering",
+        "emoji": "🎯",
+        "explanation": "K-Means partitions data into K clusters by alternating two steps: assign each point to its nearest cluster center, then move each center to the mean of its assigned points. You pick K up front, and the elbow method or silhouette score helps choose a reasonable value. It's fast, scales well, and works great when clusters are roughly spherical and equally sized. It struggles with elongated clusters, varying densities, and outliers — which is when DBSCAN or hierarchical clustering pull ahead.",
+        "takeaway": "K-Means: simple, fast, assumes round clusters.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      },
+      {
+        "topicTag": "Unsupervised",
+        "title": "DBSCAN and hierarchical clustering",
+        "emoji": "🔗",
+        "explanation": "DBSCAN groups points by density — areas of high density become clusters, and low-density points are labeled noise. It doesn't need K specified, finds arbitrary shapes, and naturally handles outliers, but tuning its `eps` and `min_samples` parameters can be tricky. Hierarchical clustering builds a tree of nested groupings (dendrogram), letting you cut at any level to get the number of clusters you want. Both shine on data where K-Means' spherical assumption breaks down.",
+        "takeaway": "DBSCAN finds shapes; hierarchical builds a cluster tree.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Unsupervised",
+        "title": "PCA: dimensionality reduction",
+        "emoji": "🔭",
+        "explanation": "Principal Component Analysis finds new axes that capture the most variance in your data, letting you compress 100 features into 10 while keeping most of the signal. It's the go-to for visualization (project to 2D and plot), preprocessing (denoise, decorrelate), and speeding up downstream models. PCA is linear, so it can't capture curved structure — that's where t-SNE and UMAP take over for visualization. Always standardize features before PCA, or high-variance features will dominate purely because of their scale.",
+        "takeaway": "PCA: keep the variance, drop the dimensions.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Imbalance",
+        "title": "Handling imbalanced data",
+        "emoji": "⚖️",
+        "explanation": "When one class dominates — fraud, disease, churn — most algorithms collapse to predicting the majority class and look great on accuracy while being useless. The standard tools are class weights (penalize majority-class errors less), oversampling the minority class with SMOTE, undersampling the majority class, or switching to evaluation metrics like F1 or PR-AUC that don't reward laziness. Different fixes shine in different contexts, so try a few and validate carefully. And always remember: imbalanced data is a feature of the problem, not a flaw to be erased.",
+        "takeaway": "Imbalance: weight, resample, and pick honest metrics.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Tuning",
+        "title": "Hyperparameter tuning",
+        "emoji": "🎛️",
+        "explanation": "Hyperparameters live outside training and you have to choose them — learning rate, tree depth, regularization strength, number of neighbors. Grid search tries every combination from a list, random search samples randomly and is usually more efficient, and Bayesian methods (like Optuna) intelligently focus on promising regions. Always tune using cross-validation on the training data, never the test set, or you re-introduce leakage. Spend tuning time on the few hyperparameters that actually matter — most have minor effects.",
+        "takeaway": "Tune the few hyperparameters that move the needle. Random > grid.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Tuning",
+        "title": "Pipelines tie it all together",
+        "emoji": "🪡",
+        "explanation": "A scikit-learn Pipeline chains preprocessing steps and a model into a single object that you fit and predict on as one unit. This isn't just convenience — it's the cleanest way to prevent data leakage during cross-validation, since transformations get refit inside each fold. Pipelines also save you in production: one object captures the full chain, so training and serving stay in sync. Once you've been bitten by leakage from preprocessing outside cross-validation, you never go back to ad-hoc steps.",
+        "takeaway": "Pipelines: one object for prep + model. Leakage-proof and production-ready.",
+        "difficulty": "advanced",
+        "type": "concept",
+        "xpReward": 20
+      },
+      {
+        "topicTag": "Choosing",
+        "title": "Which algorithm should I pick?",
+        "emoji": "🧭",
+        "explanation": "Start with a regularized linear model as a baseline — fast, interpretable, and informative. For tabular data with non-linear patterns and decent volume, gradient boosting (XGBoost/LightGBM/CatBoost) is the practical default. Random Forest is a great low-tuning alternative when you want strong results with minimal fuss. KNN, Naive Bayes, and SVMs still earn their place for specific niches — small data, text, or when interpretability or speed dominate. The honest answer is: try two or three families and let validation scores decide.",
+        "takeaway": "Linear baseline → boosting → ensemble — and let validation pick.",
+        "difficulty": "intermediate",
+        "type": "concept",
+        "xpReward": 15
+      }
+    ]
+  }

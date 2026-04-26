@@ -1,0 +1,182 @@
+{
+    "track": {
+      "emoji": "🐍",
+      "name": "Python Basics",
+      "description": "The core building blocks of Python — variables, types, collections, control flow, and functions — that every other Python topic rests on.",
+      "level": "beginner",
+      "isPremium": false,
+      "status": "published"
+    },
+    "cards": [
+      {
+        "topicTag": "Getting Started",
+        "title": "What is Python?",
+        "emoji": "🐍",
+        "explanation": "Python is a general-purpose programming language built around readability — the syntax stays out of your way so you can focus on the logic. It's the default language for AI, data work, scripting, and a huge chunk of the modern web backend.",
+        "takeaway": "Python: clean syntax, runs almost everything.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Syntax Basics",
+        "title": "Indentation is syntax",
+        "emoji": "📐",
+        "explanation": "Most languages use braces or keywords to mark code blocks — Python uses indentation, usually 4 spaces. Mixing tabs and spaces or being inconsistent doesn't just look messy, it actually breaks the program.",
+        "takeaway": "In Python, whitespace is part of the grammar.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Variables & Types",
+        "title": "Variables are labels, not boxes",
+        "emoji": "🏷️",
+        "explanation": "A variable in Python is just a name that points to a value — you don't declare a type, you just assign with `=` and Python figures it out. The same name can later point to a totally different value or even a different type.",
+        "takeaway": "Variables hold references, not fixed types.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Variables & Types",
+        "title": "The core data types",
+        "emoji": "🧱",
+        "explanation": "Python ships with a small set of types you'll use constantly: int, float, str, bool, list, tuple, dict, set. Most bugs in early code come from confusing one for another — like treating a number as a string after reading user input.",
+        "takeaway": "Know your types — half of debugging is type confusion.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Variables & Types",
+        "title": "Strings are immutable",
+        "emoji": "🔤",
+        "explanation": "Strings are text wrapped in single, double, or triple quotes. They're immutable, meaning every 'edit' — uppercase, replace, slice — actually returns a brand new string instead of changing the original.",
+        "takeaway": "String operations return new strings, not edits.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Variables & Types",
+        "title": "Numbers: int vs float",
+        "emoji": "🔢",
+        "explanation": "Python has int (whole numbers) and float (decimals), and it auto-promotes int to float when needed. Dividing two ints with `/` always gives a float; use `//` when you want integer division.",
+        "takeaway": "`/` gives a float, `//` gives an int.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Variables & Types",
+        "title": "Truthy and falsy values",
+        "emoji": "✅",
+        "explanation": "True and False are the boolean values, but almost any value can act like one in a condition. Empty strings, 0, None, empty lists, and empty dicts all count as False — everything else is True.",
+        "takeaway": "Empty or zero things are falsy.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Collections",
+        "title": "Lists: ordered and mutable",
+        "emoji": "📋",
+        "explanation": "Lists are ordered collections written with [] — you can mix types, change items in place, and grow or shrink them anytime. They're the default 'a bunch of things' container in Python.",
+        "takeaway": "Lists: ordered, mutable, anything goes.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Collections",
+        "title": "Tuples: lists that can't change",
+        "emoji": "📦",
+        "explanation": "Tuples look like lists but use () and are immutable — once created, you can't add, remove, or replace items. Use them for fixed groupings like coordinates, return values, or anything you want to safely hand around.",
+        "takeaway": "Tuple = list that won't change.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Collections",
+        "title": "Dictionaries: key → value lookups",
+        "emoji": "🗂️",
+        "explanation": "Dicts store key-value pairs in {} and are how you model anything with named fields — a user, a config, an API response. Lookups by key are nearly instant, no matter how big the dict gets.",
+        "takeaway": "Dicts: named lookups, fast at any size.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Collections",
+        "title": "Sets: unique items only",
+        "emoji": "🎯",
+        "explanation": "Sets are unordered collections that automatically drop duplicates. They're perfect for deduplication and 'is X in here?' checks, which run far faster than scanning a list.",
+        "takeaway": "Sets: unique items, instant membership checks.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Control Flow",
+        "title": "if / elif / else",
+        "emoji": "🔀",
+        "explanation": "if, elif, and else let your code branch based on conditions. Python evaluates them top-down and runs the first branch whose condition is true — the rest are skipped, even if they'd also match.",
+        "takeaway": "First matching branch wins; the rest are skipped.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Control Flow",
+        "title": "for loops iterate, not count",
+        "emoji": "🔁",
+        "explanation": "Python's for loop walks through any iterable — lists, strings, dicts, ranges — handing you one item at a time. You don't manage an index counter; you just loop over the thing itself.",
+        "takeaway": "Loop over the thing, not over an index.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Control Flow",
+        "title": "while loops",
+        "emoji": "⏳",
+        "explanation": "A while loop keeps running as long as its condition stays true. Use it when you don't know how many iterations you'll need — reading until end-of-file, retrying until success, polling until ready.",
+        "takeaway": "while = loop until the condition fails.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Functions",
+        "title": "Functions with def",
+        "emoji": "🧩",
+        "explanation": "Functions are defined with `def`, take parameters, and optionally return a value with `return`. They're the main tool for avoiding repetition and keeping code testable — if you've written the same logic twice, it probably wants to be a function.",
+        "takeaway": "Wrote it twice? Make it a function.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Functions",
+        "title": "print() and input()",
+        "emoji": "💬",
+        "explanation": "`print()` sends output to the terminal; `input()` pauses the program and reads one line from the user. The catch: `input()` always returns a string, so wrap it in `int()` or `float()` when you need a number.",
+        "takeaway": "input() always gives you a string.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      },
+      {
+        "topicTag": "Syntax Basics",
+        "title": "Comments: explain the why",
+        "emoji": "💭",
+        "explanation": "Single-line comments start with `#`; for longer notes people often use triple-quoted strings. Good comments explain *why* code does something — the code itself already shows *what* it does.",
+        "takeaway": "Comment the why, not the what.",
+        "difficulty": "beginner",
+        "type": "concept",
+        "xpReward": 10
+      }
+    ]
+  }
