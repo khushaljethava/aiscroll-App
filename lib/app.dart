@@ -5,6 +5,7 @@ import 'core/router/app_router.dart';
 import 'core/router/deep_link.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_provider.dart';
+import 'data/providers/analytics_provider.dart';
 import 'data/providers/auth_provider.dart';
 import 'data/providers/content_provider.dart';
 import 'data/providers/news_provider.dart';
@@ -60,6 +61,11 @@ class _SixtySecondAIAppState extends ConsumerState<SixtySecondAIApp>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // 0. Apply persisted analytics opt-out before any event fires. Sync
+      //    pref read + one platform-channel call; ignore failures so a
+      //    missing iOS Firebase config never blocks the boot path.
+      await ref.read(analyticsServiceProvider).init();
+
       // 1. Hydrate content from the on-disk manifest cache BEFORE anything
       //    else reads card/track lists. Synchronous-ish (one SharedPreferences
       //    read + JSON decode) — no network yet.
@@ -74,6 +80,19 @@ class _SixtySecondAIAppState extends ConsumerState<SixtySecondAIApp>
       await ref.read(userProvider.notifier).load();
       await ref.read(questsProvider.notifier).load();
 
+      // 2a. Stamp Firebase Analytics with the active identity + onboarding
+      //     attributes so every subsequent event lands on the right
+      //     audience / funnel. setUserId is null for guests so we don't
+      //     leak the local guest UUID to GA's user-graph.
+      final user = ref.read(userProvider);
+      final analytics = ref.read(analyticsServiceProvider);
+      await analytics.setUserId(user.isGuest ? null : user.firebaseUid);
+      await analytics.setUserProperty('persona', user.persona);
+      await analytics.setUserProperty('knowledge_level', user.knowledgeLevel);
+      await analytics.setUserProperty('daily_goal', '${user.dailyGoal}');
+      await analytics.setUserProperty('is_guest', user.isGuest ? 'true' : 'false');
+      await analytics.setUserProperty('is_premium', user.isPremium ? 'true' : 'false');
+
       // 2b. Prime the client JWT. This round-trips to Firebase App Check
       //     and `/api/client/token` on first run. Silent no-op when the
       //     admin URL isn't configured or Firebase isn't initialised.
@@ -85,7 +104,6 @@ class _SixtySecondAIAppState extends ConsumerState<SixtySecondAIApp>
       //     available." 4-second timeout so a hung App Check call doesn't
       //     block boot indefinitely; the splash already shows cached
       //     content by this point.
-      final user = ref.read(userProvider);
       try {
         await ref
             .read(authServiceProvider)

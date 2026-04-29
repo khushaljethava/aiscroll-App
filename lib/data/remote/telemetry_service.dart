@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../local/preferences_service.dart';
+import 'analytics_service.dart';
 
 /// Fire-and-forget event pipeline — never throws, never blocks the UI.
 ///
@@ -22,9 +23,13 @@ import '../local/preferences_service.dart';
 /// Set base URL via:
 ///   flutter run --dart-define=ADMIN_API_URL=http://10.0.2.2:3000
 class TelemetryService {
-  TelemetryService({Dio? dio, PreferencesService? prefs})
-      : _dio = dio ?? Dio(),
+  TelemetryService({
+    Dio? dio,
+    PreferencesService? prefs,
+    AnalyticsService? analytics,
+  })  : _dio = dio ?? Dio(),
         _prefs = prefs ?? PreferencesService.instance,
+        _analytics = analytics,
         _sessionId = const Uuid().v4() {
     _restorePending();
     _startFlushTimer();
@@ -33,6 +38,11 @@ class TelemetryService {
   final Dio _dio;
   final PreferencesService _prefs;
   final String _sessionId;
+
+  /// Optional Firebase Analytics sink. When provided, every named log helper
+  /// fans out to both the admin backend and Firebase. Generic [log] also
+  /// forwards a sanitised version of the payload.
+  final AnalyticsService? _analytics;
 
   // Raw env value; [_baseUrl] strips a trailing slash so the
   // `/api/events/ingest` composition is canonical.
@@ -58,13 +68,23 @@ class TelemetryService {
 
   /// Enqueues an event. Cheap + sync — safe to call from StateNotifier
   /// methods. Never throws.
+  ///
+  /// Also fans out to [AnalyticsService] when one was injected. Firebase
+  /// Analytics still fires even when the admin URL isn't configured, so the
+  /// `isConfigured` short-circuit is admin-only.
   void log(
     String name, {
     required String guestId,
     String? userId,
     Map<String, Object?> props = const {},
   }) {
-    if (!isConfigured) return; // build has no backend — drop silently
+    // Mirror to Firebase Analytics first — it's independent of admin config.
+    final a = _analytics;
+    if (a != null) {
+      // ignore: discarded_futures
+      a.logEvent(name, params: props);
+    }
+    if (!isConfigured) return; // build has no admin backend — drop silently
     try {
       final event = <String, dynamic>{
         'id': const Uuid().v4(),

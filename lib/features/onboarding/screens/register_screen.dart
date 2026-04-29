@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/auth_service.dart';
@@ -90,6 +91,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       await ref
           .read(firestoreServiceProvider)
           .createInitialProfile(ref.read(userProvider));
+      // ignore: discarded_futures
+      ref.read(analyticsServiceProvider).logSignUp(method: 'password');
+      // ignore: discarded_futures
+      ref.read(analyticsServiceProvider).setUserId(fbUser.uid);
       if (!mounted) return;
       context.go(AppRoutes.onboardingPersona);
     } on AuthFailed catch (e) {

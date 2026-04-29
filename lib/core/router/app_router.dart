@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -138,10 +140,29 @@ class _MainShell extends ConsumerWidget {
 // Router
 // ---------------------------------------------------------------------------
 
+/// Lazy NavigatorObserver list. Built on first read of [appRouter] (which
+/// happens inside `MaterialApp.router(routerConfig: ...)`, well after
+/// `Firebase.initializeApp()` runs in `main()`), so accessing
+/// `FirebaseAnalytics.instance` is safe. Empty list when Firebase failed to
+/// initialise (e.g. iOS without `GoogleService-Info.plist`) — observers are
+/// no-ops in that case rather than crashing the app on launch.
+List<NavigatorObserver> _routerObservers() {
+  if (Firebase.apps.isEmpty) return const <NavigatorObserver>[];
+  return [
+    FirebaseAnalyticsObserver(
+      analytics: FirebaseAnalytics.instance,
+      // GoRoute.name → settings.name. Falls back to the path so unnamed
+      // routes still produce a useful screen_view payload.
+      nameExtractor: (settings) => settings.name ?? 'unnamed',
+    ),
+  ];
+}
+
 final appRouter = GoRouter(
   debugLogDiagnostics: false,
   initialLocation: AppRoutes.splash,
   refreshListenable: PreferencesService.revision,
+  observers: _routerObservers(),
   redirect: (context, state) {
     final onboarded = PreferencesService.instance.isOnboardingCompleteSync();
     final loc = state.matchedLocation;
@@ -180,34 +201,42 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           path: 'splash',
+          name: 'splash',
           builder: (context, state) => const SplashScreen(),
         ),
         GoRoute(
           path: 'welcome',
+          name: 'onboarding_welcome',
           builder: (context, state) => const WelcomeScreen(),
         ),
         GoRoute(
           path: 'login',
+          name: 'onboarding_login',
           builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
           path: 'register',
+          name: 'onboarding_register',
           builder: (context, state) => const RegisterScreen(),
         ),
         GoRoute(
           path: 'persona',
+          name: 'onboarding_persona',
           builder: (context, state) => const PersonaScreen(),
         ),
         GoRoute(
           path: 'level',
+          name: 'onboarding_level',
           builder: (context, state) => const KnowledgeLevelScreen(),
         ),
         GoRoute(
           path: 'topics',
+          name: 'onboarding_topics',
           builder: (context, state) => const TopicPickerScreen(),
         ),
         GoRoute(
           path: 'goal',
+          name: 'onboarding_goal',
           builder: (context, state) => const DailyGoalScreen(),
         ),
       ],
@@ -218,6 +247,7 @@ final appRouter = GoRouter(
     // -----------------------------------------------------------------------
     GoRoute(
       path: AppRoutes.profileEdit,
+      name: 'profile_edit',
       builder: (context, state) => const EditProfileScreen(),
     ),
 
@@ -237,10 +267,12 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.news,
+              name: 'news',
               builder: (context, state) => const NewsScreen(),
               routes: [
                 GoRoute(
                   path: ':id',
+                  name: 'news_detail',
                   builder: (context, state) => NewsDetailScreen(
                     articleId: state.pathParameters['id']!,
                     initialArticle: state.extra is NewsArticle
@@ -258,18 +290,21 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.learn,
+              name: 'learn_tracks',
               builder: (context, state) => const TracksScreen(),
               routes: [
                 // /learn/track/:trackId   — scroll the track
                 // /learn/track/:trackId/quiz — boss quiz for the track
                 GoRoute(
                   path: 'track/:trackId',
+                  name: 'learn_track',
                   builder: (context, state) => TrackLearnScreen(
                     trackId: state.pathParameters['trackId']!,
                   ),
                   routes: [
                     GoRoute(
                       path: 'quiz',
+                      name: 'learn_track_quiz',
                       builder: (context, state) => BossQuizScreen(
                         trackId: state.pathParameters['trackId']!,
                       ),
@@ -279,6 +314,7 @@ final appRouter = GoRouter(
                 // /learn/card/:cardId — detail reader (Save / Share / Learned)
                 GoRoute(
                   path: 'card/:cardId',
+                  name: 'learn_card',
                   builder: (context, state) => LearnDetailScreen(
                     cardId: state.pathParameters['cardId']!,
                     initialCard: state.extra is LearningCard
@@ -296,6 +332,7 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.saved,
+              name: 'saved',
               builder: (context, state) => const SavedScreen(),
             ),
           ],
@@ -306,6 +343,7 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.profile,
+              name: 'profile',
               builder: (context, state) => const ProfileScreen(),
             ),
           ],

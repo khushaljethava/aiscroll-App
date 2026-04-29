@@ -10,6 +10,7 @@ import '../../../core/feedback/feedback_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/news_model.dart';
+import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/news_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/news_service.dart';
@@ -47,6 +48,10 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
       if (!mounted) return;
       // ignore: discarded_futures
       ref.read(userProvider.notifier).markNewsRead(widget.articleId);
+      // Distinguish "opened the article reader" from the deduplicated
+      // `news_read` event so funnels can measure scroll-through later.
+      // ignore: discarded_futures
+      ref.read(analyticsServiceProvider).logNewsOpened(widget.articleId);
     });
   }
 

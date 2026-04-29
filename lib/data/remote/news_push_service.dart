@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/notifications/notification_service.dart';
 import '../../core/router/deep_link.dart';
+import '../providers/analytics_provider.dart';
+import 'analytics_service.dart';
 
 /// FCM background / terminated isolate entry point.
 ///
@@ -24,10 +26,14 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
 /// All initialization is best-effort and never blocks UI. Errors degrade
 /// gracefully — the rest of the app continues without push notifications.
 class NewsPushService {
-  NewsPushService({FirebaseMessaging? messaging})
-      : _messaging = messaging ?? FirebaseMessaging.instance;
+  NewsPushService({
+    FirebaseMessaging? messaging,
+    AnalyticsService? analytics,
+  })  : _messaging = messaging ?? FirebaseMessaging.instance,
+        _analytics = analytics;
 
   final FirebaseMessaging _messaging;
+  final AnalyticsService? _analytics;
 
   /// Server-side FCM topic name. Must match `notifyTopic` in the admin's
   /// `news.pipeline` config (default: `"news"`).
@@ -64,7 +70,11 @@ class NewsPushService {
       // User tapped a notification while the app was backgrounded.
       FirebaseMessaging.onMessageOpenedApp.listen((m) {
         final id = m.data['articleId'];
-        if (id is String && id.isNotEmpty) goToNewsArticle(id);
+        if (id is String && id.isNotEmpty) {
+          // ignore: discarded_futures
+          _analytics?.logNotificationOpen(articleId: id);
+          goToNewsArticle(id);
+        }
       });
 
       // App launched from a terminated state by tapping a notification.
@@ -72,7 +82,11 @@ class NewsPushService {
       final initial = await _messaging.getInitialMessage();
       if (initial != null) {
         final id = initial.data['articleId'];
-        if (id is String && id.isNotEmpty) goToNewsArticle(id);
+        if (id is String && id.isNotEmpty) {
+          // ignore: discarded_futures
+          _analytics?.logNotificationOpen(articleId: id);
+          goToNewsArticle(id);
+        }
       }
 
       // If a previous session already granted permission, make sure the
@@ -164,5 +178,8 @@ class NewsPushService {
 }
 
 final newsPushServiceProvider = Provider<NewsPushService>((ref) {
-  return NewsPushService();
+  // Reuse the singleton AnalyticsService so push taps fan out into the same
+  // sink as every other Firebase event (sharing the opt-out flag).
+  final analytics = ref.watch(analyticsServiceProvider);
+  return NewsPushService(analytics: analytics);
 });

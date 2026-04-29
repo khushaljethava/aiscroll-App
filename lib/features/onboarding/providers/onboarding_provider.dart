@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/user_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -90,6 +91,22 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
       dailyGoal: state.dailyGoal,
       stayGuest: stayGuest,
     );
+
+    // Refresh Firebase Analytics user properties + emit tutorial_complete so
+    // the funnel from welcome → onboarded is complete in GA4. Fire-and-forget;
+    // a Firebase outage must never block the user from reaching the news tab.
+    final analytics = _ref.read(analyticsServiceProvider);
+    // ignore: discarded_futures
+    analytics.setUserProperty('persona', state.persona);
+    // ignore: discarded_futures
+    analytics.setUserProperty(
+        'knowledge_level', knowledgeKeyFromValue(state.knowledgeLevel));
+    // ignore: discarded_futures
+    analytics.setUserProperty('daily_goal', '${state.dailyGoal}');
+    // ignore: discarded_futures
+    analytics.setUserProperty('is_guest', stayGuest ? 'true' : 'false');
+    // ignore: discarded_futures
+    analytics.logTutorialComplete();
   }
 }
 

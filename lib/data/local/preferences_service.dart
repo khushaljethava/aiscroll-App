@@ -235,6 +235,10 @@ class PreferencesService {
 
   Future<void> setInt(String key, int value) => _p.setInt(key, value);
 
+  bool? getBool(String key) => _p.getBool(key);
+
+  Future<void> setBool(String key, bool value) => _p.setBool(key, value);
+
   Future<void> remove(String key) async {
     await _p.remove(key);
   }

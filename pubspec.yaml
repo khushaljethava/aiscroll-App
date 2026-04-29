@@ -33,6 +33,8 @@ dependencies:
   google_sign_in: ^6.2.1
   # Cloud Firestore — server-of-truth for signed-in user profiles.
   cloud_firestore: ^5.4.4
+  # Firebase Analytics — user activity, screen views, retention funnels.
+  firebase_analytics: ^11.3.3
   # AdMob — native + rewarded ads for monetisation.
   google_mobile_ads: ^5.2.0
 

@@ -11,6 +11,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/theme_mode_provider.dart';
 import '../../../data/local/preferences_service.dart';
 import '../../../data/models/user_model.dart';
+import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
@@ -92,6 +93,13 @@ class ProfileScreen extends ConsumerWidget {
                   _HapticsTile(user: user),
                   const _ThemedDivider(),
                   _SoundTile(user: user),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _SettingsGroup(
+                label: 'Privacy',
+                children: const [
+                  _AnalyticsTile(),
                 ],
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -1253,6 +1261,51 @@ class _SoundTile extends ConsumerWidget {
       value: user.soundEnabled,
       onChanged: (v) =>
           ref.read(userProvider.notifier).setSoundEnabled(v),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Privacy: anonymous analytics toggle
+// ---------------------------------------------------------------------------
+
+/// Reads/writes the `analytics.enabled` SharedPreference via [AnalyticsService].
+/// Stored locally — toggling immediately calls
+/// `setAnalyticsCollectionEnabled` on the Firebase SDK so no further events
+/// are recorded once the user opts out.
+class _AnalyticsTile extends ConsumerStatefulWidget {
+  const _AnalyticsTile();
+
+  @override
+  ConsumerState<_AnalyticsTile> createState() => _AnalyticsTileState();
+}
+
+class _AnalyticsTileState extends ConsumerState<_AnalyticsTile> {
+  late bool _enabled;
+
+  @override
+  void initState() {
+    super.initState();
+    // Read the in-memory cached value populated by AnalyticsService.init()
+    // during app boot.
+    _enabled = ref.read(analyticsServiceProvider).isEnabled;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      title: const Text('Help improve the app'),
+      subtitle: const Text(
+        'Anonymous usage analytics. We never share your name, email, or '
+        'reading history with third parties.',
+      ),
+      secondary: const Icon(Icons.bar_chart_rounded),
+      value: _enabled,
+      onChanged: (v) async {
+        await ref.read(analyticsServiceProvider).setEnabled(v);
+        if (!mounted) return;
+        setState(() => _enabled = v);
+      },
     );
   }
 }

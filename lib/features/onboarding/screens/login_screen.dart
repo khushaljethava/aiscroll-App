@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/local/preferences_service.dart';
+import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/auth_service.dart';
@@ -65,6 +66,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 photoUrl: fbUser.photoURL,
                 provider: 'password',
               );
+      // ignore: discarded_futures
+      ref.read(analyticsServiceProvider).logLogin(method: 'password');
+      // ignore: discarded_futures
+      ref.read(analyticsServiceProvider).setUserId(fbUser.uid);
       if (!mounted) return;
       if (hasComplete) {
         await PreferencesService.instance.saveOnboardingComplete(true);
