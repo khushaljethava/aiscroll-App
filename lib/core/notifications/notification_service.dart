@@ -31,7 +31,7 @@ class NotificationService {
   static const String newsChannelId = 'news';
   static const String _newsChannelName = 'AI News';
   static const String _newsChannelDescription =
-      'Random AI news drops from the AIScroll team.';
+      'Random AI news drops from the 60 Second AI team.';
 
   Future<void> initialize() async {
     if (_initialized) return;
@@ -46,7 +46,10 @@ class NotificationService {
         tz.setLocalLocation(tz.getLocation('UTC'));
       }
 
-      const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+      // Use the dedicated stat icon (white silhouette on transparent
+      // background). The launcher icon is not a valid notification icon
+      // on Android 5+ and is silently rejected by some OEMs.
+      const android = AndroidInitializationSettings('ic_stat_notification');
       const ios = DarwinInitializationSettings(
         // Permissions requested explicitly on toggle, not at init.
         requestAlertPermission: false,
@@ -85,6 +88,11 @@ class NotificationService {
   }
 
   /// Prompts for permission. Returns true if granted.
+  ///
+  /// On Android 13+ the OS only shows the runtime dialog once. If the user
+  /// has already denied (or selected "Don't ask again"), this returns false
+  /// without re-prompting — callers should surface a hint pointing the
+  /// user to system settings.
   Future<bool> requestPermission() async {
     await initialize();
     final ios = _plugin.resolvePlatformSpecificImplementation<
@@ -100,14 +108,36 @@ class NotificationService {
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     if (android != null) {
+      // If the user previously granted, skip the dialog entirely.
+      final alreadyEnabled = await android.areNotificationsEnabled() ?? false;
+      if (alreadyEnabled) return true;
       final granted = await android.requestNotificationsPermission();
-      return granted ?? true;
+      return granted ?? false;
     }
+    return true;
+  }
+
+  /// Returns the current OS-level "notifications enabled" state without
+  /// re-prompting. Use for UI badges that nudge the user to system
+  /// settings when permission was permanently denied.
+  Future<bool> areEnabled() async {
+    await initialize();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      return await android.areNotificationsEnabled() ?? true;
+    }
+    // iOS doesn't expose a check without prompting; assume enabled.
     return true;
   }
 
   /// Schedules a daily repeating notification at [minutesSinceMidnight].
   /// Cancels any previously scheduled daily reminder first.
+  ///
+  /// Prefers `exactAllowWhileIdle` so doze mode doesn't push the fire
+  /// hours past the user's chosen time. Falls back to inexact when the
+  /// OS denies the SCHEDULE_EXACT_ALARM permission (Android 12+ users
+  /// must enable "Alarms & reminders" manually in system settings).
   Future<void> scheduleDaily(int minutesSinceMidnight) async {
     await initialize();
     await cancel();
@@ -126,6 +156,14 @@ class NotificationService {
         firstFire = firstFire.add(const Duration(days: 1));
       }
 
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final canExact =
+          await android?.canScheduleExactNotifications() ?? true;
+      final mode = canExact
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexactAllowWhileIdle;
+
       await _plugin.zonedSchedule(
         _dailyReminderId,
         'Time to learn 🤖',
@@ -141,7 +179,7 @@ class NotificationService {
           ),
           iOS: DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: mode,
         matchDateTimeComponents: DateTimeComponents.time,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,

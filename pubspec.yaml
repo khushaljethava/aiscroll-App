@@ -1,7 +1,7 @@
 name: aiscroll
 description: "Learn AI in Seconds, One Scroll at a Time"
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
   sdk: ^3.11.3
@@ -40,6 +40,27 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: logo.png
+  remove_alpha_ios: true
+  background_color_ios: "#000000"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: logo.png
+  web:
+    generate: true
+    image_path: logo.png
+    background_color: "#0175C2"
+    theme_color: "#0175C2"
+  windows:
+    generate: true
+    image_path: logo.png
+  macos:
+    generate: true
+    image_path: logo.png
 
 flutter:
   uses-material-design: true

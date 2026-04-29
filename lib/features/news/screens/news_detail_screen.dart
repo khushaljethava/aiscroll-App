@@ -12,6 +12,8 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/news_model.dart';
 import '../../../data/providers/news_provider.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../data/remote/news_service.dart';
+import '../../ads/widgets/inline_native_ad.dart';
 import '../widgets/news_action_bar.dart';
 
 /// Editorial article reader.
@@ -59,10 +61,25 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
     final fetchAsync = ref.watch(newsArticleFetchProvider(widget.articleId));
     return fetchAsync.when(
       loading: _loadingScaffold,
-      error: (_, _) => _notFoundScaffold(),
-      data: (article) => article == null
-          ? _notFoundScaffold()
-          : _buildArticleScaffold(context, article),
+      error: (e, _) => _retryScaffold(
+        title: 'Couldn\'t load article',
+        message: '$e',
+      ),
+      data: (result) => switch (result) {
+        FetchByIdSuccess(:final article) =>
+          _buildArticleScaffold(context, article),
+        FetchByIdNotFound() => _notFoundScaffold(),
+        FetchByIdAuthError(:final statusCode) => _retryScaffold(
+            title: 'Sign-in expired',
+            message:
+                'The app couldn\'t verify your session (HTTP $statusCode). '
+                'Try again in a moment.',
+          ),
+        FetchByIdNetworkError(:final message) => _retryScaffold(
+            title: 'Couldn\'t load article',
+            message: message,
+          ),
+      },
     );
   }
 
@@ -78,6 +95,42 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
         ),
       );
 
+  Widget _retryScaffold({required String title, required String message}) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Article')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off_rounded, size: 48),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                message,
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              FilledButton.icon(
+                onPressed: () => ref
+                    .invalidate(newsArticleFetchProvider(widget.articleId)),
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Try again'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildArticleScaffold(BuildContext context, NewsArticle article) {
     final category =
         ref.watch(newsCategoryByKeyProvider(article.categoryKey));
@@ -89,6 +142,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
     final hasCover =
         article.coverImageUrl != null && article.coverImageUrl!.isNotEmpty;
     final readingMinutes = _estimateReadingMinutes(article.body);
+    final articleParagraphs = _splitParagraphs(article.body);
 
     return Scaffold(
       extendBodyBehindAppBar: hasCover,
@@ -164,72 +218,76 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
               title: Text(category?.label ?? 'Article',
                   style: tt.titleMedium),
             ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.editorialGutter,
-              AppSpacing.xxl,
-              AppSpacing.editorialGutter,
-              120, // leave breathing room above bottom action bar
-            ),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  Row(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.editorialGutter,
+                AppSpacing.xxl,
+                AppSpacing.editorialGutter,
+                120, // leave breathing room above bottom action bar
+              ),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 680),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _Overline(
-                        label: (category?.label ?? article.categoryKey)
-                            .toUpperCase(),
+                      Row(
+                        children: [
+                          _Overline(
+                            label: (category?.label ?? article.categoryKey)
+                                .toUpperCase(),
+                            accent: accent,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            _relativeTime(article.publishedAt),
+                            style: tt.labelMedium?.copyWith(
+                              color: cs.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        article.headline,
+                        style: tt.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: cs.onSurface,
+                          height: 1.14,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      _Byline(
+                        sourceName: article.sourceName,
+                        publishedAt: article.publishedAt,
+                        readingMinutes: readingMinutes,
                         accent: accent,
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        _relativeTime(article.publishedAt),
-                        style: tt.labelMedium?.copyWith(
-                          color: cs.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.3,
+                      if (article.tags.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.lg),
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          children: article.tags
+                              .map((t) => _TagChip(label: t))
+                              .toList(),
                         ),
+                      ],
+                      const SizedBox(height: AppSpacing.xxl),
+                      _PullQuote(text: article.summary, accent: accent),
+                      const SizedBox(height: AppSpacing.xxl),
+                      _ArticleBody(
+                        paragraphs: articleParagraphs,
+                        articleId: article.id,
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    article.headline,
-                    style: tt.displaySmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
-                      height: 1.08,
-                      letterSpacing: -0.6,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _Byline(
-                    sourceName: article.sourceName,
-                    publishedAt: article.publishedAt,
-                    readingMinutes: readingMinutes,
-                    accent: accent,
-                  ),
-                  if (article.tags.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.lg),
-                    Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children:
-                          article.tags.map((t) => _TagChip(label: t)).toList(),
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.xxl),
-                  _PullQuote(text: article.summary, accent: accent),
-                  const SizedBox(height: AppSpacing.xl),
-                  Text(
-                    article.body,
-                    style: tt.bodyLarge?.copyWith(
-                      fontSize: 17,
-                      height: 1.7,
-                      color: cs.onSurface,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -418,21 +476,76 @@ class _PullQuote extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     return Container(
-      padding: const EdgeInsets.only(left: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(color: accent, width: 3),
-        ),
+        color: accent.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: accent.withValues(alpha: 0.22)),
       ),
-      child: Text(
-        text,
-        style: tt.titleLarge?.copyWith(
-          fontSize: 19,
-          height: 1.5,
-          fontWeight: FontWeight.w500,
-          color: cs.onSurfaceVariant,
-        ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.format_quote_rounded, color: accent, size: 24),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              text,
+              style: tt.titleLarge?.copyWith(
+                fontSize: 18,
+                height: 1.48,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _ArticleBody extends StatelessWidget {
+  const _ArticleBody({required this.paragraphs, required this.articleId});
+
+  final List<String> paragraphs;
+  final String articleId;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final paragraphStyle = tt.bodyLarge?.copyWith(
+      fontSize: 18,
+      height: 1.72,
+      letterSpacing: 0,
+      color: cs.onSurface.withValues(alpha: 0.92),
+    );
+    final children = <Widget>[];
+
+    for (var i = 0; i < paragraphs.length; i++) {
+      children.add(
+        Text(
+          paragraphs[i],
+          style: paragraphStyle,
+          textAlign: TextAlign.start,
+        ),
+      );
+
+      if (i == 0) {
+        children.addAll([
+          const SizedBox(height: AppSpacing.xl),
+          InlineNativeAd(key: ValueKey('article_inline_ad_$articleId')),
+          const SizedBox(height: AppSpacing.xl),
+        ]);
+      } else if (i < paragraphs.length - 1) {
+        children.add(const SizedBox(height: AppSpacing.lg));
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
     );
   }
 }
@@ -516,4 +629,23 @@ String _relativeTime(DateTime time) {
   if (diff.inHours < 24) return '${diff.inHours}h ago';
   if (diff.inDays < 7) return '${diff.inDays}d ago';
   return DateFormat.yMMMd().format(time);
+}
+
+List<String> _splitParagraphs(String body) {
+  final trimmed = body.trim();
+  if (trimmed.isEmpty) return const [];
+
+  final blankLineParagraphs = trimmed
+      .split(RegExp(r'\n\s*\n+'))
+      .map((p) => p.trim())
+      .where((p) => p.isNotEmpty)
+      .toList();
+  if (blankLineParagraphs.length > 1) return blankLineParagraphs;
+
+  final lineParagraphs = trimmed
+      .split(RegExp(r'\n+'))
+      .map((p) => p.trim())
+      .where((p) => p.isNotEmpty)
+      .toList();
+  return lineParagraphs.isEmpty ? [trimmed] : lineParagraphs;
 }

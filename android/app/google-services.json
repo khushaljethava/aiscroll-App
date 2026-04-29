@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "491758021602-lvv0it4jtch1162489suvm0479tudpqm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kj.aiscroll",
+            "certificate_hash": "7836fafdf105c8c735125b64ed6751293f2b0ebe"
+          }
+        },
+        {
           "client_id": "491758021602-dsrlme64c9a71nh2th3mmu8fufbjajhg.apps.googleusercontent.com",
           "client_type": 3
         }

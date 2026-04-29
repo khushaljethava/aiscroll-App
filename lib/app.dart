@@ -13,14 +13,14 @@ import 'data/providers/user_provider.dart';
 import 'data/remote/news_push_service.dart';
 import 'features/gamification/providers/quests_provider.dart';
 
-class AIScrollApp extends ConsumerStatefulWidget {
-  const AIScrollApp({super.key});
+class SixtySecondAIApp extends ConsumerStatefulWidget {
+  const SixtySecondAIApp({super.key});
 
   @override
-  ConsumerState<AIScrollApp> createState() => _AIScrollAppState();
+  ConsumerState<SixtySecondAIApp> createState() => _SixtySecondAIAppState();
 }
 
-class _AIScrollAppState extends ConsumerState<AIScrollApp>
+class _SixtySecondAIAppState extends ConsumerState<SixtySecondAIApp>
     with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -76,11 +76,26 @@ class _AIScrollAppState extends ConsumerState<AIScrollApp>
 
       // 2b. Prime the client JWT. This round-trips to Firebase App Check
       //     and `/api/client/token` on first run. Silent no-op when the
-      //     admin URL isn't configured or Firebase isn't initialised;
-      //     Dio interceptors still fire per-request if the cache is warm.
+      //     admin URL isn't configured or Firebase isn't initialised.
+      //
+      //     **Awaited** here so any queued deep-link (notification tap from
+      //     terminated state) drains AFTER the JWT is in cache — otherwise
+      //     `fetchById` for the deep-linked article races the auth round-
+      //     trip, hits 401, and the user sees "Article no longer
+      //     available." 4-second timeout so a hung App Check call doesn't
+      //     block boot indefinitely; the splash already shows cached
+      //     content by this point.
       final user = ref.read(userProvider);
-      // ignore: unawaited_futures
-      ref.read(authServiceProvider).getValidToken(guestId: user.id);
+      try {
+        await ref
+            .read(authServiceProvider)
+            .getValidToken(guestId: user.id)
+            .timeout(const Duration(seconds: 4));
+      } catch (_) {
+        // Don't block boot on auth failures — Dio interceptor will retry
+        // per-request on 401 and the typed `FetchByIdAuthError` UI in
+        // NewsDetailScreen surfaces lingering failures with a Retry button.
+      }
 
       // 3. Emit session_start telemetry — non-blocking, drops silently when
       //    no admin URL is configured.
@@ -127,7 +142,7 @@ class _AIScrollAppState extends ConsumerState<AIScrollApp>
     // active. MaterialApp's Builder gives us a context whose
     // Theme.of(...) has already been resolved.
     return MaterialApp.router(
-      title: 'AIScroll',
+      title: '60 Second AI',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

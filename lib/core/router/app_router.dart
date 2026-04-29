@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/local/preferences_service.dart';
 import '../../data/models/card_model.dart';
 import '../../data/models/news_model.dart';
+import '../../data/providers/news_provider.dart';
 import '../../features/feed/screens/learn_detail_screen.dart';
 import '../../features/feed/screens/track_learn_screen.dart';
 import '../../features/news/screens/news_detail_screen.dart';
@@ -68,10 +70,14 @@ class AppRoutes {
 // Bottom nav shell
 // ---------------------------------------------------------------------------
 
-class _MainShell extends StatelessWidget {
+class _MainShell extends ConsumerWidget {
   const _MainShell({required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
+
+  /// Index of the News tab in [_tabs]. Re-taps on this branch pulse
+  /// `newsTabPulseProvider` so NewsScreen can scroll to the latest story.
+  static const _newsTabIndex = 0;
 
   // Outlined icons while inactive, filled/rounded when selected — keeps the
   // nav bar quiet but still gives a clear affordance at the current tab.
@@ -99,15 +105,21 @@ class _MainShell extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
-        ),
+        onDestinationSelected: (index) {
+          final reTapped = index == navigationShell.currentIndex;
+          navigationShell.goBranch(index, initialLocation: reTapped);
+          // Re-tap on News → pulse so NewsScreen jumps to the latest
+          // article and runs a stale-aware refresh. Other branches keep
+          // their default "pop to root" behaviour from `goBranch`.
+          if (reTapped && index == _newsTabIndex) {
+            ref.read(newsTabPulseProvider.notifier).state++;
+          }
+        },
         destinations: _tabs
             .map(
               (t) => NavigationDestination(

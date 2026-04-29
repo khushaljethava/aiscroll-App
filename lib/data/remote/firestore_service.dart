@@ -166,6 +166,7 @@ class FirestoreService {
       soundEnabled: cloud.soundEnabled,
       notificationsEnabled: cloud.notificationsEnabled,
       reminderMinutesSinceMidnight: cloud.reminderMinutesSinceMidnight,
+      pushNotificationsEnabled: cloud.pushNotificationsEnabled,
       dailyReviewCap: cloud.dailyReviewCap,
       freezesAvailable: max(local.freezesAvailable, cloud.freezesAvailable),
       freezesUsedTotal: max(local.freezesUsedTotal, cloud.freezesUsedTotal),

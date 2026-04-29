@@ -13,7 +13,16 @@
       "Bash(./gradlew clean *)",
       "Bash(./gradlew :app:assembleDebug --no-build-cache --rerun-tasks)",
       "Bash(grep -n \"401\\\\|fetch failed\\\\|getValidToken\\\\|HTTP \\\\${\" C:/Users/ADMIN/random/test3/aiscroll/lib/data/remote/news_service.dart)",
-      "Read(//c/Users/ADMIN/random/test3/**)"
+      "Read(//c/Users/ADMIN/random/test3/**)",
+      "Read(//c/Program Files/Android/Android Studio/jbr/bin/**)",
+      "Read(//c/Program Files/Java/**)",
+      "Bash(/c/Program Files/Android/Android Studio/jbr/bin/keytool.exe *)",
+      "Bash('/c/Program Files/Android/Android Studio/jbr/bin/keytool.exe' -list -v -keystore C:/Users/ADMIN/random/test3/aiscroll/android/app/upload-keystore.jks -alias upload -storepass D3evil4@54645)",
+      "Bash(grep -v \":0$\")",
+      "Bash(curl -is \"https://aiscroll-admin-admin.vercel.app/api/news?limit=1\")",
+      "Bash(curl -is \"https://aiscroll-admin.vercel.app/api/news?limit=1\")",
+      "Bash(curl -is \"https://aiscroll-admin-admin.vercel.app/api/news/some-fake-id\")",
+      "Bash(curl -is \"https://aiscroll-admin-admin.vercel.app/api/news/hugging-face-transformers-v5-4-adds-mistral-4-paddlepaddle-support-and-lightweig\")"
     ]
   }
 }

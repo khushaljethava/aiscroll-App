@@ -40,6 +40,15 @@
 -dontwarn j$.time.**
 
 # ---------------------------------------------------------------------------
+# flutter_local_notifications — the boot receiver and scheduled-action
+# receivers are referenced by name from AndroidManifest.xml; R8 doesn't
+# see those string references and would otherwise strip them, breaking
+# reboot rescheduling and the foreground news banner.
+# ---------------------------------------------------------------------------
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+-dontwarn com.dexterous.flutterlocalnotifications.**
+
+# ---------------------------------------------------------------------------
 # WebView (used by Google Mobile Ads native template renderer).
 # ---------------------------------------------------------------------------
 -keepclassmembers class * extends android.webkit.WebViewClient {

@@ -41,6 +41,15 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="news" />
+        <!-- FCM: small icon used when the server payload omits one. Required —
+             without it some OEM Androids drop notifications silently because
+             the launcher icon is not a valid notification silhouette. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_color" />
         <!-- AdMob app ID. The SDK refuses to load any ad if this is missing
              or doesn't match the app ID configured in AdMob console. -->
         <meta-data

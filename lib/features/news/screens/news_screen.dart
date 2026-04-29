@@ -13,7 +13,6 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/news_model.dart';
 import '../../../data/providers/news_provider.dart';
 import '../../../data/providers/user_provider.dart';
-import '../../../data/remote/ads_service.dart';
 import '../../../features/ads/widgets/native_ad_card.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 
@@ -24,17 +23,16 @@ class _FeedAdSlot {
 }
 
 const _adSlot = _FeedAdSlot();
+const _newsAdEvery = 4;
 
-/// Interleaves an ad sentinel into [items] every [AdConfig.adEvery] real
-/// items, with an [AdConfig.adWarmup]-item warmup at the start.
+/// Interleaves an ad sentinel into [items] after every 4 real news stories.
 List<Object> interleaveAds<T extends Object>(List<T> items) {
-  if (items.length <= AdConfig.adWarmup) return List<Object>.from(items);
+  if (items.length <= _newsAdEvery) return List<Object>.from(items);
   final out = <Object>[];
   for (var i = 0; i < items.length; i++) {
     out.add(items[i]);
     final shown = i + 1;
-    if (shown > AdConfig.adWarmup &&
-        (shown - AdConfig.adWarmup) % AdConfig.adEvery == 0) {
+    if (shown % _newsAdEvery == 0) {
       out.add(_adSlot);
     }
   }
@@ -70,6 +68,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
     }
+    ref.read(newsProvider.notifier).markUnseenSeen();
   }
 
   void _onPageChanged(int i, List<Object> items) {
@@ -82,6 +81,19 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
         ref.read(userProvider.notifier).markNewsRead(item.id);
       }
     }
+    // Returning to page 0 means the user has caught up — clear the
+    // unseen counter so the "↑ N new stories" pill stops nagging.
+    if (i == 0) {
+      ref.read(newsProvider.notifier).markUnseenSeen();
+    }
+  }
+
+  void _onJumpToNewStories() {
+    FeedbackService.light(ref);
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    ref.read(newsProvider.notifier).markUnseenSeen();
   }
 
   Future<void> _onBookmark(NewsArticle article) async {
@@ -125,6 +137,42 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Auto-stick to page 0 when a refresh prepends new content while the
+    // user is already at the top of the feed. Without this, periodic
+    // refresh would shift indices but the user would have to swipe up to
+    // see the new top story even when they hadn't moved away from it.
+    ref.listen<NewsState>(newsProvider, (prev, next) {
+      final prevTopId = prev?.articles.isEmpty ?? true
+          ? null
+          : prev!.articles.first.id;
+      final nextTopId =
+          next.articles.isEmpty ? null : next.articles.first.id;
+      if (prevTopId == nextTopId) return;
+      if (!_pageController.hasClients) return;
+      final page = _pageController.page ?? 0;
+      // Within half a page of the top → consider the user "at the top".
+      if (page < 0.5) {
+        _pageController.jumpToPage(0);
+        ref.read(newsProvider.notifier).markUnseenSeen();
+      }
+    });
+
+    // Re-tap on the News bottom-nav tab → jump to the latest story and
+    // run a stale-aware refresh. The pulse counter only ever increments,
+    // so any `next > prev` is a fresh re-tap. `refreshIfStale` enforces
+    // the 30-second cache floor so tap-spamming the tab doesn't hammer
+    // the admin.
+    ref.listen<int>(newsTabPulseProvider, (prev, next) {
+      if (prev == null || next <= prev) return;
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(0);
+      }
+      final notifier = ref.read(newsProvider.notifier);
+      notifier.markUnseenSeen();
+      // ignore: unawaited_futures
+      notifier.scheduler.refreshIfStale();
+    });
+
     final state = ref.watch(newsProvider);
     final user = ref.watch(userProvider);
     final visible = state.visibleArticles;
@@ -149,8 +197,15 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                   if (_pageController.hasClients) {
                     _pageController.jumpToPage(0);
                   }
+                  ref.read(newsProvider.notifier).markUnseenSeen();
                 },
               ),
+              _FreshnessChip(state: state),
+              if (state.unseenNewCount > 0)
+                _NewStoriesPill(
+                  count: state.unseenNewCount,
+                  onTap: _onJumpToNewStories,
+                ),
               Expanded(
                 child: _FeedBody(
                   state: state,
@@ -175,6 +230,10 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
   }
 }
 
+/// Renders whenever there's a `lastError`. Severity is gated by cache age:
+///  - cache fresh (< 30 min) → subtle amber tone, "couldn't refresh"
+///  - cache stale (>= 30 min) → loud orange, "showing cached stories"
+///  - never synced → loud orange, "no stories yet"
 class _StaleBanner extends StatelessWidget {
   const _StaleBanner({required this.state});
 
@@ -182,10 +241,19 @@ class _StaleBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final err = state.lastError;
+    if (err == null) return const SizedBox.shrink();
     final last = state.lastSyncedAt;
-    final stale = last == null ||
-        DateTime.now().difference(last) > const Duration(hours: 24);
-    if (!stale || state.lastError == null) return const SizedBox.shrink();
+    final ageMinutes =
+        last == null ? null : DateTime.now().difference(last).inMinutes;
+    final severe = last == null || (ageMinutes ?? 0) >= 30;
+
+    final tone = severe ? AppColors.warning : AppColors.ctaAmber;
+    final prefix = last == null
+        ? 'Couldn\'t load news'
+        : severe
+            ? 'Showing cached stories'
+            : 'Couldn\'t refresh';
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(
@@ -199,24 +267,132 @@ class _StaleBanner extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.12),
+        color: tone.withValues(alpha: severe ? 0.12 : 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.25)),
+        border: Border.all(color: tone.withValues(alpha: severe ? 0.25 : 0.18)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.cloud_off_rounded,
-              size: 16, color: AppColors.warning),
+          Icon(Icons.cloud_off_rounded, size: 16, color: tone),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              'Showing cached stories - ${state.lastError}',
-              style: const TextStyle(fontSize: 12, color: AppColors.warning),
+              '$prefix - $err',
+              style: TextStyle(fontSize: 12, color: tone),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// One-line "Updated 2m ago" / "Never synced" / "Refreshing…" indicator
+/// rendered just below the category rail. Kills the "is polling working?"
+/// question without taking up meaningful screen real estate.
+class _FreshnessChip extends StatelessWidget {
+  const _FreshnessChip({required this.state});
+
+  final NewsState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final last = state.lastSyncedAt;
+    final label = state.refreshing
+        ? 'Refreshing…'
+        : last == null
+            ? 'Never synced'
+            : 'Updated ${_relativeTime(last)}';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenGutter,
+        2,
+        AppSpacing.screenGutter,
+        4,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Icon(
+            state.refreshing
+                ? Icons.refresh_rounded
+                : Icons.schedule_rounded,
+            size: 11,
+            color: cs.onSurfaceVariant,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: tt.labelSmall?.copyWith(
+              color: cs.onSurfaceVariant,
+              fontSize: 10.5,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "↑ N new stories" pill rendered when a periodic refresh prepends
+/// articles while the user is mid-feed. Tapping jumps to page 0 and
+/// resets the unseen counter.
+class _NewStoriesPill extends StatelessWidget {
+  const _NewStoriesPill({required this.count, required this.onTap});
+
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = count == 1 ? '1 new story' : '$count new stories';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenGutter,
+        2,
+        AppSpacing.screenGutter,
+        AppSpacing.sm,
+      ),
+      child: Center(
+        child: Material(
+          color: AppColors.ctaAmber,
+          shape: const StadiumBorder(),
+          child: InkWell(
+            onTap: onTap,
+            customBorder: const StadiumBorder(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: 6,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.arrow_upward_rounded,
+                    size: 14,
+                    color: AppColors.inkBlack,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: AppColors.inkBlack,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

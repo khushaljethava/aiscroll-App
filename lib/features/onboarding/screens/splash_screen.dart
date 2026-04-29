@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   .fadeIn(duration: 400.ms),
               const SizedBox(height: 24),
               const Text(
-                'AIScroll',
+                '60 Second AI',
                 style: TextStyle(
                   color: AppColors.primary,
                   fontSize: 32,

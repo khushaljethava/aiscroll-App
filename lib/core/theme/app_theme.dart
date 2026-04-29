@@ -4,7 +4,7 @@ import 'app_colors.dart';
 import 'app_semantic_colors.dart';
 import 'app_spacing.dart';
 
-/// Editorial theme for AIScroll.
+/// Editorial theme for 60 Second AI.
 ///
 /// Typography blends two Google Fonts:
 ///  - **Newsreader** (serif) for display/headline — gives the News feature

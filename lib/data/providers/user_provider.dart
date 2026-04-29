@@ -8,6 +8,7 @@ import '../models/user_model.dart';
 import '../../core/constants/xp_constants.dart';
 import '../../core/notifications/notification_service.dart';
 import '../remote/firestore_service.dart';
+import '../remote/news_push_service.dart';
 import '../remote/telemetry_service.dart';
 import 'telemetry_provider.dart';
 
@@ -642,6 +643,29 @@ class UserNotifier extends StateNotifier<UserProfile> {
     if (state.notificationsEnabled) {
       await NotificationService.instance.scheduleDaily(clamped);
     }
+  }
+
+  /// Toggles FCM news-topic subscription. On enable, prompts the user for
+  /// system permission (Android 13+ / iOS) and subscribes the device.
+  /// State reflects reality: if permission is denied, the toggle stays off.
+  Future<bool> setPushEnabled(bool v) async {
+    final svc = _ref?.read(newsPushServiceProvider);
+    if (svc == null) {
+      // Tests / harness without a Ref — treat as a no-op success.
+      state = state.copyWith(pushNotificationsEnabled: v);
+      await _flushSave();
+      return v;
+    }
+    if (v) {
+      final granted = await svc.requestPermissionAndSubscribe();
+      state = state.copyWith(pushNotificationsEnabled: granted);
+      await _flushSave();
+      return granted;
+    }
+    await svc.unsubscribe();
+    state = state.copyWith(pushNotificationsEnabled: false);
+    await _flushSave();
+    return true;
   }
 
   // -------------------------------------------------------------------------

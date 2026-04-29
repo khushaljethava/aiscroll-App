@@ -98,6 +98,10 @@ class UserProfile {
   // --- notifications ---
   final bool notificationsEnabled;
   final int reminderMinutesSinceMidnight;
+  // FCM news-topic opt-in. Distinct from `notificationsEnabled` (which
+  // governs the daily local reminder) — users may want one without the
+  // other. Default off so we never auto-prompt on first launch.
+  final bool pushNotificationsEnabled;
 
   const UserProfile({
     required this.id,
@@ -136,6 +140,7 @@ class UserProfile {
     this.lastFreezeGrantedAt,
     this.notificationsEnabled = false,
     this.reminderMinutesSinceMidnight = 8 * 60,
+    this.pushNotificationsEnabled = false,
   });
 
   /// Bumped whenever the cloud-side `toFirestoreMap` schema changes in a
@@ -187,6 +192,7 @@ class UserProfile {
     DateTime? lastFreezeGrantedAt,
     bool? notificationsEnabled,
     int? reminderMinutesSinceMidnight,
+    bool? pushNotificationsEnabled,
   }) => UserProfile(
     id: id,
     name: identical(name, _sentinel) ? this.name : name as String?,
@@ -228,6 +234,8 @@ class UserProfile {
     notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     reminderMinutesSinceMidnight:
         reminderMinutesSinceMidnight ?? this.reminderMinutesSinceMidnight,
+    pushNotificationsEnabled:
+        pushNotificationsEnabled ?? this.pushNotificationsEnabled,
   );
 
   Map<String, dynamic> toMap() => {
@@ -268,6 +276,7 @@ class UserProfile {
     'lastFreezeGrantedAt': lastFreezeGrantedAt?.toIso8601String(),
     'notificationsEnabled': notificationsEnabled,
     'reminderMinutesSinceMidnight': reminderMinutesSinceMidnight,
+    'pushNotificationsEnabled': pushNotificationsEnabled,
   };
 
   factory UserProfile.fromMap(Map<String, dynamic> m) => UserProfile(
@@ -316,6 +325,8 @@ class UserProfile {
     notificationsEnabled: (m['notificationsEnabled'] as bool?) ?? false,
     reminderMinutesSinceMidnight:
         (m['reminderMinutesSinceMidnight'] as int?) ?? 8 * 60,
+    pushNotificationsEnabled:
+        (m['pushNotificationsEnabled'] as bool?) ?? false,
   );
 
   /// Cloud-shaped payload for `users/{uid}` in Firestore.

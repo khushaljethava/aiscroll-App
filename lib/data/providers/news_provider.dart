@@ -15,6 +15,11 @@ class NewsState {
   final String? lastError;
   final bool refreshing;
 
+  /// Articles that arrived above what the user last saw at the top of the
+  /// feed. Drives the "↑ N new stories" pill so a periodic refresh that
+  /// prepends content while the user is mid-feed is visible.
+  final int unseenNewCount;
+
   const NewsState({
     this.articles = const [],
     this.categories = const [],
@@ -22,6 +27,7 @@ class NewsState {
     this.lastSyncedAt,
     this.lastError,
     this.refreshing = false,
+    this.unseenNewCount = 0,
   });
 
   /// Articles filtered by [selectedCategoryKey]; pinned items stay on top in
@@ -41,6 +47,7 @@ class NewsState {
     DateTime? lastSyncedAt,
     Object? lastError = _sentinel,
     bool? refreshing,
+    int? unseenNewCount,
   }) =>
       NewsState(
         articles: articles ?? this.articles,
@@ -53,6 +60,7 @@ class NewsState {
             ? this.lastError
             : lastError as String?,
         refreshing: refreshing ?? this.refreshing,
+        unseenNewCount: unseenNewCount ?? this.unseenNewCount,
       );
 
   static const _sentinel = Object();
@@ -96,15 +104,42 @@ class NewsNotifier extends StateNotifier<NewsState> {
   /// Network refresh. Never throws — on failure, keeps existing state and
   /// surfaces [lastError].
   Future<void> refresh() async {
+    final prevTopId =
+        state.articles.isEmpty ? null : state.articles.first.id;
     state = state.copyWith(refreshing: true);
     await _service.refreshFromNetwork();
+    final newArticles = _service.articles;
+    // Count articles that appear above the previous top-of-feed id. If the
+    // previous top isn't in the new list (unlikely — server keeps 30 most
+    // recent), treat the entire payload as "new".
+    var unseenDelta = 0;
+    if (prevTopId != null) {
+      for (final a in newArticles) {
+        if (a.id == prevTopId) break;
+        unseenDelta++;
+      }
+      // If we walked the whole list without finding prevTopId, the list
+      // rolled past — cap the delta at the list length so we don't
+      // double-count the entire feed.
+      if (unseenDelta == newArticles.length) {
+        unseenDelta = newArticles.length;
+      }
+    }
     state = state.copyWith(
-      articles: _service.articles,
+      articles: newArticles,
       categories: _service.categories,
       lastSyncedAt: _service.lastSyncedAt,
       lastError: _service.lastError,
       refreshing: false,
+      unseenNewCount: state.unseenNewCount + unseenDelta,
     );
+  }
+
+  /// Resets the unseen counter — call when the user scrolls back to page 0
+  /// or taps the "↑ N new stories" pill.
+  void markUnseenSeen() {
+    if (state.unseenNewCount == 0) return;
+    state = state.copyWith(unseenNewCount: 0);
   }
 
   void selectCategory(String? key) {
@@ -153,10 +188,19 @@ final newsCategoryByKeyProvider =
 
 /// Resolve a single article by id, falling back to the network when the
 /// item isn't in the home-feed cache (notifications can deep-link to
-/// articles older than the 30 most-recent the cache holds).
-final newsArticleFetchProvider =
-    FutureProvider.autoDispose.family<NewsArticle?, String>((ref, id) async {
+/// articles older than the 30 most-recent the cache holds). Returns a
+/// typed result so the UI can branch on Success / NotFound / AuthError /
+/// NetworkError instead of collapsing every failure into "article gone."
+final newsArticleFetchProvider = FutureProvider.autoDispose
+    .family<FetchByIdResult, String>((ref, id) async {
   final cached = ref.watch(newsArticleByIdProvider(id));
-  if (cached != null) return cached;
+  if (cached != null) return FetchByIdSuccess(cached);
   return ref.read(newsServiceProvider).fetchById(id);
 });
+
+/// Pulses (increments) every time the user taps the News bottom-nav tab
+/// while already on the News branch. NewsScreen `ref.listen`s on this
+/// and resets to page 0 + does a stale-aware refresh — the "Twitter
+/// top-tap" UX. Decoupled from `goBranch` so the router stays a pure
+/// StatelessWidget concern; only `_MainShell` writes to it.
+final newsTabPulseProvider = StateProvider<int>((ref) => 0);

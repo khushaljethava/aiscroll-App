@@ -19,6 +19,33 @@ class NewsFetchResult {
   });
 }
 
+/// Outcome of [NewsService.fetchById]. Lets the UI distinguish a genuine
+/// 404 ("article gone") from transient failures ("auth expired",
+/// "network down") so the screen can offer the right recovery — Retry
+/// for transient, "no longer available" only for genuine misses.
+sealed class FetchByIdResult {
+  const FetchByIdResult();
+}
+
+class FetchByIdSuccess extends FetchByIdResult {
+  const FetchByIdSuccess(this.article);
+  final NewsArticle article;
+}
+
+class FetchByIdNotFound extends FetchByIdResult {
+  const FetchByIdNotFound();
+}
+
+class FetchByIdAuthError extends FetchByIdResult {
+  const FetchByIdAuthError(this.statusCode);
+  final int statusCode;
+}
+
+class FetchByIdNetworkError extends FetchByIdResult {
+  const FetchByIdNetworkError(this.message);
+  final String message;
+}
+
 /// Pulls news from the admin's public `/api/news` endpoint and caches the
 /// latest page in SharedPreferences so the feed renders instantly on launch.
 ///
@@ -96,6 +123,11 @@ class NewsService {
     if (!isAdminConfigured) {
       _lastError =
           'ADMIN_API_URL not configured; staying on cached data.';
+      // Diagnostic: explicit log so a forgotten `--dart-define=ADMIN_API_URL=…`
+      // is obvious in logcat. Without this, the only signal is `_lastError`
+      // which the UI gates behind a 24-h staleness check.
+      debugPrint('NewsService: ADMIN_API_URL is empty — '
+          'rebuild with --dart-define=ADMIN_API_URL=<host>');
       return false;
     }
     // Diagnostic: surface the composed URL to logcat. Cheap and easy to
@@ -162,6 +194,13 @@ class NewsService {
       _lastSyncedAt = DateTime.now();
       _lastError = null;
 
+      // Diagnostic fingerprint: lets you tell from logcat whether the
+      // server is producing new content vs. echoing the same payload
+      // every poll.
+      debugPrint('NewsService: refreshed ${decodedArticles.length} articles, '
+          'top id=${decodedArticles.isEmpty ? "<empty>" : decodedArticles.first.id} '
+          'top published=${decodedArticles.isEmpty ? "" : decodedArticles.first.publishedAt.toIso8601String()}');
+
       await _prefs.saveNewsArticlesJson(
         jsonEncode(decodedArticles.map((a) => a.toMap()).toList()),
       );
@@ -179,27 +218,43 @@ class NewsService {
     }
   }
 
-  /// Fetches a single article by id. Returns null on 404, network failure,
-  /// missing admin URL, or malformed response. Used by the deep-link path
-  /// when the article isn't in the 30-item home-feed cache.
-  Future<NewsArticle?> fetchById(String id) async {
-    if (!isAdminConfigured) return null;
-    if (id.isEmpty) return null;
+  /// Fetches a single article by id. Used by the deep-link path when the
+  /// article isn't in the 30-item home-feed cache. Returns a typed result
+  /// so the UI can offer Retry for transient failures and only show
+  /// "no longer available" for genuine 404s.
+  Future<FetchByIdResult> fetchById(String id) async {
+    if (!isAdminConfigured || id.isEmpty) {
+      return const FetchByIdNotFound();
+    }
     try {
       final resp = await _dio.get<dynamic>(
         '$_baseUrl/api/news/${Uri.encodeComponent(id)}',
         options: _reqOptions(),
       );
-      if (resp.statusCode != 200) return null;
+      final code = resp.statusCode ?? 0;
+      if (code == 404) return const FetchByIdNotFound();
+      if (code == 401 || code == 403) return FetchByIdAuthError(code);
+      if (code != 200) {
+        return FetchByIdNetworkError('HTTP $code');
+      }
       final body = resp.data;
-      if (body is! Map<String, dynamic>) return null;
-      if (body['success'] != true) return null;
+      if (body is! Map<String, dynamic>) {
+        return const FetchByIdNetworkError('Bad response shape');
+      }
+      if (body['success'] != true) {
+        return const FetchByIdNotFound();
+      }
       final data = body['data'];
-      if (data is! Map<String, dynamic>) return null;
-      return NewsArticle.fromMap(data);
+      if (data is! Map<String, dynamic>) {
+        return const FetchByIdNotFound();
+      }
+      return FetchByIdSuccess(NewsArticle.fromMap(data));
+    } on DioException catch (e) {
+      debugPrint('NewsService.fetchById($id) DioException: ${e.message}');
+      return FetchByIdNetworkError(e.message ?? e.type.name);
     } catch (e) {
       debugPrint('NewsService.fetchById($id) failed: $e');
-      return null;
+      return FetchByIdNetworkError('$e');
     }
   }
 

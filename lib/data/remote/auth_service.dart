@@ -33,7 +33,7 @@ class AuthFailed implements Exception {
 ///     App Attest provider on iOS (debug provider in debug builds).
 ///  2. On first request, `AuthService.getValidToken()` asks Firebase for an
 ///     App Check token, posts `{ appCheckToken, guestId }` to
-///     `/api/client/token`, and receives a signed AIScroll client JWT that
+///     `/api/client/token`, and receives a signed 60 Second AI client JWT that
 ///     middleware accepts on every `/api/news`, `/api/content/*`, and
 ///     `/api/events/*` request.
 ///  3. The JWT + its expiry are cached in SharedPreferences. We refresh

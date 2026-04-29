@@ -77,6 +77,11 @@ class PeriodicSyncScheduler {
       return;
     }
     _inFlight = true;
+    // Confirms in logcat that the timer is actually firing. Without this,
+    // "polling never happens" complaints can't be distinguished from
+    // "polling happens but server returns the same data".
+    debugPrint('PeriodicSyncScheduler[$label]: $source tick @ '
+        '${DateTime.now().toIso8601String()}');
     try {
       await _refresh();
     } catch (e) {

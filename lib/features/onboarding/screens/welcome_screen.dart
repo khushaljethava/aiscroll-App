@@ -99,7 +99,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   .fadeIn(duration: 400.ms),
               const SizedBox(height: 16),
               const Text(
-                'Welcome to AIScroll',
+                'Welcome to 60 Second AI',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.textPrimary,

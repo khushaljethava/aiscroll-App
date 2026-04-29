@@ -10,6 +10,7 @@ import 'app.dart';
 import 'core/notifications/notification_service.dart';
 import 'data/local/preferences_service.dart';
 import 'data/remote/news_push_service.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,12 +32,12 @@ void main() async {
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  runApp(const ProviderScope(child: AIScrollApp()));
+  runApp(const ProviderScope(child: SixtySecondAIApp()));
 }
 
 /// Initialise Firebase + App Check. Both are required for the admin API
 /// auth flow (the Flutter client exchanges an App Check token for an
-/// AIScroll client JWT in [AuthService]).
+/// 60 Second AI client JWT in [AuthService]).
 ///
 /// Failures here are logged and swallowed — the app keeps running in
 /// offline-first mode with whatever is already in the cache. That's
@@ -44,10 +45,16 @@ void main() async {
 /// precondition for the user to see content.
 Future<void> _initFirebaseAppCheck() async {
   try {
-    // `Firebase.initializeApp` with no options picks up
-    // `google-services.json` on Android and `GoogleService-Info.plist` on
-    // iOS. Web builds need explicit options — not a target today.
-    await Firebase.initializeApp();
+    // Pass explicit options so initialization doesn't depend solely on
+    // the Gradle plugin parsing `google-services.json` at build time.
+    // iOS isn't configured in `firebase_options.dart` yet, so guard.
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } else {
+      await Firebase.initializeApp();
+    }
     await FirebaseAppCheck.instance.activate(
       // Debug builds: let Firebase print a debug token on first launch so
       // developers can register it in the console.

@@ -76,6 +76,8 @@ class ProfileScreen extends ConsumerWidget {
               _SettingsGroup(
                 label: 'Notifications',
                 children: [
+                  _PushSwitchTile(user: user),
+                  const _ThemedDivider(),
                   _ReminderSwitchTile(user: user),
                   const _ThemedDivider(),
                   _ReminderTimeTile(user: user),
@@ -1056,6 +1058,33 @@ class _NavTile extends StatelessWidget {
 // Notifications group tiles
 // ---------------------------------------------------------------------------
 
+class _PushSwitchTile extends ConsumerWidget {
+  const _PushSwitchTile({required this.user});
+  final UserProfile user;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SwitchListTile(
+      title: const Text('News push notifications'),
+      subtitle: const Text('Breaking AI news from the 60 Second AI team.'),
+      secondary: const Icon(Icons.campaign_rounded),
+      value: user.pushNotificationsEnabled,
+      onChanged: (v) async {
+        final ok = await ref.read(userProvider.notifier).setPushEnabled(v);
+        if (v && !ok && context.mounted) {
+          // Permission denied — Android 13+ won't show the dialog again.
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+              'Push notifications are blocked. Enable them in Settings → Apps → 60 Second AI → Notifications.',
+            ),
+            duration: Duration(seconds: 6),
+          ));
+        }
+      },
+    );
+  }
+}
+
 class _ReminderSwitchTile extends ConsumerWidget {
   const _ReminderSwitchTile({required this.user});
   final UserProfile user;
@@ -1066,8 +1095,19 @@ class _ReminderSwitchTile extends ConsumerWidget {
       title: const Text('Daily reminder'),
       secondary: const Icon(Icons.notifications_rounded),
       value: user.notificationsEnabled,
-      onChanged: (v) =>
-          ref.read(userProvider.notifier).setNotificationsEnabled(v),
+      onChanged: (v) async {
+        final ok =
+            await ref.read(userProvider.notifier).setNotificationsEnabled(v);
+        if (v && !ok && context.mounted) {
+          // Permission permanently denied — Android 13+ won't re-prompt.
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+              'Notifications are blocked. Enable them in Settings → Apps → 60 Second AI → Notifications.',
+            ),
+            duration: Duration(seconds: 6),
+          ));
+        }
+      },
     );
   }
 }
