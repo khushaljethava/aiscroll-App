@@ -40,10 +40,21 @@ class AnalyticsService {
   /// Reads the persisted opt-out and applies it to the SDK. Safe to call from
   /// app boot before `runApp`; failures degrade to "analytics off".
   Future<void> init() async {
-    _enabled = _prefs.getBool(_kEnabledPref) ?? !kDebugMode;
+    // [Analytics-Verify] TEMP: forced ON for DebugView verification.
+    // Original: `_prefs.getBool(_kEnabledPref) ?? !kDebugMode`. Revert in Step 7.
+    _enabled = _prefs.getBool(_kEnabledPref) ?? true;
+    // [Analytics-Verify] temporary diagnostic — remove after verification.
+    debugPrint('[Analytics] init: firebaseAvailable=$_firebaseAvailable '
+        'enabled=$_enabled kDebugMode=$kDebugMode');
     if (!_firebaseAvailable) return;
     try {
       await _analytics.setAnalyticsCollectionEnabled(_enabled);
+      // [Analytics-Verify] print app_instance_id so we can match logs to
+      // Firebase Console DebugView. Remove after verification.
+      // ignore: discarded_futures
+      _analytics.appInstanceId.then(
+        (id) => debugPrint('[Analytics] app_instance_id=$id'),
+      );
     } catch (e) {
       debugPrint('AnalyticsService.init failed: $e');
     }
@@ -87,12 +98,20 @@ class AnalyticsService {
     String name, {
     Map<String, Object?> params = const {},
   }) async {
-    if (!_enabled || !_firebaseAvailable) return;
+    if (!_enabled || !_firebaseAvailable) {
+      // [Analytics-Verify] temporary diagnostic — remove after verification.
+      debugPrint('[Analytics] SKIP event=$name '
+          '(enabled=$_enabled firebaseAvailable=$_firebaseAvailable)');
+      return;
+    }
     try {
+      final sanitized = _sanitize(params);
       await _analytics.logEvent(
         name: name,
-        parameters: _sanitize(params),
+        parameters: sanitized,
       );
+      // [Analytics-Verify] temporary diagnostic — remove after verification.
+      debugPrint('[Analytics] sent event=$name params=$sanitized');
     } catch (e) {
       debugPrint('AnalyticsService.logEvent($name) failed: $e');
     }
@@ -198,9 +217,16 @@ class AnalyticsService {
   // ---------------------------------------------------------------------------
 
   Future<void> _safe(Future<void> Function() op) async {
-    if (!_enabled || !_firebaseAvailable) return;
+    if (!_enabled || !_firebaseAvailable) {
+      // [Analytics-Verify] temporary diagnostic — remove after verification.
+      debugPrint('[Analytics] SKIP _safe op '
+          '(enabled=$_enabled firebaseAvailable=$_firebaseAvailable)');
+      return;
+    }
     try {
       await op();
+      // [Analytics-Verify] temporary diagnostic — remove after verification.
+      debugPrint('[Analytics] _safe op ok');
     } catch (e) {
       debugPrint('AnalyticsService op failed: $e');
     }

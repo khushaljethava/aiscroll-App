@@ -22,7 +22,11 @@
       "Bash(curl -is \"https://aiscroll-admin-admin.vercel.app/api/news?limit=1\")",
       "Bash(curl -is \"https://aiscroll-admin.vercel.app/api/news?limit=1\")",
       "Bash(curl -is \"https://aiscroll-admin-admin.vercel.app/api/news/some-fake-id\")",
-      "Bash(curl -is \"https://aiscroll-admin-admin.vercel.app/api/news/hugging-face-transformers-v5-4-adds-mistral-4-paddlepaddle-support-and-lightweig\")"
+      "Bash(curl -is \"https://aiscroll-admin-admin.vercel.app/api/news/hugging-face-transformers-v5-4-adds-mistral-4-paddlepaddle-support-and-lightweig\")",
+      "Bash(adb -s ZY22H7T653 shell setprop debug.firebase.analytics.app com.kj.aiscroll)",
+      "Bash(adb -s ZY22H7T653 shell getprop debug.firebase.analytics.app)",
+      "Bash(\"/c/Users/ADMIN/AppData/Local/Android/Sdk/platform-tools/adb.exe\" -s ZY22H7T653 shell setprop debug.firebase.analytics.app com.kj.aiscroll)",
+      "Bash(\"/c/Users/ADMIN/AppData/Local/Android/Sdk/platform-tools/adb.exe\" -s ZY22H7T653 shell getprop debug.firebase.analytics.app)"
     ]
   }
 }
