@@ -62,10 +62,21 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
 
   void setPersona(String persona) {
     state = state.copyWith(persona: persona);
+    // ignore: discarded_futures
+    _ref.read(analyticsServiceProvider).logOnboardingStep(
+          'persona',
+          extra: {'value': persona},
+        );
   }
 
   void setKnowledgeLevel(double level) {
-    state = state.copyWith(knowledgeLevel: level.clamp(0.0, 3.0));
+    final clamped = level.clamp(0.0, 3.0);
+    state = state.copyWith(knowledgeLevel: clamped);
+    // ignore: discarded_futures
+    _ref.read(analyticsServiceProvider).logOnboardingStep(
+          'knowledge_level',
+          extra: {'value': knowledgeKeyFromValue(clamped)},
+        );
   }
 
   void toggleTopic(String topic) {
@@ -76,10 +87,20 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
       current.add(topic);
     }
     state = state.copyWith(selectedTopics: List.unmodifiable(current));
+    // ignore: discarded_futures
+    _ref.read(analyticsServiceProvider).logOnboardingStep(
+          'topics',
+          extra: {'count': current.length},
+        );
   }
 
   void setDailyGoal(int goal) {
     state = state.copyWith(dailyGoal: goal);
+    // ignore: discarded_futures
+    _ref.read(analyticsServiceProvider).logOnboardingStep(
+          'daily_goal',
+          extra: {'value': goal},
+        );
   }
 
   Future<void> completeOnboarding({bool stayGuest = false}) async {

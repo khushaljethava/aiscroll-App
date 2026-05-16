@@ -142,6 +142,21 @@ class AnalyticsService {
 
   Future<void> logTutorialComplete() => _safe(_analytics.logTutorialComplete);
 
+  /// Emits a step-level funnel event. Pair with the auto-logged
+  /// `screen_view` events from FirebaseAnalyticsObserver to compute
+  /// onboarding drop-off per step in GA4.
+  ///
+  /// Recommended steps: `welcome`, `persona`, `knowledge_level`, `topics`,
+  /// `daily_goal`, `login`, `register`, `complete`.
+  Future<void> logOnboardingStep(
+    String step, {
+    Map<String, Object>? extra,
+  }) =>
+      logEvent('onboarding_step_complete', params: {
+        'step': step,
+        ...?extra,
+      });
+
   Future<void> logCardViewed(
     String cardId, {
     int dwellMs = 0,
