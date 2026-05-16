@@ -37,6 +37,8 @@ dependencies:
   firebase_analytics: ^11.3.3
   # AdMob — native + rewarded ads for monetisation.
   google_mobile_ads: ^5.2.0
+  # Text-to-speech — read cards aloud (commuter / accessibility use case).
+  flutter_tts: ^4.0.2
 
 dev_dependencies:
   flutter_test:

@@ -9,6 +9,7 @@ import '../../../core/feedback/feedback_service.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/share/card_image_share.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/tts/tts_service.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/card_model.dart';
 import '../../../data/models/quest_model.dart';
@@ -80,6 +81,9 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
     // End dwell telemetry regardless of whether XP was awarded. Uses the
     // cached notifier — `ref` is unavailable at this point.
     _feedNotifier.endDwell(widget.cardId);
+    // Stop any TTS playback so audio doesn't bleed into the next screen.
+    // ignore: discarded_futures
+    TtsService.instance.stop();
     super.dispose();
   }
 
@@ -143,6 +147,22 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
   Future<void> _toggleBookmark(LearningCard card) async {
     FeedbackService.light(ref);
     await _userNotifier.toggleBookmark(card.id);
+  }
+
+  Future<void> _speak(LearningCard card) async {
+    FeedbackService.light(ref);
+    final buf = StringBuffer()
+      ..writeln(card.title)
+      ..writeln()
+      ..writeln(card.takeaway)
+      ..writeln()
+      ..writeln(card.explanation);
+    if (card.expandedContent != null) {
+      buf
+        ..writeln()
+        ..writeln(card.expandedContent);
+    }
+    await TtsService.instance.speak(buf.toString());
   }
 
   Future<void> _share(LearningCard card) async {
@@ -285,6 +305,7 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
             isLearned: isLearned,
             onMarkLearned: () => _markLearned(card),
             onShare: () => _share(card),
+            onSpeak: () => _speak(card),
           ),
         ),
       ],
@@ -397,12 +418,14 @@ class _BottomBar extends StatelessWidget {
     required this.isLearned,
     required this.onMarkLearned,
     required this.onShare,
+    required this.onSpeak,
   });
 
   final LearningCard card;
   final bool isLearned;
   final VoidCallback onMarkLearned;
   final VoidCallback onShare;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
@@ -442,6 +465,17 @@ class _BottomBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            ValueListenableBuilder<bool>(
+              valueListenable: TtsService.instance.isSpeaking,
+              builder: (context, speaking, _) => _RoundIconButton(
+                icon: speaking
+                    ? Icons.stop_rounded
+                    : Icons.volume_up_rounded,
+                tooltip: speaking ? 'Stop reading' : 'Read aloud',
+                onTap: onSpeak,
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
