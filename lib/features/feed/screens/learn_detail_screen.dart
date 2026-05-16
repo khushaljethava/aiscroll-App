@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/xp_constants.dart';
 import '../../../core/feedback/feedback_service.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/share/card_image_share.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/card_model.dart';
@@ -20,6 +20,7 @@ import '../../../shared/widgets/app_tag_chip.dart';
 import '../providers/feed_provider.dart';
 import '../providers/srs_provider.dart';
 import '../widgets/difficulty_badge.dart';
+import '../widgets/shareable_card.dart';
 
 /// Full-screen reader for a single [LearningCard]. The XP award flow (dwell
 /// timer + mark-read) lives here now — in the list-based feed, scrolling past
@@ -42,6 +43,7 @@ class LearnDetailScreen extends ConsumerStatefulWidget {
 class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
   Timer? _dwellTimer;
   bool _awarded = false;
+  final GlobalKey _shareBoundaryKey = GlobalKey();
 
   /// Riverpod forbids `ref` access after the widget is disposed, so we cache
   /// every notifier this screen mutates during [initState] and use the cached
@@ -145,11 +147,11 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
 
   Future<void> _share(LearningCard card) async {
     FeedbackService.light(ref);
-    await SharePlus.instance.share(
-      ShareParams(
-        text: 'Check out this AI concept: ${card.title}\n\n${card.takeaway}',
-        subject: card.title,
-      ),
+    await shareWidgetAsImage(
+      boundaryKey: _shareBoundaryKey,
+      fallbackText:
+          'Check out this AI concept: ${card.title}\n\n${card.takeaway}',
+      subject: card.title,
     );
     await _questsNotifier.recordEvent(QuestType.shareCard);
   }
@@ -170,9 +172,22 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
     final isBookmarked = user.bookmarkedCardIds.contains(card.id);
     final isLearned = user.learnedCardIds.contains(card.id);
 
-    return Scaffold(
-      // Theme drives scaffold colour — inkBlack in dark, paper in light.
-      appBar: AppBar(
+    return Stack(
+      children: [
+        // Hidden capture target. Positioned far offscreen so it lays out
+        // and paints but is never visible. RepaintBoundary scopes the
+        // share pipeline's `toImage(...)` call to just this subtree.
+        Positioned(
+          left: -10000,
+          top: -10000,
+          child: RepaintBoundary(
+            key: _shareBoundaryKey,
+            child: ShareableCard(card: card),
+          ),
+        ),
+        Scaffold(
+          // Theme drives scaffold colour — inkBlack in dark, paper in light.
+          appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).maybePop().then((popped) {
@@ -265,12 +280,14 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: _BottomBar(
-        card: card,
-        isLearned: isLearned,
-        onMarkLearned: () => _markLearned(card),
-        onShare: () => _share(card),
-      ),
+          bottomNavigationBar: _BottomBar(
+            card: card,
+            isLearned: isLearned,
+            onMarkLearned: () => _markLearned(card),
+            onShare: () => _share(card),
+          ),
+        ),
+      ],
     );
   }
 }
