@@ -99,21 +99,14 @@ class TracksScreen extends ConsumerWidget {
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              sliver: SliverGrid(
-                // Adaptive extent — 2 columns on phones (<= ~440 px), 3 on
-                // large phones / tablets, 4 on desktop. `mainAxisExtent`
-                // fixes tile height so track names that wrap can't clip
-                // the progress bar.
-                gridDelegate:
-                    const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 220,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  mainAxisExtent: 220,
-                ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) => _TrackCard(track: filtered[index]),
+                  (context, index) => _PathStation(
+                    track: filtered[index],
+                    side: index.isEven ? _PathSide.left : _PathSide.right,
+                    isLast: index == filtered.length - 1,
+                  ),
                   childCount: filtered.length,
                 ),
               ),
@@ -165,13 +158,27 @@ class _FilterRow extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// _TrackCard
+// _PathStation — a single node on the learning path.
+//
+// Tracks are rendered as alternating-side stations connected by dashed
+// vertical trails. Each station shows a circular emoji medallion with a
+// progress ring; completed tracks get a gold ring + check overlay,
+// not-started tracks get a muted outline ring, in-progress tracks show
+// partial fill.
 // ---------------------------------------------------------------------------
 
-class _TrackCard extends ConsumerWidget {
-  const _TrackCard({required this.track});
+enum _PathSide { left, right }
+
+class _PathStation extends ConsumerWidget {
+  const _PathStation({
+    required this.track,
+    required this.side,
+    required this.isLast,
+  });
 
   final LearningTrack track;
+  final _PathSide side;
+  final bool isLast;
 
   Color _accent() {
     switch (track.level) {
@@ -191,89 +198,226 @@ class _TrackCard extends ConsumerWidget {
     final learned = user.learnedCardIds;
     final completed = track.completedCount(learned);
     final progress = track.progressFor(learned);
-    // Pro/paywall removed — every track is free; ads are the only
-    // monetisation surface. The `isPremium` field on the track model
-    // stays so existing manifests parse, but we ignore it for routing.
     final accent = _accent();
+    final isCompleted = track.isCompleted(learned);
+    final inProgress = !isCompleted && completed > 0;
 
-    return Material(
-      color: AppColors.inkSurface,
-      borderRadius: BorderRadius.circular(16),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.push(AppRoutes.learnTrack(track.id)),
-        child: Ink(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.inkHairline),
-            borderRadius: BorderRadius.circular(16),
+    final medallion = _Medallion(
+      emoji: track.emoji,
+      accent: accent,
+      progress: progress,
+      isCompleted: isCompleted,
+      onTap: () => context.push(AppRoutes.learnTrack(track.id)),
+    );
+
+    final label = _StationLabel(
+      track: track,
+      tt: tt,
+      completed: completed,
+      isCompleted: isCompleted,
+      inProgress: inProgress,
+      accent: accent,
+    );
+
+    final children = side == _PathSide.left
+        ? [medallion, const SizedBox(width: 16), Expanded(child: label)]
+        : [Expanded(child: label), const SizedBox(width: 16), medallion];
+
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: children,
+        ),
+        if (!isLast)
+          // Trail connector — alternates side to suggest the path winds
+          // between stations.
+          Padding(
+            padding: EdgeInsets.only(
+              left: side == _PathSide.left ? 40 : 0,
+              right: side == _PathSide.left ? 0 : 40,
+              top: 4,
+              bottom: 4,
+            ),
+            child: Align(
+              alignment: side == _PathSide.left
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
+              child: const _DashedTrail(),
+            ),
           ),
-          child: Stack(
-            children: [
-              // Leading accent bar.
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: Container(width: 3, color: accent),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(track.emoji,
-                            style: const TextStyle(fontSize: 36)),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      track.name,
-                      style: tt.titleMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Expanded(
-                      child: Text(
-                        track.description,
-                        style: tt.bodySmall?.copyWith(
-                          color: AppColors.textMutedOnInk,
-                          height: 1.4,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(2),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        backgroundColor: AppColors.inkSurface2,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(accent),
-                        minHeight: 4,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '$completed / ${track.totalCards} cards',
-                      style: tt.labelMedium?.copyWith(
-                        color: AppColors.textMutedOnInk,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ],
+      ],
+    );
+  }
+}
+
+class _Medallion extends StatelessWidget {
+  const _Medallion({
+    required this.emoji,
+    required this.accent,
+    required this.progress,
+    required this.isCompleted,
+    required this.onTap,
+  });
+
+  final String emoji;
+  final Color accent;
+  final double progress;
+  final bool isCompleted;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 84,
+        height: 84,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: 84,
+              height: 84,
+              child: CircularProgressIndicator(
+                value: isCompleted ? 1.0 : progress,
+                strokeWidth: 5,
+                backgroundColor: AppColors.inkSurface2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isCompleted ? AppColors.xpGold : accent,
                 ),
               ),
-            ],
+            ),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.inkSurface,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.inkHairline),
+              ),
+              alignment: Alignment.center,
+              child: Text(emoji, style: const TextStyle(fontSize: 32)),
+            ),
+            if (isCompleted)
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  decoration: const BoxDecoration(
+                    color: AppColors.xpGold,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.check_rounded,
+                    size: 14,
+                    color: AppColors.inkBlack,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StationLabel extends StatelessWidget {
+  const _StationLabel({
+    required this.track,
+    required this.tt,
+    required this.completed,
+    required this.isCompleted,
+    required this.inProgress,
+    required this.accent,
+  });
+
+  final LearningTrack track;
+  final TextTheme tt;
+  final int completed;
+  final bool isCompleted;
+  final bool inProgress;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = isCompleted
+        ? 'Completed'
+        : inProgress
+            ? '$completed / ${track.totalCards} cards'
+            : '${track.totalCards} cards';
+    final statusColor =
+        isCompleted ? AppColors.xpGold : AppColors.textMutedOnInk;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          track.name,
+          style: tt.titleMedium?.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          track.description,
+          style: tt.bodySmall?.copyWith(
+            color: AppColors.textMutedOnInk,
+            height: 1.4,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              status,
+              style: tt.labelMedium?.copyWith(
+                color: statusColor,
+                letterSpacing: 0.2,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _DashedTrail extends StatelessWidget {
+  const _DashedTrail();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 4,
+      height: 28,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(
+          4,
+          (_) => Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: AppColors.inkHairline,
+              shape: BoxShape.circle,
+            ),
           ),
         ),
       ),
