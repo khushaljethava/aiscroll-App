@@ -7,10 +7,13 @@ import '../models/srs_model.dart';
 import '../models/user_model.dart';
 import '../../core/constants/xp_constants.dart';
 import '../../core/notifications/notification_service.dart';
+import '../../core/referral/referral_code.dart';
 import '../remote/firestore_service.dart';
 import '../remote/news_push_service.dart';
 import '../remote/telemetry_service.dart';
 import 'telemetry_provider.dart';
+
+enum RedeemResult { success, invalid, selfReferral, alreadyRedeemed }
 
 class UserNotifier extends StateNotifier<UserProfile> {
   UserNotifier._(super.initial, {Ref? ref}) : _ref = ref;
@@ -27,7 +30,14 @@ class UserNotifier extends StateNotifier<UserProfile> {
       // ignore: discarded_futures
       prefs.saveGuestId(guestId);
     }
-    return UserNotifier._(UserProfile(id: guestId, isGuest: true), ref: ref);
+    return UserNotifier._(
+      UserProfile(
+        id: guestId,
+        isGuest: true,
+        inviteCode: ReferralCode.generate(),
+      ),
+      ref: ref,
+    );
   }
 
   // Null-safe accessor — when a notifier is built in tests without a Ref,
@@ -106,8 +116,12 @@ class UserNotifier extends StateNotifier<UserProfile> {
   /// the calendar day has advanced since `lastActiveDate`. Also seeds SRS
   /// reviews for previously learned cards on first upgrade.
   Future<void> load() async {
-    final saved = await _prefs.loadUserProfile();
-    if (saved == null) return;
+    final loaded = await _prefs.loadUserProfile();
+    if (loaded == null) return;
+    // Backfill invite code for legacy profiles created before referrals.
+    final saved = (loaded.inviteCode == null || loaded.inviteCode!.isEmpty)
+        ? loaded.copyWith(inviteCode: ReferralCode.generate())
+        : loaded;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -162,6 +176,41 @@ class UserNotifier extends StateNotifier<UserProfile> {
 
     // Weekly housekeeping — separate clock from daily rollover.
     _weeklyHousekeeping(today);
+  }
+
+  /// Redeems a friend's referral code. Returns one of:
+  ///   * `RedeemResult.success` — code accepted, +1 streak freeze granted.
+  ///   * `RedeemResult.invalid` — malformed (not 6 chars or unknown alpha).
+  ///   * `RedeemResult.selfReferral` — code matches this user's own code.
+  ///   * `RedeemResult.alreadyRedeemed` — user already redeemed before.
+  ///
+  /// Server-side reward to the inviter is intentionally out of scope at v1
+  /// — that requires a Firestore lookup keyed by code. The redeemer reward
+  /// is enough to bootstrap viral loops; inviter reward can land later.
+  Future<RedeemResult> redeemReferralCode(String raw) async {
+    if (state.redeemedInviteCode != null &&
+        state.redeemedInviteCode!.isNotEmpty) {
+      return RedeemResult.alreadyRedeemed;
+    }
+    final code = ReferralCode.normalise(raw);
+    if (code == null) return RedeemResult.invalid;
+    if (state.inviteCode != null && code == state.inviteCode) {
+      return RedeemResult.selfReferral;
+    }
+    const freezeCap = 2;
+    final nextFreezes = (state.freezesAvailable + 1).clamp(0, freezeCap);
+    state = state.copyWith(
+      redeemedInviteCode: code,
+      freezesAvailable: nextFreezes,
+    );
+    await _flushSave();
+    _telemetry?.log(
+      'referral_redeemed',
+      guestId: state.id,
+      userId: _userIdForTelemetry,
+      props: {'code': code},
+    );
+    return RedeemResult.success;
   }
 
   /// Grants one bonus streak freeze on top of the weekly grant — used by

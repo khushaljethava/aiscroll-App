@@ -102,6 +102,14 @@ class UserProfile {
   // governs the daily local reminder) — users may want one without the
   // other. Default off so we never auto-prompt on first launch.
   final bool pushNotificationsEnabled;
+  // --- referrals ---
+  // Six-char alphanumeric code (unambiguous alphabet, see ReferralCode).
+  // Generated lazily on first read in UserNotifier so cold-start guests
+  // can share immediately. Null only on legacy profiles before migration.
+  final String? inviteCode;
+  // Code this user redeemed. One-shot — once set it cannot be changed.
+  // Null means the user has not redeemed anyone.
+  final String? redeemedInviteCode;
 
   const UserProfile({
     required this.id,
@@ -141,6 +149,8 @@ class UserProfile {
     this.notificationsEnabled = false,
     this.reminderMinutesSinceMidnight = 8 * 60,
     this.pushNotificationsEnabled = false,
+    this.inviteCode,
+    this.redeemedInviteCode,
   });
 
   /// Bumped whenever the cloud-side `toFirestoreMap` schema changes in a
@@ -193,6 +203,8 @@ class UserProfile {
     bool? notificationsEnabled,
     int? reminderMinutesSinceMidnight,
     bool? pushNotificationsEnabled,
+    String? inviteCode,
+    String? redeemedInviteCode,
   }) => UserProfile(
     id: id,
     name: identical(name, _sentinel) ? this.name : name as String?,
@@ -236,6 +248,8 @@ class UserProfile {
         reminderMinutesSinceMidnight ?? this.reminderMinutesSinceMidnight,
     pushNotificationsEnabled:
         pushNotificationsEnabled ?? this.pushNotificationsEnabled,
+    inviteCode: inviteCode ?? this.inviteCode,
+    redeemedInviteCode: redeemedInviteCode ?? this.redeemedInviteCode,
   );
 
   Map<String, dynamic> toMap() => {
@@ -277,6 +291,8 @@ class UserProfile {
     'notificationsEnabled': notificationsEnabled,
     'reminderMinutesSinceMidnight': reminderMinutesSinceMidnight,
     'pushNotificationsEnabled': pushNotificationsEnabled,
+    'inviteCode': inviteCode,
+    'redeemedInviteCode': redeemedInviteCode,
   };
 
   factory UserProfile.fromMap(Map<String, dynamic> m) => UserProfile(
@@ -327,6 +343,8 @@ class UserProfile {
         (m['reminderMinutesSinceMidnight'] as int?) ?? 8 * 60,
     pushNotificationsEnabled:
         (m['pushNotificationsEnabled'] as bool?) ?? false,
+    inviteCode: m['inviteCode'] as String?,
+    redeemedInviteCode: m['redeemedInviteCode'] as String?,
   );
 
   /// Cloud-shaped payload for `users/{uid}` in Firestore.

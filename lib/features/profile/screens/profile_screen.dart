@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/xp_constants.dart';
 import '../../../core/router/app_router.dart';
@@ -57,6 +59,8 @@ class ProfileScreen extends ConsumerWidget {
               _StreakCalendar(user: user),
               const SizedBox(height: AppSpacing.lg),
               _StreakFreezeRewardTile(user: user),
+              const SizedBox(height: AppSpacing.lg),
+              _ReferralCard(user: user),
               const SizedBox(height: AppSpacing.lg),
               _BadgesSection(user: user),
               const SizedBox(height: AppSpacing.xl),
@@ -1571,4 +1575,197 @@ String _formatMinutes(int m) {
   final period = h < 12 ? 'AM' : 'PM';
   final h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h);
   return '$h12:${min.toString().padLeft(2, '0')} $period';
+}
+
+// ---------------------------------------------------------------------------
+// Referral card — share code, redeem friend's code for +1 streak freeze.
+// ---------------------------------------------------------------------------
+
+class _ReferralCard extends ConsumerStatefulWidget {
+  const _ReferralCard({required this.user});
+
+  final UserProfile user;
+
+  @override
+  ConsumerState<_ReferralCard> createState() => _ReferralCardState();
+}
+
+class _ReferralCardState extends ConsumerState<_ReferralCard> {
+  final TextEditingController _controller = TextEditingController();
+  bool _redeeming = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _copy(String code) async {
+    await Clipboard.setData(ClipboardData(text: code));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        const SnackBar(
+          duration: Duration(milliseconds: 1200),
+          content: Text('Code copied'),
+        ),
+      );
+  }
+
+  Future<void> _share(String code) async {
+    await SharePlus.instance.share(
+      ShareParams(
+        text:
+            'I\'m learning AI in 60s on AIScroll. Use my code $code when you '
+            'sign up and we both get a streak freeze. https://aiscroll.app',
+        subject: 'Join me on AIScroll',
+      ),
+    );
+  }
+
+  Future<void> _redeem() async {
+    if (_redeeming) return;
+    setState(() => _redeeming = true);
+    final result =
+        await ref.read(userProvider.notifier).redeemReferralCode(_controller.text);
+    if (!mounted) return;
+    setState(() => _redeeming = false);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    switch (result) {
+      case RedeemResult.success:
+        _controller.clear();
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Code accepted — +1 streak freeze!')),
+        );
+      case RedeemResult.invalid:
+        messenger.showSnackBar(
+          const SnackBar(content: Text('That code doesn\'t look right.')),
+        );
+      case RedeemResult.selfReferral:
+        messenger.showSnackBar(
+          const SnackBar(content: Text('You can\'t redeem your own code.')),
+        );
+      case RedeemResult.alreadyRedeemed:
+        messenger.showSnackBar(
+          const SnackBar(content: Text('You\'ve already redeemed a code.')),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final code = widget.user.inviteCode;
+    if (code == null || code.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final alreadyRedeemed = widget.user.redeemedInviteCode != null &&
+        widget.user.redeemedInviteCode!.isNotEmpty;
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
+
+    return AppSectionCard(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.card_giftcard_rounded,
+                  color: AppColors.ctaAmber,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  'Invite friends',
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Share your code. They get a streak freeze when they redeem.',
+              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: cs.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: cs.outlineVariant),
+                    ),
+                    child: Text(
+                      code,
+                      style: tt.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 4,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                IconButton(
+                  tooltip: 'Copy',
+                  onPressed: () => _copy(code),
+                  icon: const Icon(Icons.copy_rounded),
+                ),
+                IconButton(
+                  tooltip: 'Share',
+                  onPressed: () => _share(code),
+                  icon: const Icon(Icons.ios_share_rounded),
+                ),
+              ],
+            ),
+            if (!alreadyRedeemed) ...[
+              const SizedBox(height: AppSpacing.md),
+              const Divider(height: 1),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Got a code from a friend?',
+                style: tt.labelLarge,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      textCapitalization: TextCapitalization.characters,
+                      maxLength: 8,
+                      decoration: const InputDecoration(
+                        hintText: 'ABC123',
+                        counterText: '',
+                        isDense: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  FilledButton(
+                    onPressed: _redeeming ? null : _redeem,
+                    child: Text(_redeeming ? '...' : 'Redeem'),
+                  ),
+                ],
+              ),
+            ] else ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                '✓ You redeemed code ${widget.user.redeemedInviteCode}',
+                style: tt.bodySmall?.copyWith(color: AppColors.accent),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 }
