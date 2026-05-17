@@ -191,6 +191,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
               _CategoryRail(
                 categories: state.categories,
                 selectedKey: selectedCategory,
+                state: state,
                 onSelect: (key) {
                   FeedbackService.selection(ref);
                   ref.read(newsProvider.notifier).selectCategory(key);
@@ -200,7 +201,6 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
                   ref.read(newsProvider.notifier).markUnseenSeen();
                 },
               ),
-              _FreshnessChip(state: state),
               if (state.unseenNewCount > 0)
                 _NewStoriesPill(
                   count: state.unseenNewCount,
@@ -247,6 +247,10 @@ class _StaleBanner extends StatelessWidget {
     final ageMinutes =
         last == null ? null : DateTime.now().difference(last).inMinutes;
     final severe = last == null || (ageMinutes ?? 0) >= 30;
+    // Refined-minimal: only surface a banner when the situation is severe.
+    // Transient refresh failures with a fresh cache are silently swallowed —
+    // the freshness label in the rail still hints at staleness.
+    if (!severe) return const SizedBox.shrink();
 
     final tone = severe ? AppColors.warning : AppColors.ctaAmber;
     final prefix = last == null
@@ -281,56 +285,6 @@ class _StaleBanner extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: tone),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// One-line "Updated 2m ago" / "Never synced" / "Refreshing…" indicator
-/// rendered just below the category rail. Kills the "is polling working?"
-/// question without taking up meaningful screen real estate.
-class _FreshnessChip extends StatelessWidget {
-  const _FreshnessChip({required this.state});
-
-  final NewsState state;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    final last = state.lastSyncedAt;
-    final label = state.refreshing
-        ? 'Refreshing…'
-        : last == null
-            ? 'Never synced'
-            : 'Updated ${_relativeTime(last)}';
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenGutter,
-        2,
-        AppSpacing.screenGutter,
-        4,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Icon(
-            state.refreshing
-                ? Icons.refresh_rounded
-                : Icons.schedule_rounded,
-            size: 11,
-            color: cs.onSurfaceVariant,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: tt.labelSmall?.copyWith(
-              color: cs.onSurfaceVariant,
-              fontSize: 10.5,
-              letterSpacing: 0.2,
             ),
           ),
         ],
@@ -406,40 +360,87 @@ class _CategoryRail extends StatelessWidget {
   const _CategoryRail({
     required this.categories,
     required this.selectedKey,
+    required this.state,
     required this.onSelect,
   });
 
   final List<NewsCategory> categories;
   final String? selectedKey;
+  final NewsState state;
   final ValueChanged<String?> onSelect;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 42,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding:
-            const EdgeInsets.symmetric(horizontal: AppSpacing.screenGutter),
-        itemCount: categories.length + 1,
-        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.xs),
-        itemBuilder: (context, i) {
-          if (i == 0) {
-            return _RailChip(
-              label: 'For You',
-              accent: AppColors.ctaAmber,
-              selected: selectedKey == null,
-              onTap: () => onSelect(null),
-            );
-          }
-          final cat = categories[i - 1];
-          return _RailChip(
-            label: cat.label,
-            accent: AppColors.categoryAccent(cat.key),
-            selected: selectedKey == cat.key,
-            onTap: () => onSelect(cat.key),
-          );
-        },
+      child: Row(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(
+                left: AppSpacing.screenGutter,
+                right: AppSpacing.sm,
+              ),
+              itemCount: categories.length + 1,
+              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.xs),
+              itemBuilder: (context, i) {
+                if (i == 0) {
+                  return _RailChip(
+                    label: 'For You',
+                    accent: AppColors.ctaAmber,
+                    selected: selectedKey == null,
+                    onTap: () => onSelect(null),
+                  );
+                }
+                final cat = categories[i - 1];
+                return _RailChip(
+                  label: cat.label,
+                  accent: AppColors.categoryAccent(cat.key),
+                  selected: selectedKey == cat.key,
+                  onTap: () => onSelect(cat.key),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.screenGutter),
+            child: _InlineFreshness(state: state),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Compact "2m" / "•" indicator placed at the trailing edge of the
+/// category rail. Replaces the standalone `_FreshnessChip` row.
+class _InlineFreshness extends StatelessWidget {
+  const _InlineFreshness({required this.state});
+
+  final NewsState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final last = state.lastSyncedAt;
+    if (state.refreshing) {
+      return SizedBox(
+        width: 14,
+        height: 14,
+        child: CircularProgressIndicator(
+          strokeWidth: 1.5,
+          color: cs.onSurfaceVariant,
+        ),
+      );
+    }
+    if (last == null) return const SizedBox.shrink();
+    return Text(
+      _relativeTime(last),
+      style: TextStyle(
+        fontSize: 10.5,
+        color: cs.onSurfaceVariant,
+        letterSpacing: 0.2,
       ),
     );
   }

@@ -237,11 +237,11 @@ class _SavedCardItem extends StatelessWidget {
             DifficultyBadge(difficulty: card.difficulty),
           ],
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.bookmark_remove_rounded,
-              color: AppColors.textSecondary),
-          onPressed: onDismiss,
+        trailing: const Icon(
+          Icons.chevron_right_rounded,
+          color: AppColors.textSecondary,
         ),
+        onTap: () => context.push(AppRoutes.learnCard(card.id), extra: card),
         isThreeLine: true,
       ),
     );

@@ -124,8 +124,8 @@ class KnowledgeLevelScreen extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: () => context.go(AppRoutes.onboardingTopics),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textPrimary,
+                    backgroundColor: AppColors.ctaAmber,
+                    foregroundColor: AppColors.inkBlack,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -163,10 +163,10 @@ class _StyledSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliderTheme(
       data: SliderThemeData(
-        activeTrackColor: AppColors.primary,
+        activeTrackColor: AppColors.ctaAmber,
         inactiveTrackColor: AppColors.inkSurface2,
-        thumbColor: AppColors.primary,
-        overlayColor: AppColors.primary.withValues(alpha: 0.15),
+        thumbColor: AppColors.ctaAmber,
+        overlayColor: AppColors.ctaAmber.withValues(alpha: 0.15),
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
         trackHeight: 6,
       ),

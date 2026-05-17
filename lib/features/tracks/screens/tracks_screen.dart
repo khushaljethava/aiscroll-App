@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/card_model.dart';
 import '../../../data/models/track_model.dart';
 import '../../../data/providers/cards_provider.dart';
@@ -46,24 +45,13 @@ class TracksScreen extends ConsumerWidget {
           SliverAppBar(
             pinned: true,
             centerTitle: false,
-            // Colour omitted — the AppBar theme's background (scaffold in
-            // dark, paper in light) keeps the sliver appbar in step with
-            // the rest of the screen when scrolled.
             surfaceTintColor: Colors.transparent,
             automaticallyImplyLeading: false,
-            title: Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    color: AppColors.ctaAmber,
-                    borderRadius: BorderRadius.circular(2),
+            title: Text(
+              'Learn',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                const Text('Learn'),
-              ],
             ),
           ),
           SliverToBoxAdapter(

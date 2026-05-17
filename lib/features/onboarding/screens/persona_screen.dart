@@ -125,12 +125,12 @@ class _PersonaCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.12)
+              ? AppColors.ctaAmber.withValues(alpha: 0.10)
               : AppColors.inkSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? AppColors.primary
+                ? AppColors.ctaAmber
                 : AppColors.inkSurface2.withValues(alpha: 0.5),
             width: isSelected ? 2 : 1,
           ),
@@ -170,7 +170,7 @@ class _PersonaCard extends StatelessWidget {
             if (isSelected)
               const Icon(
                 Icons.check_circle_rounded,
-                color: AppColors.primary,
+                color: AppColors.ctaAmber,
                 size: 24,
               ),
           ],

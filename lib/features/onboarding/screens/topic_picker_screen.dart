@@ -108,10 +108,10 @@ class TopicPickerScreen extends ConsumerWidget {
                   onPressed:
                       hasEnough ? () => context.go(AppRoutes.onboardingGoal) : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.ctaAmber,
                     disabledBackgroundColor:
                         AppColors.inkSurface2.withValues(alpha: 0.5),
-                    foregroundColor: AppColors.textPrimary,
+                    foregroundColor: AppColors.inkBlack,
                     disabledForegroundColor:
                         AppColors.textSecondary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -161,11 +161,11 @@ class _TopicChip extends StatelessWidget {
         padding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.inkSurface,
+          color: isSelected ? AppColors.ctaAmber : AppColors.inkSurface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isSelected
-                ? AppColors.primary
+                ? AppColors.ctaAmber
                 : AppColors.inkSurface2.withValues(alpha: 0.6),
             width: 1.5,
           ),
@@ -179,7 +179,7 @@ class _TopicChip extends StatelessWidget {
               topic.label,
               style: TextStyle(
                 color: isSelected
-                    ? AppColors.textPrimary
+                    ? AppColors.inkBlack
                     : AppColors.textSecondary,
                 fontSize: 14,
                 fontWeight:

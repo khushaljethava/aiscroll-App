@@ -28,7 +28,8 @@
       "Bash(\"/c/Users/ADMIN/AppData/Local/Android/Sdk/platform-tools/adb.exe\" -s ZY22H7T653 shell setprop debug.firebase.analytics.app com.kj.aiscroll)",
       "Bash(\"/c/Users/ADMIN/AppData/Local/Android/Sdk/platform-tools/adb.exe\" -s ZY22H7T653 shell getprop debug.firebase.analytics.app)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(export ECC_DISABLED_HOOKS=\"pre:edit-write:gateguard-fact-force,pre:bash:gateguard-fact-force\")"
     ]
   }
 }

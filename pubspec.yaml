@@ -1,7 +1,7 @@
 name: aiscroll
 description: "Learn AI in Seconds, One Scroll at a Time"
 publish_to: 'none'
-version: 1.0.0+4
+version: 1.0.0+7
 
 environment:
   sdk: ^3.11.3

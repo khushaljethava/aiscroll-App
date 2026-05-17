@@ -304,7 +304,7 @@ class AppTheme {
         selectedItemColor: AppColors.inkOnPaper,
         unselectedItemColor: AppColors.inkMutedOnPaper,
         type: BottomNavigationBarType.fixed,
-        elevation: 4,
+        elevation: 0,
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
@@ -315,7 +315,7 @@ class AppTheme {
           }
           return const IconThemeData(color: AppColors.inkMutedOnPaper);
         }),
-        elevation: 2,
+        elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
       cardTheme: CardThemeData(

@@ -458,11 +458,18 @@ class _BottomBar extends StatelessWidget {
                 label: Text(isLearned ? 'Learned' : 'I know this'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      isLearned ? AppColors.accent : AppColors.primary,
-                  foregroundColor: Colors.white,
+                      isLearned ? AppColors.accent : AppColors.ctaAmber,
+                  foregroundColor: isLearned
+                      ? Colors.white
+                      : AppColors.inkBlack,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.input,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.1,
                   ),
                 ),
               ),

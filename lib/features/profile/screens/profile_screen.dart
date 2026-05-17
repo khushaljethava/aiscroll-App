@@ -65,8 +65,9 @@ class ProfileScreen extends ConsumerWidget {
               _BadgesSection(user: user),
               const SizedBox(height: AppSpacing.xl),
               _SettingsGroup(
-                label: 'Preferences',
+                label: 'Settings',
                 children: [
+                  const _GroupSubheader(label: 'Preferences'),
                   _NavTile(
                     icon: Icons.edit_outlined,
                     title: 'Edit profile',
@@ -75,12 +76,8 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const _ThemedDivider(),
                   const _AppearanceTile(),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              _SettingsGroup(
-                label: 'Notifications',
-                children: [
+                  const _ThemedDivider(),
+                  const _GroupSubheader(label: 'Notifications'),
                   _PushSwitchTile(user: user),
                   const _ThemedDivider(),
                   _ReminderSwitchTile(user: user),
@@ -88,22 +85,14 @@ class ProfileScreen extends ConsumerWidget {
                   _ReminderTimeTile(user: user),
                   const _ThemedDivider(),
                   _ReviewCapTile(user: user),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              _SettingsGroup(
-                label: 'Feedback',
-                children: [
+                  const _ThemedDivider(),
+                  const _GroupSubheader(label: 'Feedback'),
                   _HapticsTile(user: user),
                   const _ThemedDivider(),
                   _SoundTile(user: user),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              _SettingsGroup(
-                label: 'Privacy',
-                children: const [
-                  _AnalyticsTile(),
+                  const _ThemedDivider(),
+                  const _GroupSubheader(label: 'Privacy'),
+                  const _AnalyticsTile(),
                 ],
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -200,8 +189,8 @@ class _SignInButton extends StatelessWidget {
         icon: const Icon(Icons.login_rounded, size: 18),
         label: const Text('Sign in / Create account'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.textPrimary,
+          backgroundColor: AppColors.ctaAmber,
+          foregroundColor: AppColors.inkBlack,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(999),
@@ -266,10 +255,10 @@ class _LevelPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.16),
+        color: AppColors.ctaAmber.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.4),
+          color: AppColors.ctaAmber.withValues(alpha: 0.45),
           width: 1,
         ),
       ),
@@ -277,8 +266,9 @@ class _LevelPill extends StatelessWidget {
         'Level $level · $title',
         style: const TextStyle(
           fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
+          color: AppColors.ctaAmber,
+          letterSpacing: 0.2,
         ),
       ),
     );
@@ -369,13 +359,13 @@ class _StatsGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dueToday = ref.watch(dueReviewCountProvider);
     final stats = [
-      ('🔥', '${user.currentStreak}', 'Day Streak'),
-      ('📚', '${user.totalCardsRead}', 'Cards Read'),
-      ('⚡', '${user.quizzesPassed}', 'Quizzes'),
+      ('🔥', '${user.currentStreak}', 'Day streak'),
+      ('📚', '${user.totalCardsRead}', 'Cards read'),
+      ('⚡', '${user.quizzesPassed}', 'Quizzes passed'),
       (
         '🔁',
-        '${user.reviewsDoneToday}/${user.reviewsDoneToday + dueToday}',
-        'Reviews',
+        '${user.reviewsDoneToday}',
+        dueToday > 0 ? 'Reviews · $dueToday due' : 'Reviews today',
       ),
     ];
     return Padding(
@@ -1017,6 +1007,30 @@ class _SettingsGroup extends StatelessWidget {
           child: Column(children: children),
         ),
       ],
+    );
+  }
+}
+
+class _GroupSubheader extends StatelessWidget {
+  const _GroupSubheader({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
+      child: Text(
+        label.toUpperCase(),
+        style: tt.labelMedium?.copyWith(
+          color: cs.onSurfaceVariant,
+          letterSpacing: 1.2,
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 }

@@ -123,8 +123,8 @@ class _DailyGoalScreenState extends ConsumerState<DailyGoalScreen> {
                 child: ElevatedButton(
                   onPressed: _isFinishing ? null : _finishOnboarding,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textPrimary,
+                    backgroundColor: AppColors.ctaAmber,
+                    foregroundColor: AppColors.inkBlack,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -136,7 +136,7 @@ class _DailyGoalScreenState extends ConsumerState<DailyGoalScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.inkBlack,
                           ),
                         )
                       : const Text(
@@ -181,12 +181,12 @@ class _GoalCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.12)
+              ? AppColors.ctaAmber.withValues(alpha: 0.12)
               : AppColors.inkSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? AppColors.primary
+                ? AppColors.ctaAmber
                 : AppColors.inkSurface2.withValues(alpha: 0.5),
             width: isSelected ? 2 : 1,
           ),
@@ -198,7 +198,7 @@ class _GoalCard extends StatelessWidget {
               height: 52,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.2)
+                    ? AppColors.ctaAmber.withValues(alpha: 0.2)
                     : AppColors.inkSurface2.withValues(alpha: 0.4),
                 shape: BoxShape.circle,
               ),
@@ -232,7 +232,7 @@ class _GoalCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.25)
+                              ? AppColors.ctaAmber.withValues(alpha: 0.25)
                               : AppColors.inkSurface2.withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -240,7 +240,7 @@ class _GoalCard extends StatelessWidget {
                           goal.label,
                           style: TextStyle(
                             color: isSelected
-                                ? AppColors.primary
+                                ? AppColors.ctaAmber
                                 : AppColors.textSecondary,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -271,7 +271,7 @@ class _GoalCard extends StatelessWidget {
             if (isSelected)
               const Icon(
                 Icons.check_circle_rounded,
-                color: AppColors.primary,
+                color: AppColors.ctaAmber,
                 size: 24,
               ),
           ],
