@@ -749,7 +749,7 @@ class _BadgeTile extends StatelessWidget {
             ),
           ),
           if (isEarned)
-            AppBadge(label: 'EARNED', color: sem.success),
+            AppBadge.micro(label: 'EARNED', color: sem.success),
         ],
       ),
     );

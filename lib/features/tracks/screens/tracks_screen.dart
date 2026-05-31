@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/models/card_model.dart';
-import '../../../shared/widgets/app_badge.dart';
 import '../../../data/models/track_model.dart';
 import '../../../data/providers/cards_provider.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../shared/widgets/app_badge.dart';
 import '../../../shared/widgets/search_field.dart';
 
 // ---------------------------------------------------------------------------

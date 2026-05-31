@@ -16,4 +16,25 @@ void main() {
     ));
     expect(find.byType(AppStatusDot), findsOneWidget);
   });
+
+  testWidgets('AppStatusDot is a sized circle', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: Center(child: AppStatusDot(color: Colors.green, size: 8))),
+    ));
+    expect(tester.getSize(find.byType(AppStatusDot)), const Size(8, 8));
+  });
+
+  testWidgets('AppBadge renders an icon when provided', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: AppBadge(label: 'X', color: Colors.amber, icon: Icons.star)),
+    ));
+    expect(find.byIcon(Icons.star), findsOneWidget);
+  });
+
+  testWidgets('AppBadge.micro shows label', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: AppBadge.micro(label: 'EARNED', color: Colors.green)),
+    ));
+    expect(find.text('EARNED'), findsOneWidget);
+  });
 }
