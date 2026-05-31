@@ -5,8 +5,6 @@ class Brand {
 
   static const String name = 'Brevio';
   static const String tagline = 'Learn AI Daily, in Seconds.';
-  static const String welcomeTitle = 'Welcome to $name';
-
   /// Marketing/share URL. TODO(pre-launch): confirm domain ownership.
   static const String shareUrl = 'https://brevio.app';
 

@@ -10,4 +10,11 @@ void main() {
     ));
     expect(find.text(Brand.name), findsOneWidget);
   });
+
+  testWidgets('compact wordmark renders the brand name', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: BrandWordmark.compact()),
+    ));
+    expect(find.text(Brand.name), findsOneWidget);
+  });
 }

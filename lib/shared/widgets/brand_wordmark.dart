@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import '../../core/constants/brand.dart';
 
 /// The Brevio wordmark, set in the theme's editorial serif (Newsreader via
-/// `displaySmall`/`headlineMedium`). Use on Splash and Welcome.
+/// `displaySmall`/`headlineMedium`).
 class BrandWordmark extends StatelessWidget {
-  const BrandWordmark({super.key, this.large = true});
+  /// Hero size for Splash / Welcome (`displaySmall`).
+  const BrandWordmark({super.key}) : _hero = true;
 
-  /// Hero size (Splash) vs. compact (inline headers).
-  final bool large;
+  /// Compact size for inline headers (`headlineMedium`).
+  const BrandWordmark.compact({super.key}) : _hero = false;
+
+  final bool _hero;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    final style = large ? tt.displaySmall : tt.headlineMedium;
+    final style = _hero ? tt.displaySmall : tt.headlineMedium;
     return Text(
       Brand.name,
       textAlign: TextAlign.center,
