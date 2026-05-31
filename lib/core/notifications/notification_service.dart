@@ -31,7 +31,7 @@ class NotificationService {
   // `channelId: "news"`, and we render the foreground banner here too.
   static const String newsChannelId = 'news';
   static const String _newsChannelName = 'AI News';
-  static final String _newsChannelDescription =
+  static const String _newsChannelDescription =
       'Random AI news drops from the ${Brand.name} team.';
 
   Future<void> initialize() async {
