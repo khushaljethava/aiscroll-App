@@ -20,6 +20,7 @@ import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
 import '../../../features/feed/providers/srs_provider.dart';
 import '../../../features/gamification/providers/gamification_provider.dart';
+import '../../../shared/widgets/app_badge.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_section_card.dart';
 
@@ -173,7 +174,7 @@ class _ProfileHeader extends StatelessWidget {
                   ],
                 ],
                 const SizedBox(height: 8),
-                _LevelPill(level: level, title: title),
+                AppBadge(label: 'Level $level · $title', color: context.sem.xpGold),
               ],
             ),
           ),
@@ -216,37 +217,6 @@ class _Avatar extends StatelessWidget {
         fit: BoxFit.cover,
         placeholder: (_, _) => fallback,
         errorWidget: (_, _, _) => fallback,
-      ),
-    );
-  }
-}
-
-class _LevelPill extends StatelessWidget {
-  const _LevelPill({required this.level, required this.title});
-
-  final int level;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.ctaAmber.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.ctaAmber.withValues(alpha: 0.45),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        'Level $level · $title',
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: AppColors.ctaAmber,
-          letterSpacing: 0.2,
-        ),
       ),
     );
   }
@@ -779,21 +749,7 @@ class _BadgeTile extends StatelessWidget {
             ),
           ),
           if (isEarned)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              decoration: BoxDecoration(
-                color: sem.success.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                'EARNED',
-                style: TextStyle(
-                  fontSize: 8,
-                  fontWeight: FontWeight.w800,
-                  color: sem.success,
-                ),
-              ),
-            ),
+            AppBadge(label: 'EARNED', color: sem.success),
         ],
       ),
     );
