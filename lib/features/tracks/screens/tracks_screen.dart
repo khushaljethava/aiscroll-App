@@ -9,6 +9,7 @@ import '../../../data/models/track_model.dart';
 import '../../../data/providers/cards_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../shared/widgets/app_badge.dart';
+import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/search_field.dart';
 
 // ---------------------------------------------------------------------------
@@ -75,15 +76,12 @@ class TracksScreen extends ConsumerWidget {
           if (filtered.isEmpty)
             SliverFillRemaining(
               hasScrollBody: false,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    query.isEmpty
-                        ? 'No tracks match this filter'
-                        : 'No tracks match "$query"',
-                  ),
-                ),
+              child: AppEmptyState(
+                icon: Icons.search_off_rounded,
+                title: query.isEmpty ? 'No tracks here yet' : 'No matches',
+                message: query.isEmpty
+                    ? 'Try a different difficulty filter.'
+                    : 'Nothing matches "$query". Try another search.',
               ),
             )
           else
