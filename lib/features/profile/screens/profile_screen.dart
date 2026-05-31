@@ -8,7 +8,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/constants/brand.dart';
 import '../../../core/constants/xp_constants.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/theme_mode_provider.dart';
@@ -195,13 +194,14 @@ class _Avatar extends StatelessWidget {
     // Signed-in users with a photoUrl get their Google avatar. Guests or
     // users whose photo failed to load fall back to a primary-tinted
     // circle with their initial.
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
     final fallback = CircleAvatar(
       radius: 36,
-      backgroundColor: AppColors.primary,
+      backgroundColor: cs.primary,
       child: Text(
         initial,
-        style: const TextStyle(
-          fontSize: 28,
+        style: tt.headlineSmall?.copyWith(
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -253,9 +253,8 @@ class _XpProgressCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  fontSize: 16,
                 ),
               ),
               Text(
@@ -270,7 +269,9 @@ class _XpProgressCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             'Level $level → Level ${level + 1}: $nextTitle',
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 10),
           ClipRRect(
@@ -285,7 +286,9 @@ class _XpProgressCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '$xpToNext XP to next level',
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -354,7 +357,7 @@ class _StatItem extends StatelessWidget {
         message: '$label: $value',
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 24)),
+            Text(emoji, style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -364,9 +367,8 @@ class _StatItem extends StatelessWidget {
                 children: [
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      fontSize: 18,
                       height: 1.1,
                     ),
                     maxLines: 1,
@@ -374,8 +376,7 @@ class _StatItem extends StatelessWidget {
                   ),
                   Text(
                     label,
-                    style: TextStyle(
-                      fontSize: 11,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       height: 1.2,
                       color: cs.onSurfaceVariant,
                     ),
@@ -456,7 +457,9 @@ class _DayDot extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: cs.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 4),
         Container(
@@ -522,7 +525,7 @@ class _BadgesSection extends StatelessWidget {
                 child: Text(
                   'View all',
                   style: tt.labelLarge?.copyWith(
-                    color: AppColors.primary,
+                    color: cs.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -617,7 +620,7 @@ class _BadgeChip extends StatelessWidget {
       case BadgeRarity.uncommon:
         return sem.success;
       case BadgeRarity.rare:
-        return AppColors.primary;
+        return cs.primary;
       case BadgeRarity.legendary:
         return sem.xpGold;
     }
@@ -644,7 +647,7 @@ class _BadgeChip extends StatelessWidget {
                   : null,
             ),
             alignment: Alignment.center,
-            child: Text(badge.emoji, style: const TextStyle(fontSize: 22)),
+            child: Text(badge.emoji, style: tt.titleLarge),
           ),
           const SizedBox(height: 4),
           SizedBox(
@@ -655,7 +658,6 @@ class _BadgeChip extends StatelessWidget {
                 color: isEarned ? null : cs.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.2,
-                fontSize: 9,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -689,7 +691,7 @@ class _BadgeTile extends StatelessWidget {
       case BadgeRarity.uncommon:
         return sem.success;
       case BadgeRarity.rare:
-        return AppColors.primary;
+        return cs.primary;
       case BadgeRarity.legendary:
         return sem.xpGold;
     }
@@ -699,6 +701,7 @@ class _BadgeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final sem = context.sem;
+    final tt = Theme.of(context).textTheme;
     final color = _rarityColor(context);
     Widget tile = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -720,7 +723,7 @@ class _BadgeTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(badge.emoji, style: const TextStyle(fontSize: 26)),
+          Text(badge.emoji, style: tt.headlineMedium),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -729,9 +732,8 @@ class _BadgeTile extends StatelessWidget {
               children: [
                 Text(
                   badge.name,
-                  style: const TextStyle(
+                  style: tt.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    fontSize: 12,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -833,11 +835,11 @@ class _StreakFreezeRewardTileState
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.16),
+                color: cs.primary.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
-              child: const Text('❄️', style: TextStyle(fontSize: 22)),
+              child: Text('❄️', style: tt.titleLarge),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -909,7 +911,6 @@ class _SettingsGroup extends StatelessWidget {
             style: tt.labelMedium?.copyWith(
               color: cs.onSurfaceVariant,
               letterSpacing: 1.2,
-              fontSize: 11,
             ),
           ),
         ),
@@ -938,7 +939,6 @@ class _GroupSubheader extends StatelessWidget {
         style: tt.labelMedium?.copyWith(
           color: cs.onSurfaceVariant,
           letterSpacing: 1.2,
-          fontSize: 10.5,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -983,7 +983,9 @@ class _NavTile extends StatelessWidget {
           ? null
           : Text(
               subtitle!,
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
             ),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: onTap,
@@ -1064,7 +1066,7 @@ class _ReminderTimeTile extends ConsumerWidget {
         _formatMinutes(user.reminderMinutesSinceMidnight),
         style: TextStyle(
           color: user.notificationsEnabled
-              ? AppColors.primary
+              ? cs.primary
               : cs.onSurfaceVariant,
           fontWeight: FontWeight.w700,
         ),
@@ -1104,12 +1106,14 @@ class _ReviewCapTile extends ConsumerWidget {
       title: const Text('Daily review cap'),
       subtitle: Text(
         'Max number of spaced-repetition reviews per day',
-        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: cs.onSurfaceVariant,
+        ),
       ),
       trailing: Text(
         '${user.dailyReviewCap}',
-        style: const TextStyle(
-          color: AppColors.primary,
+        style: TextStyle(
+          color: cs.primary,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -1140,9 +1144,9 @@ class _ReviewCapTile extends ConsumerWidget {
               ListTile(
                 title: Text('$n reviews / day'),
                 trailing: n == current
-                    ? const Icon(
+                    ? Icon(
                         Icons.check_rounded,
-                        color: AppColors.primary,
+                        color: Theme.of(sheetCtx).colorScheme.primary,
                       )
                     : null,
                 onTap: () => Navigator.of(sheetCtx).pop(n),
@@ -1360,7 +1364,6 @@ class _DangerZone extends ConsumerWidget {
             style: tt.labelMedium?.copyWith(
               color: cs.error,
               letterSpacing: 1.2,
-              fontSize: 11,
             ),
           ),
         ),
@@ -1487,7 +1490,9 @@ class _DangerTile extends StatelessWidget {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: cs.onSurfaceVariant,
+        ),
       ),
       onTap: onTap,
     );
@@ -1598,9 +1603,9 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.card_giftcard_rounded,
-                  color: AppColors.ctaAmber,
+                  color: cs.secondary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
@@ -1687,7 +1692,7 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 '✓ You redeemed code ${widget.user.redeemedInviteCode}',
-                style: tt.bodySmall?.copyWith(color: AppColors.accent),
+                style: tt.bodySmall?.copyWith(color: context.sem.success),
               ),
             ],
           ],

@@ -32,7 +32,7 @@ class _AppSkeletonState extends State<AppSkeleton>
   Widget build(BuildContext context) {
     final base = Theme.of(context).colorScheme.surfaceContainerHighest;
     return FadeTransition(
-      opacity: Tween(begin: 0.45, end: 0.9).animate(_c),
+      opacity: Tween<double>(begin: 0.45, end: 0.9).animate(_c),
       child: Container(
         height: widget.height,
         width: widget.width,
