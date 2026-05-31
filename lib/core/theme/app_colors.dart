@@ -26,6 +26,7 @@ class AppColors {
   /// Brevio brand / action color (warm coral). Single action color: primary
   /// buttons, links, focus, selected states, non-gamification accents.
   static const brandCoral = Color(0xFFFF5A4D);
+  /// Darkened coral for pressed/active button states.
   static const brandCoralPressed = Color(0xFFE64A3F);
 
   /// Near-black warm ink for text/icons on coral fills (AA: ~6:1 on coral).

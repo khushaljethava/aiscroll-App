@@ -4,7 +4,7 @@ import 'app_colors.dart';
 import 'app_semantic_colors.dart';
 import 'app_spacing.dart';
 
-/// Editorial theme for 60 Second AI.
+/// Editorial theme for Brevio.
 ///
 /// Typography blends two Google Fonts:
 ///  - **Newsreader** (serif) for display/headline — gives the News feature
@@ -22,8 +22,8 @@ class AppTheme {
     return base.copyWith(
       colorScheme: const ColorScheme(
         brightness: Brightness.dark,
-        primary: AppColors.primary,
-        onPrimary: AppColors.textPrimary,
+        primary: AppColors.brandCoral,
+        onPrimary: AppColors.onCoral,
         primaryContainer: AppColors.inkSurface,
         onPrimaryContainer: AppColors.textPrimary,
         secondary: AppColors.ctaAmber,
@@ -254,8 +254,8 @@ class AppTheme {
     return base.copyWith(
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
-        primary: AppColors.primary,
-        onPrimary: Colors.white,
+        primary: AppColors.brandCoral,
+        onPrimary: AppColors.onCoral,
         primaryContainer: Color(0xFFE0E7FF),
         onPrimaryContainer: Color(0xFF3730A3),
         secondary: AppColors.ctaAmber,

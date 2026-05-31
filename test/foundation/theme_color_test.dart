@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:aiscroll/core/theme/app_colors.dart';
 import 'package:aiscroll/core/theme/app_theme.dart';
 
@@ -10,6 +11,11 @@ double _contrast(Color a, Color b) {
 }
 
 void main() {
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    GoogleFonts.config.allowRuntimeFetching = false;
+  });
+
   test('brand coral defined and distinct from status reds', () {
     expect(AppColors.brandCoral, const Color(0xFFFF5A4D));
     expect(_contrast(AppColors.brandCoral, AppColors.error), greaterThan(1.4));
@@ -21,8 +27,12 @@ void main() {
         greaterThanOrEqualTo(4.5));
   });
 
-  test('theme primary is coral in both brightnesses', () {
+  testWidgets('theme primary is coral in both brightnesses',
+      (WidgetTester tester) async {
     expect(AppTheme.darkTheme.colorScheme.primary, AppColors.brandCoral);
     expect(AppTheme.lightTheme.colorScheme.primary, AppColors.brandCoral);
+    // Drain any pending google_fonts async font-load callbacks so they don't
+    // leak past test teardown and cause a spurious failure.
+    await tester.pump();
   });
 }
