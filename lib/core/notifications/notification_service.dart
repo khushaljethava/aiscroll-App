@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../constants/brand.dart';
 import '../router/deep_link.dart';
 
 /// Wraps `flutter_local_notifications` so the rest of the app can toggle
@@ -30,8 +31,8 @@ class NotificationService {
   // `channelId: "news"`, and we render the foreground banner here too.
   static const String newsChannelId = 'news';
   static const String _newsChannelName = 'AI News';
-  static const String _newsChannelDescription =
-      'Random AI news drops from the 60 Second AI team.';
+  static final String _newsChannelDescription =
+      'Random AI news drops from the ${Brand.name} team.';
 
   Future<void> initialize() async {
     if (_initialized) return;
@@ -72,7 +73,7 @@ class NotificationService {
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(
-            const AndroidNotificationChannel(
+            AndroidNotificationChannel(
               newsChannelId,
               _newsChannelName,
               description: _newsChannelDescription,
@@ -216,7 +217,7 @@ class NotificationService {
         articleId.hashCode & 0x7fffffff,
         title,
         body,
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
             newsChannelId,
             _newsChannelName,

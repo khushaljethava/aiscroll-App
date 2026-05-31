@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/brand.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/local/preferences_service.dart';
@@ -103,10 +104,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   )
                   .fadeIn(duration: 400.ms),
               const SizedBox(height: 16),
-              const Text(
-                'Welcome to 60 Second AI',
+              Text(
+                Brand.welcomeTitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 26,
                   fontWeight: FontWeight.bold,

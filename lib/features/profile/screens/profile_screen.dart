@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/constants/brand.dart';
 import '../../../core/constants/xp_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -1092,18 +1093,18 @@ class _PushSwitchTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SwitchListTile(
       title: const Text('News push notifications'),
-      subtitle: const Text('Breaking AI news from the 60 Second AI team.'),
+      subtitle: Text(Brand.pushFromLine),
       secondary: const Icon(Icons.campaign_rounded),
       value: user.pushNotificationsEnabled,
       onChanged: (v) async {
         final ok = await ref.read(userProvider.notifier).setPushEnabled(v);
         if (v && !ok && context.mounted) {
           // Permission denied — Android 13+ won't show the dialog again.
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              'Push notifications are blocked. Enable them in Settings → Apps → 60 Second AI → Notifications.',
+              'Push notifications are blocked. Enable them in Settings → Apps → ${Brand.name} → Notifications.',
             ),
-            duration: Duration(seconds: 6),
+            duration: const Duration(seconds: 6),
           ));
         }
       },
@@ -1126,11 +1127,11 @@ class _ReminderSwitchTile extends ConsumerWidget {
             await ref.read(userProvider.notifier).setNotificationsEnabled(v);
         if (v && !ok && context.mounted) {
           // Permission permanently denied — Android 13+ won't re-prompt.
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              'Notifications are blocked. Enable them in Settings → Apps → 60 Second AI → Notifications.',
+              'Notifications are blocked. Enable them in Settings → Apps → ${Brand.name} → Notifications.',
             ),
-            duration: Duration(seconds: 6),
+            duration: const Duration(seconds: 6),
           ));
         }
       },
@@ -1631,9 +1632,9 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
     await SharePlus.instance.share(
       ShareParams(
         text:
-            'I\'m learning AI in 60s on AIScroll. Use my code $code when you '
-            'sign up and we both get a streak freeze. https://aiscroll.app',
-        subject: 'Join me on AIScroll',
+            'I\'m learning AI in 60s on ${Brand.name}. Use my code $code when you '
+            'sign up and we both get a streak freeze. ${Brand.shareUrl}',
+        subject: 'Join me on ${Brand.name}',
       ),
     );
   }

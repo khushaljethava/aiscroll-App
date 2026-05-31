@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/constants/brand.dart';
 import 'core/router/app_router.dart';
 import 'core/router/deep_link.dart';
 import 'core/theme/app_theme.dart';
@@ -160,7 +161,7 @@ class _SixtySecondAIAppState extends ConsumerState<SixtySecondAIApp>
     // active. MaterialApp's Builder gives us a context whose
     // Theme.of(...) has already been resolved.
     return MaterialApp.router(
-      title: '60 Second AI',
+      title: Brand.name,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

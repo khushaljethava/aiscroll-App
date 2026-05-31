@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/constants/brand.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/local/preferences_service.dart';
@@ -48,9 +49,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   )
                   .fadeIn(duration: 400.ms),
               const SizedBox(height: 24),
-              const Text(
-                '60 Second AI',
-                style: TextStyle(
+              Text(
+                Brand.name,
+                style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,

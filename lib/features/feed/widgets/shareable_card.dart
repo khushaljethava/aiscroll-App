@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/constants/brand.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/card_model.dart';
@@ -114,7 +115,7 @@ class ShareableCard extends StatelessWidget {
                   ),
                   Spacer(),
                   Text(
-                    '→ AIScroll',
+                    '→ ${Brand.name}',
                     style: TextStyle(
                       color: AppColors.ctaAmber,
                       fontSize: 12,

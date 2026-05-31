@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/brand.dart';
 import '../../core/notifications/notification_service.dart';
 import '../../core/router/deep_link.dart';
 import '../providers/analytics_provider.dart';
@@ -166,7 +167,7 @@ class NewsPushService {
     final notif = message.notification;
     final id = message.data['articleId'] as String?;
     final title =
-        notif?.title ?? message.data['title'] as String? ?? '60 Second AI';
+        notif?.title ?? message.data['title'] as String? ?? Brand.name;
     final body = notif?.body ?? message.data['body'] as String? ?? '';
     if (title.isEmpty && body.isEmpty) return;
     await NotificationService.instance.showNewsBanner(
