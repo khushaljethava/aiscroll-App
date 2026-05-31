@@ -14,6 +14,7 @@ class AppButton extends StatelessWidget {
     this.expand = true,
   });
 
+  /// Button text. Hidden (replaced by a spinner) while [loading] is true.
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;

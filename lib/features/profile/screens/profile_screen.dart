@@ -145,7 +145,15 @@ class _ProfileHeader extends StatelessWidget {
                   // Guests get a tappable Sign-in CTA in place of the
                   // username — sends them through the auth flow but
                   // preserves their local progress on return.
-                  _SignInButton()
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: AppButton(
+                      label: 'Sign in / Create account',
+                      icon: Icons.login_rounded,
+                      expand: false,
+                      onPressed: () => context.push(AppRoutes.onboardingWelcome),
+                    ),
+                  )
                 else ...[
                   Text(
                     user.name ?? 'User',
@@ -170,27 +178,6 @@ class _ProfileHeader extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Compact pill button shown in the profile header for guest users. Routes
-/// to the welcome screen so the user can sign in or register; their local
-/// progress is preserved and merged into the cloud profile on return.
-class _SignInButton extends StatelessWidget {
-  // ignore: unused_element_parameter
-  const _SignInButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: AppButton(
-        label: 'Sign in / Create account',
-        icon: Icons.login_rounded,
-        expand: false,
-        onPressed: () => context.push(AppRoutes.onboardingWelcome),
       ),
     );
   }
@@ -928,7 +915,7 @@ class _StreakFreezeRewardTileState
               icon: _watching ? null : Icons.play_circle_outline_rounded,
               loading: _watching,
               expand: false,
-              onPressed: (atCap || _watching) ? null : _watchAdForFreeze,
+              onPressed: atCap ? null : _watchAdForFreeze,
             ),
           ],
         ),
