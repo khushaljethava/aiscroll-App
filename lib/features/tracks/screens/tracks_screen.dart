@@ -259,9 +259,12 @@ class _Medallion extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final sem = context.sem;
     final tt = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+    return Semantics(
+      button: true,
+      label: 'Open track',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 84,
         height: 84,
@@ -313,6 +316,7 @@ class _Medallion extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
