@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Scans lib/ for banned legacy brand strings. Comments are migrated in a
-/// later task, so this first pass skips comment-only lines.
+/// Scans lib/ for banned legacy brand strings, including in doc comments.
 void main() {
   test('no legacy brand names in user-facing strings', () {
     final banned = ['60 Second AI', 'AIScroll', 'aiscroll.app'];
@@ -12,8 +11,6 @@ void main() {
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
         final line = lines[i];
-        final trimmed = line.trimLeft();
-        if (trimmed.startsWith('//') || trimmed.startsWith('///')) continue;
         for (final b in banned) {
           if (line.contains(b)) offenders.add('${file.path}:${i + 1}  $b');
         }

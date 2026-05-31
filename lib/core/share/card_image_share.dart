@@ -42,7 +42,7 @@ Future<bool> shareWidgetAsImage({
   final file = XFile.fromData(
     pngBytes,
     mimeType: 'image/png',
-    name: 'aiscroll-card.png',
+    name: 'brevio-card.png',
     length: pngBytes.lengthInBytes,
   );
   await SharePlus.instance.share(

@@ -1,6 +1,6 @@
 /// Spaced-repetition state for a single card, using the SM-2 algorithm.
 ///
-/// Quality scale (mapped to 60 Second AI interaction events):
+/// Quality scale (mapped to Brevio interaction events):
 ///   5 — Quiz answer correct (parent card)
 ///   4 — Right-swipe "Learned"
 ///   3 — Card seen ≥15s, not learned, not previously due
