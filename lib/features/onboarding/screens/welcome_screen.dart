@@ -7,6 +7,7 @@ import '../../../core/constants/brand.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/local/preferences_service.dart';
+import '../../../shared/widgets/brand_wordmark.dart';
 import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/user_provider.dart';
@@ -91,36 +92,17 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 64),
-              const Text(
-                '🤖',
-                style: TextStyle(fontSize: 72),
-              )
+              const BrandWordmark()
                   .animate()
-                  .scale(
-                    begin: const Offset(0.6, 0.6),
-                    end: const Offset(1.0, 1.0),
-                    duration: 500.ms,
-                    curve: Curves.elasticOut,
-                  )
-                  .fadeIn(duration: 400.ms),
-              const SizedBox(height: 16),
-              Text(
-                Brand.welcomeTitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
+                  .fadeIn(duration: 400.ms)
+                  .slideY(begin: 0.1, end: 0, duration: 400.ms),
               const SizedBox(height: 6),
-              const Text(
-                'Learn AI in seconds. Across every device.',
+              Text(
+                Brand.tagline,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ).animate().fadeIn(delay: 300.ms, duration: 400.ms),
               const Spacer(),
               AuthButton(
