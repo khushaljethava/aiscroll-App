@@ -20,6 +20,7 @@ import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
 import '../../../features/feed/providers/srs_provider.dart';
 import '../../../features/gamification/providers/gamification_provider.dart';
+import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_section_card.dart';
 
 // ---------------------------------------------------------------------------
@@ -185,23 +186,11 @@ class _SignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: ElevatedButton.icon(
+      child: AppButton(
+        label: 'Sign in / Create account',
+        icon: Icons.login_rounded,
+        expand: false,
         onPressed: () => context.push(AppRoutes.onboardingWelcome),
-        icon: const Icon(Icons.login_rounded, size: 18),
-        label: const Text('Sign in / Create account'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.ctaAmber,
-          foregroundColor: AppColors.inkBlack,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(999),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-          elevation: 0,
-        ),
       ),
     );
   }
@@ -934,34 +923,12 @@ class _StreakFreezeRewardTileState
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
-            ElevatedButton.icon(
-              onPressed:
-                  (atCap || _watching) ? null : _watchAdForFreeze,
-              icon: _watching
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.play_circle_outline_rounded, size: 18),
-              label: Text(_watching ? 'Loading' : 'Watch ad'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-                elevation: 0,
-              ),
+            AppButton(
+              label: _watching ? 'Loading' : 'Watch ad',
+              icon: _watching ? null : Icons.play_circle_outline_rounded,
+              loading: _watching,
+              expand: false,
+              onPressed: (atCap || _watching) ? null : _watchAdForFreeze,
             ),
           ],
         ),
@@ -1765,9 +1732,11 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  FilledButton(
+                  AppButton(
+                    label: 'Redeem',
+                    loading: _redeeming,
+                    expand: false,
                     onPressed: _redeeming ? null : _redeem,
-                    child: Text(_redeeming ? '...' : 'Redeem'),
                   ),
                 ],
               ),
