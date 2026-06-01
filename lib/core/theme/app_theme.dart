@@ -121,7 +121,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.input,
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+          borderSide: const BorderSide(color: AppColors.brandCoral, width: 1.4),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppRadius.input,
@@ -135,8 +135,8 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.textPrimary,
+          backgroundColor: AppColors.brandCoral,
+          foregroundColor: AppColors.onCoral,
           elevation: 0,
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xxl,
@@ -167,7 +167,7 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.brandCoral,
           textStyle: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -341,7 +341,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.input,
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+          borderSide: const BorderSide(color: AppColors.brandCoral, width: 1.4),
         ),
         hintStyle: const TextStyle(color: AppColors.inkMutedOnPaper),
         contentPadding: const EdgeInsets.symmetric(
@@ -351,8 +351,8 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.brandCoral,
+          foregroundColor: AppColors.onCoral,
           elevation: 0,
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xxl,

@@ -35,4 +35,16 @@ void main() {
     // leak past test teardown and cause a spurious failure.
     await tester.pump();
   });
+
+  test('primary button theme renders coral, not indigo', () {
+    for (final theme in [AppTheme.darkTheme, AppTheme.lightTheme]) {
+      final bg = theme.elevatedButtonTheme.style?.backgroundColor
+          ?.resolve(<WidgetState>{});
+      expect(bg, AppColors.brandCoral,
+          reason: 'ElevatedButton must use coral, not indigo');
+      final fg = theme.elevatedButtonTheme.style?.foregroundColor
+          ?.resolve(<WidgetState>{});
+      expect(fg, AppColors.onCoral);
+    }
+  });
 }
