@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_semantic_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../data/local/preferences_service.dart';
 import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/auth_provider.dart';
@@ -98,6 +99,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -116,20 +119,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Welcome back',
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 28,
+                  style: tt.headlineSmall?.copyWith(
+                    color: cs.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ).animate().fadeIn(duration: 400.ms),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Sign in to continue your streak.',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
+                  style: tt.bodyMedium?.copyWith(
+                    color: cs.onSurfaceVariant,
                   ),
                 ).animate().fadeIn(delay: 80.ms, duration: 400.ms),
                 const SizedBox(height: 32),
@@ -142,7 +143,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     autofillHints: const [AutofillHints.email],
                     textInputAction: TextInputAction.next,
                     validator: _validateEmail,
-                    decoration: _inputDecoration(hint: 'you@example.com'),
+                    decoration: _inputDecoration(
+                      context: context,
+                      hint: 'you@example.com',
+                    ),
                   ),
                 ).animate().fadeIn(delay: 150.ms, duration: 350.ms),
                 const SizedBox(height: 16),
@@ -157,6 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     validator: _validatePassword,
                     onFieldSubmitted: (_) => _submit(),
                     decoration: _inputDecoration(
+                      context: context,
                       hint: 'Your password',
                       suffix: IconButton(
                         icon: Icon(
@@ -174,8 +179,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 32),
                 AuthButton(
                   onPressed: _isLoading ? null : _submit,
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.textPrimary,
+                  backgroundColor: cs.primary,
+                  foregroundColor: cs.onSurface,
                   child: _isLoading
                       ? const SizedBox(
                           width: 20,
@@ -185,10 +190,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
+                      : Text(
                           'Sign in',
-                          style: TextStyle(
-                            fontSize: 16,
+                          style: tt.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -199,21 +203,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: _isLoading
                         ? null
                         : () => context.go(AppRoutes.onboardingRegister),
-                    child: const Text.rich(
+                    child: Text.rich(
                       TextSpan(
                         children: [
                           TextSpan(
                             text: 'No account? ',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
+                            style: tt.bodyMedium?.copyWith(
+                              color: cs.onSurfaceVariant,
                             ),
                           ),
                           TextSpan(
                             text: 'Create one',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 14,
+                            style: tt.bodyMedium?.copyWith(
+                              color: cs.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -231,27 +233,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-InputDecoration _inputDecoration({required String hint, Widget? suffix}) {
+InputDecoration _inputDecoration({
+  required BuildContext context,
+  required String hint,
+  Widget? suffix,
+}) {
+  final cs = Theme.of(context).colorScheme;
+  final tt = Theme.of(context).textTheme;
   return InputDecoration(
     hintText: hint,
-    hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+    hintStyle: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
     filled: true,
-    fillColor: AppColors.inkSurface,
+    fillColor: context.sem.sectionSurface,
     suffixIcon: suffix,
     contentPadding:
         const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppRadius.input,
       borderSide: BorderSide.none,
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppRadius.input,
       borderSide: BorderSide.none,
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppRadius.input,
       borderSide:
-          BorderSide(color: AppColors.primary.withValues(alpha: 0.7), width: 1.4),
+          BorderSide(color: cs.primary.withValues(alpha: 0.7), width: 1.4),
     ),
   );
 }
@@ -263,6 +271,8 @@ class _LabeledField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -270,9 +280,8 @@ class _LabeledField extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, bottom: 6),
           child: Text(
             label,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
+            style: tt.labelMedium?.copyWith(
+              color: cs.onSurfaceVariant,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.4,
             ),
