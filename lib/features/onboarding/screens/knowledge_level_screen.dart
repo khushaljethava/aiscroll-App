@@ -3,14 +3,13 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/app_button.dart';
 import '../providers/onboarding_provider.dart';
 
 class KnowledgeLevelScreen extends ConsumerWidget {
   const KnowledgeLevelScreen({super.key});
 
   static const _labels = ['Nothing', 'A Little', 'Quite a Bit', 'A Lot'];
-  static const _emojis = ['🤷', '🌱', '💡', '🧠'];
   static const _descriptions = [
     "That's perfectly fine — we'll start from scratch.",
     "You have some ideas. We'll build on that.",
@@ -20,6 +19,8 @@ class KnowledgeLevelScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final level = ref.watch(
       onboardingProvider.select((s) => s.knowledgeLevel),
     );
@@ -34,14 +35,9 @@ class KnowledgeLevelScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 48),
-              const Text(
+              Text(
                 'What do you know\nabout AI?',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  height: 1.3,
-                ),
+                style: tt.headlineSmall?.copyWith(height: 1.3),
               ).animate().fadeIn(duration: 400.ms).slideY(
                     begin: -0.2,
                     end: 0,
@@ -49,12 +45,9 @@ class KnowledgeLevelScreen extends ConsumerWidget {
                     curve: Curves.easeOut,
                   ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Be honest — we tailor your feed accordingly',
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 15,
-                ),
+                style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
               ).animate().fadeIn(delay: 100.ms, duration: 400.ms),
               const SizedBox(height: 56),
               // Level display
@@ -65,26 +58,16 @@ class KnowledgeLevelScreen extends ConsumerWidget {
                     key: ValueKey(stepIndex),
                     children: [
                       Text(
-                        _emojis[stepIndex],
-                        style: const TextStyle(fontSize: 64),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
                         _labels[stepIndex],
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        textAlign: TextAlign.center,
+                        style: tt.displaySmall?.copyWith(color: cs.primary),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Text(
                         _descriptions[stepIndex],
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                        ),
+                        style:
+                            tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -109,36 +92,17 @@ class KnowledgeLevelScreen extends ConsumerWidget {
                       .map(
                         (l) => Text(
                           l,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 11,
-                          ),
+                          style: tt.labelSmall
+                              ?.copyWith(color: cs.onSurfaceVariant),
                         ),
                       )
                       .toList(),
                 ),
               ),
               const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => context.go(AppRoutes.onboardingTopics),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.ctaAmber,
-                    foregroundColor: AppColors.inkBlack,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+              AppButton(
+                label: 'Continue',
+                onPressed: () => context.go(AppRoutes.onboardingTopics),
               ).animate().fadeIn(delay: 400.ms, duration: 400.ms),
               const SizedBox(height: 24),
             ],
@@ -161,12 +125,13 @@ class _StyledSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return SliderTheme(
       data: SliderThemeData(
-        activeTrackColor: AppColors.ctaAmber,
-        inactiveTrackColor: AppColors.inkSurface2,
-        thumbColor: AppColors.ctaAmber,
-        overlayColor: AppColors.ctaAmber.withValues(alpha: 0.15),
+        activeTrackColor: cs.primary,
+        inactiveTrackColor: cs.surfaceContainerHighest,
+        thumbColor: cs.primary,
+        overlayColor: cs.primary.withValues(alpha: 0.15),
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
         trackHeight: 6,
       ),
