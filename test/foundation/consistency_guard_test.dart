@@ -19,4 +19,32 @@ void main() {
     expect(offenders, isEmpty,
         reason: 'Legacy brand strings:\n${offenders.join('\n')}');
   });
+
+  test('no ad-hoc TextStyle(fontSize:) in onboarding widgets', () {
+    final offenders = <String>[];
+    for (final file
+        in Directory('lib/features/onboarding').listSync(recursive: true)) {
+      if (file is! File || !file.path.endsWith('.dart')) continue;
+      if (file.readAsStringSync().contains('fontSize:')) {
+        offenders.add(file.path);
+      }
+    }
+    expect(offenders, isEmpty,
+        reason: 'Use textTheme tokens, not raw fontSize:\n'
+            '${offenders.join('\n')}');
+  });
+
+  test('no direct AppColors.* in onboarding widgets', () {
+    final offenders = <String>[];
+    for (final file
+        in Directory('lib/features/onboarding').listSync(recursive: true)) {
+      if (file is! File || !file.path.endsWith('.dart')) continue;
+      if (RegExp(r'AppColors\.').hasMatch(file.readAsStringSync())) {
+        offenders.add(file.path);
+      }
+    }
+    expect(offenders, isEmpty,
+        reason: 'Source color from colorScheme/context.sem:\n'
+            '${offenders.join('\n')}');
+  });
 }
