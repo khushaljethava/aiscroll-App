@@ -3,30 +3,32 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_semantic_colors.dart';
+import '../../../shared/widgets/app_button.dart';
+import '../../../shared/widgets/app_tag_chip.dart';
 import '../providers/onboarding_provider.dart';
 
 class TopicPickerScreen extends ConsumerWidget {
   const TopicPickerScreen({super.key});
 
   static const _topics = [
-    _TopicOption(id: 'ai_basics', label: 'AI Basics', emoji: '🤖'),
-    _TopicOption(id: 'machine_learning', label: 'Machine Learning', emoji: '🧠'),
-    _TopicOption(id: 'chatgpt_llms', label: 'ChatGPT & LLMs', emoji: '💬'),
-    _TopicOption(
-        id: 'computer_vision', label: 'Computer Vision', emoji: '👁️'),
-    _TopicOption(
-        id: 'generative_ai', label: 'Generative AI', emoji: '🎨'),
-    _TopicOption(id: 'ai_ethics', label: 'AI Ethics', emoji: '🔐'),
-    _TopicOption(id: 'data_science', label: 'Data Science', emoji: '📊'),
-    _TopicOption(id: 'ai_business', label: 'AI in Business', emoji: '⚙️'),
-    _TopicOption(
-        id: 'prompt_engineering', label: 'Prompt Engineering', emoji: '🧑‍💻'),
-    _TopicOption(id: 'future_ai', label: 'Future of AI', emoji: '🚀'),
+    _TopicOption(id: 'ai_basics', label: 'AI Basics'),
+    _TopicOption(id: 'machine_learning', label: 'Machine Learning'),
+    _TopicOption(id: 'chatgpt_llms', label: 'ChatGPT & LLMs'),
+    _TopicOption(id: 'computer_vision', label: 'Computer Vision'),
+    _TopicOption(id: 'generative_ai', label: 'Generative AI'),
+    _TopicOption(id: 'ai_ethics', label: 'AI Ethics'),
+    _TopicOption(id: 'data_science', label: 'Data Science'),
+    _TopicOption(id: 'ai_business', label: 'AI in Business'),
+    _TopicOption(id: 'prompt_engineering', label: 'Prompt Engineering'),
+    _TopicOption(id: 'future_ai', label: 'Future of AI'),
   ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final sem = context.sem;
     final selectedTopics = ref.watch(
       onboardingProvider.select((s) => s.selectedTopics),
     );
@@ -41,14 +43,9 @@ class TopicPickerScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 48),
-              const Text(
+              Text(
                 'Pick topics you\ncare about',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  height: 1.3,
-                ),
+                style: tt.headlineSmall?.copyWith(height: 1.3),
               ).animate().fadeIn(duration: 400.ms).slideY(
                     begin: -0.2,
                     end: 0,
@@ -60,11 +57,8 @@ class TopicPickerScreen extends ConsumerWidget {
                 hasEnough
                     ? '${selectedTopics.length} selected — nice!'
                     : 'Choose at least 3',
-                style: TextStyle(
-                  color: hasEnough
-                      ? AppColors.accent
-                      : AppColors.textSecondary,
-                  fontSize: 15,
+                style: tt.bodyMedium?.copyWith(
+                  color: hasEnough ? sem.success : cs.onSurfaceVariant,
                 ),
               ).animate().fadeIn(delay: 100.ms, duration: 400.ms),
               const SizedBox(height: 32),
@@ -76,9 +70,10 @@ class TopicPickerScreen extends ConsumerWidget {
                     children: List.generate(_topics.length, (i) {
                       final topic = _topics[i];
                       final isSelected = selectedTopics.contains(topic.id);
-                      return _TopicChip(
-                        topic: topic,
-                        isSelected: isSelected,
+                      return AppTagChip(
+                        label: topic.label,
+                        accent: cs.primary,
+                        emphasised: isSelected,
                         onTap: () {
                           ref
                               .read(onboardingProvider.notifier)
@@ -102,31 +97,11 @@ class TopicPickerScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed:
-                      hasEnough ? () => context.go(AppRoutes.onboardingGoal) : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.ctaAmber,
-                    disabledBackgroundColor:
-                        AppColors.inkSurface2.withValues(alpha: 0.5),
-                    foregroundColor: AppColors.inkBlack,
-                    disabledForegroundColor:
-                        AppColors.textSecondary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+              AppButton(
+                label: 'Continue',
+                onPressed: hasEnough
+                    ? () => context.go(AppRoutes.onboardingGoal)
+                    : null,
               ).animate().fadeIn(delay: 700.ms, duration: 400.ms),
               const SizedBox(height: 24),
             ],
@@ -138,73 +113,11 @@ class TopicPickerScreen extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Topic chip
-// ---------------------------------------------------------------------------
-
-class _TopicChip extends StatelessWidget {
-  const _TopicChip({
-    required this.topic,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final _TopicOption topic;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.ctaAmber : AppColors.inkSurface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.ctaAmber
-                : AppColors.inkSurface2.withValues(alpha: 0.6),
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(topic.emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 6),
-            Text(
-              topic.label,
-              style: TextStyle(
-                color: isSelected
-                    ? AppColors.inkBlack
-                    : AppColors.textSecondary,
-                fontSize: 14,
-                fontWeight:
-                    isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Data model
 // ---------------------------------------------------------------------------
 
 class _TopicOption {
-  const _TopicOption({
-    required this.id,
-    required this.label,
-    required this.emoji,
-  });
-
+  const _TopicOption({required this.id, required this.label});
   final String id;
   final String label;
-  final String emoji;
 }
