@@ -115,7 +115,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     ? null
                     : () => context.go(AppRoutes.onboardingRegister),
                 backgroundColor: cs.primary,
-                foregroundColor: cs.onSurface,
+                foregroundColor: cs.onPrimary,
                 child: Text(
                   'Create account',
                   style: tt.titleMedium?.copyWith(

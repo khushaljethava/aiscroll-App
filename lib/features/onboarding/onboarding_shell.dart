@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_semantic_colors.dart';
+import '../../core/theme/app_spacing.dart';
 
 /// A lightweight pass-through shell for the onboarding flow.
 ///
@@ -55,6 +56,8 @@ class _StepBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final sem = context.sem;
     return Row(
       children: List.generate(total, (i) {
         final filled = i <= current;
@@ -62,13 +65,11 @@ class _StepBar extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.only(right: i == total - 1 ? 0 : 6),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 240),
+              duration: AppMotion.base,
               height: 3,
               decoration: BoxDecoration(
-                color: filled
-                    ? AppColors.ctaAmber
-                    : AppColors.inkHairline,
-                borderRadius: BorderRadius.circular(2),
+                color: filled ? cs.primary : sem.hairline,
+                borderRadius: BorderRadius.circular(AppRadius.xs),
               ),
             ),
           ),
