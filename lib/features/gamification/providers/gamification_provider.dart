@@ -63,7 +63,7 @@ class BadgeDefinitions {
       id: 'quiz_ace',
       emoji: '⚡',
       name: 'Quiz Ace',
-      description: 'Pass 10 quizzes without errors',
+      description: 'Pass 10 quizzes',
       rarity: BadgeRarity.uncommon,
     ),
     UserBadge(
@@ -98,7 +98,7 @@ class BadgeDefinitions {
       id: 'grandmaster',
       emoji: '🏆',
       name: 'AI Grandmaster',
-      description: 'Reach Level 20',
+      description: 'Reach the top level (16)',
       rarity: BadgeRarity.legendary,
     ),
   ];

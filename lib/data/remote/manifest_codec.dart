@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../models/card_model.dart';
 import '../models/track_model.dart';
 
@@ -99,21 +101,29 @@ class ManifestCodec {
     );
   }
 
+  /// Decodes each map in [raw], skipping (and logging) malformed entries so
+  /// one bad row can't reject the whole manifest and freeze content updates.
+  static List<T> _decodeEach<T>(
+    Object? raw,
+    T Function(Map<String, dynamic>) decode,
+  ) {
+    final out = <T>[];
+    for (final m in (raw as List? ?? const []).whereType<Map<String, dynamic>>()) {
+      try {
+        out.add(decode(m));
+      } catch (e) {
+        debugPrint('ManifestCodec: skipping malformed item ${m['id']}: $e');
+      }
+    }
+    return List.unmodifiable(out);
+  }
+
   /// Decodes a full manifest payload into the three lists the app cares
   /// about. Returns nulls-safe: missing sections default to empty lists.
   static ManifestPayload decodeManifest(Map<String, dynamic> json) {
-    final tracks = (json['tracks'] as List? ?? const [])
-        .whereType<Map<String, dynamic>>()
-        .map(trackFromJson)
-        .toList(growable: false);
-    final cards = (json['cards'] as List? ?? const [])
-        .whereType<Map<String, dynamic>>()
-        .map(cardFromJson)
-        .toList(growable: false);
-    final quizzes = (json['quizzes'] as List? ?? const [])
-        .whereType<Map<String, dynamic>>()
-        .map(quizFromJson)
-        .toList(growable: false);
+    final tracks = _decodeEach(json['tracks'], trackFromJson);
+    final cards = _decodeEach(json['cards'], cardFromJson);
+    final quizzes = _decodeEach(json['quizzes'], quizFromJson);
     final version = (json['version'] as num?)?.toInt() ?? 0;
     return ManifestPayload(
       version: version,

@@ -7,14 +7,18 @@ class XpPopupWidget extends StatelessWidget {
     super.key,
     required this.xp,
     required this.visible,
+    this.label,
   });
 
   final int xp;
   final bool visible;
 
+  /// Replaces the "+N XP" text (used for level-up / badge toasts).
+  final String? label;
+
   @override
   Widget build(BuildContext context) {
-    if (!visible || xp <= 0) return const SizedBox.shrink();
+    if (!visible || (label == null && xp <= 0)) return const SizedBox.shrink();
 
     return Animate(
       effects: [
@@ -66,7 +70,7 @@ class XpPopupWidget extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              '+$xp XP',
+              label ?? '+$xp XP',
               style: const TextStyle(
                 color: AppColors.xpGold,
                 fontSize: 16,

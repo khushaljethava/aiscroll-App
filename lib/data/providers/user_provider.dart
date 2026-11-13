@@ -8,6 +8,8 @@ import '../models/user_model.dart';
 import '../../core/constants/xp_constants.dart';
 import '../../core/notifications/notification_service.dart';
 import '../../core/referral/referral_code.dart';
+import '../../features/gamification/providers/gamification_provider.dart';
+import 'cards_provider.dart';
 import '../remote/firestore_service.dart';
 import '../remote/news_push_service.dart';
 import '../remote/telemetry_service.dart';
@@ -62,6 +64,7 @@ class UserNotifier extends StateNotifier<UserProfile> {
   /// write — important when SRS review events come in bursts during a quiz.
   /// Also kicks the cloud-write debouncer when the user is signed in.
   void _scheduleSave() {
+    _awardBadges();
     _saveTimer?.cancel();
     _saveTimer = Timer(_saveDebounce, () {
       _saveTimer = null;
@@ -69,6 +72,35 @@ class UserNotifier extends StateNotifier<UserProfile> {
       _prefs.saveUserProfile(state);
     });
     _scheduleCloudSave();
+  }
+
+  /// Grants every badge whose condition the current state now meets and
+  /// pops the first new one. Runs on every save, so any mutation that
+  /// unlocks a badge is caught without per-call-site wiring.
+  /// ponytail: deep_thinker (expanded views) and sharing_caring (shares)
+  /// have no counters on UserProfile yet, so they can't be earned; add the
+  /// counters + rules here when those badges matter.
+  void _awardBadges() {
+    final s = state;
+    final tracks = _ref?.read(allTracksProvider) ?? const [];
+    final learned = s.learnedCardIds.toSet();
+    final rules = <String, bool>{
+      'first_flame': s.currentStreak >= 1,
+      'week_warrior': s.longestStreak >= 7,
+      'month_master': s.longestStreak >= 30,
+      'quiz_ace': s.quizzesPassed >= 10,
+      'grandmaster': XPConstants.getLevelFromXP(s.totalXP) >=
+          XPConstants.levelThresholds.length,
+      'track_legend': tracks.any(
+          (t) => t.cardIds.isNotEmpty && t.cardIds.every(learned.contains)),
+    };
+    final fresh = [
+      for (final e in rules.entries)
+        if (e.value && !s.earnedBadgeIds.contains(e.key)) e.key,
+    ];
+    if (fresh.isEmpty) return;
+    state = s.copyWith(earnedBadgeIds: [...s.earnedBadgeIds, ...fresh]);
+    _ref?.read(gamificationProvider.notifier).triggerBadge(fresh.first);
   }
 
   /// Mirrors the in-memory state to Firestore for signed-in users.
@@ -153,13 +185,11 @@ class UserNotifier extends StateNotifier<UserProfile> {
       );
       if (lastDay != null) {
         final diff = today.difference(lastDay).inDays;
-        if (diff == 2 && working.freezesAvailable > 0) {
-          // Streak saved by a freeze on the missed day.
-          working = working.copyWith(
-            freezesAvailable: working.freezesAvailable - 1,
-            freezesUsedTotal: working.freezesUsedTotal + 1,
-          );
-        } else if (diff > 1) {
+        // A single missed day with a freeze in hand is NOT settled here —
+        // `updateStreak` spends the freeze on today's first activity.
+        // Spending it here too consumed two freezes for one missed day.
+        final rescuable = diff == 2 && working.freezesAvailable > 0;
+        if (diff > 1 && !rescuable) {
           working = working.copyWith(currentStreak: 0);
         }
       }
@@ -258,7 +288,11 @@ class UserNotifier extends StateNotifier<UserProfile> {
   Future<void> reset() async {
     final freshId = const Uuid().v4();
     await _prefs.saveGuestId(freshId);
-    state = UserProfile(id: freshId, isGuest: true);
+    state = UserProfile(
+      id: freshId,
+      isGuest: true,
+      inviteCode: ReferralCode.generate(),
+    );
     await _flushSave();
   }
 
@@ -267,7 +301,12 @@ class UserNotifier extends StateNotifier<UserProfile> {
   // -------------------------------------------------------------------------
 
   Future<void> addXP(int xp, {String source = 'unknown'}) async {
+    final before = XPConstants.getLevelFromXP(state.totalXP);
     state = state.copyWith(totalXP: state.totalXP + xp);
+    final after = XPConstants.getLevelFromXP(state.totalXP);
+    if (after > before) {
+      _ref?.read(gamificationProvider.notifier).triggerLevelUp(after);
+    }
     _scheduleSave();
     _telemetry?.logXp(xp, source, guestId: state.id, userId: _userIdForTelemetry);
   }
@@ -283,11 +322,12 @@ class UserNotifier extends StateNotifier<UserProfile> {
 
     final updatedReadToday = List<String>.from(state.readCardIdsToday)
       ..add(cardId);
+    // Don't stamp lastActiveDate here: updateStreak compares against the
+    // *previous* active day, then stamps it itself.
     state = state.copyWith(
       cardsReadToday: state.cardsReadToday + 1,
       totalCardsRead: state.totalCardsRead + 1,
       readCardIdsToday: updatedReadToday,
-      lastActiveDate: DateTime.now(),
     );
     _scheduleSave();
     await updateStreak();
@@ -296,13 +336,15 @@ class UserNotifier extends StateNotifier<UserProfile> {
     return true;
   }
 
-  Future<void> markCardLearned(String cardId) async {
-    if (state.learnedCardIds.contains(cardId)) return;
+  /// Returns true when [cardId] was newly added to the learned list.
+  Future<bool> markCardLearned(String cardId) async {
+    if (state.learnedCardIds.contains(cardId)) return false;
     final updated = List<String>.from(state.learnedCardIds)..add(cardId);
     state = state.copyWith(learnedCardIds: updated);
     _scheduleSave();
     _telemetry?.logCardLearned(cardId,
         guestId: state.id, userId: _userIdForTelemetry);
+    return true;
   }
 
   Future<void> toggleBookmark(String cardId) async {
@@ -388,9 +430,11 @@ class UserNotifier extends StateNotifier<UserProfile> {
       reviewsDoneToday: incrementDoneToday
           ? state.reviewsDoneToday + 1
           : state.reviewsDoneToday,
-      lastActiveDate: DateTime.now(),
     );
     _scheduleSave();
+    // A review (e.g. a quiz answer) is activity: let updateStreak advance
+    // the streak and stamp lastActiveDate.
+    await updateStreak();
   }
 
   Future<void> setDailyReviewCap(int cap) async {

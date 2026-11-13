@@ -201,7 +201,12 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
     // because `markCardRead` only writes the *daily* `readCardIdsToday`
     // (which resets at midnight). Idempotent — safe even if the user
     // also taps the explicit "Mark learned" button on the detail view.
-    await _userNotifier.markCardLearned(card.id);
+    final newlyLearned = await _userNotifier.markCardLearned(card.id);
+    // Track reading is how most users "learn" a card, so it must also feed
+    // the learn-new quest — the detail screen's button rarely fires first.
+    if (newlyLearned) {
+      await _questsNotifier.recordEvent(QuestType.learnNew);
+    }
     await _userNotifier.addXP(
       XPConstants.readCard,
       source: 'read_card',
@@ -354,6 +359,20 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
                       child: XpPopupWidget(
                         xp: gamificationState.pendingXP,
                         visible: gamificationState.pendingXP > 0,
+                      ),
+                    ),
+                  if (gamificationState.showLevelUp ||
+                      gamificationState.showBadge)
+                    Positioned(
+                      top: AppSpacing.md + 48,
+                      right: AppSpacing.lg,
+                      child: XpPopupWidget(
+                        xp: 0,
+                        visible: true,
+                        label: gamificationState.showBadge
+                            ? '${BadgeDefinitions.findById(gamificationState.newBadgeId ?? '')?.emoji ?? '🏅'} '
+                                '${BadgeDefinitions.findById(gamificationState.newBadgeId ?? '')?.name ?? 'Badge'} unlocked'
+                            : 'Level ${gamificationState.newLevel}!',
                       ),
                     ),
                 ],

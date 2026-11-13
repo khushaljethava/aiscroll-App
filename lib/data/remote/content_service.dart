@@ -87,7 +87,9 @@ class ContentService {
         options: Options(
           sendTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 15),
-          validateStatus: (s) => s != null && s < 500,
+          // 401 must surface as a DioException so the auth interceptor
+          // refreshes the token and retries.
+          validateStatus: (s) => s != null && s < 500 && s != 401,
         ),
       );
 
