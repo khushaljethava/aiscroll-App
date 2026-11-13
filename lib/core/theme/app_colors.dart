@@ -15,10 +15,22 @@ class AppColors {
 
   // --- Brand ----------------------------------------------------------------
 
+  /// Indigo accent — retired as the primary action color; now kept only as a
+  /// categorical accent (e.g. "rare" badge rarity, XP chips). Do NOT use for
+  /// buttons, links, or focus rings — use [brandCoral] instead.
   static const primary = Color(0xFF4F46E5);
   static const primaryMuted = Color(0x244F46E5); // primary @ 14%
   static const accent = Color(0xFF10B981);
-  static const error = Color(0xFFEF4444);
+  static const error = Color(0xFFC81E3A); // was 0xFFEF4444 — cooler/deeper
+
+  /// Brevio brand / action color (warm coral). Single action color: primary
+  /// buttons, links, focus, selected states, non-gamification accents.
+  static const brandCoral = Color(0xFFFF5A4D);
+  /// Darkened coral for pressed/active button states.
+  static const brandCoralPressed = Color(0xFFE64A3F);
+
+  /// Near-black warm ink for text/icons on coral fills (AA: ~6:1 on coral).
+  static const onCoral = Color(0xFF2A0B06);
 
   /// Amber CTA used on editorial surfaces (News, Learn header, Go-Pro tile).
   static const ctaAmber = Color(0xFFF59E0B);
@@ -37,7 +49,7 @@ class AppColors {
 
   static const beginner = Color(0xFF10B981);
   static const intermediate = Color(0xFFF59E0B);
-  static const advanced = Color(0xFFEF4444);
+  static const advanced = Color(0xFFB0182F); // was 0xFFEF4444 — separated from coral
 
   // --- Gamification ---------------------------------------------------------
 

@@ -14,10 +14,14 @@ class QuestsNotifier extends StateNotifier<List<DailyQuest>> {
   final Ref _ref;
   PreferencesService get _prefs => PreferencesService.instance;
 
+  /// Calendar day the current [state] belongs to.
+  DateTime _day = DateTime.now();
+
   /// Loads quests for today, regenerating from templates on a new calendar
   /// day. Should be called on app start.
   Future<void> load() async {
     final today = DateTime.now();
+    _day = today;
     final saved = await _prefs.loadDailyQuestsForToday(today);
     if (saved != null && saved.isNotEmpty) {
       state = saved;
@@ -31,6 +35,15 @@ class QuestsNotifier extends StateNotifier<List<DailyQuest>> {
   /// quest. Awards XP automatically when a quest crosses its target.
   Future<void> recordEvent(QuestType type, {int delta = 1}) async {
     if (delta <= 0) return;
+    // App left open past midnight: start today's fresh quest set instead
+    // of writing yesterday's progress under today's date.
+    final now = DateTime.now();
+    if (now.year != _day.year ||
+        now.month != _day.month ||
+        now.day != _day.day) {
+      _day = now;
+      state = QuestTemplates.defaultDailyQuests;
+    }
 
     var awardedXP = 0;
     final updated = state.map((q) {
@@ -47,7 +60,7 @@ class QuestsNotifier extends StateNotifier<List<DailyQuest>> {
     }).toList();
 
     state = updated;
-    await _prefs.saveDailyQuests(state, DateTime.now());
+    await _prefs.saveDailyQuests(state, now);
 
     if (awardedXP > 0) {
       await _ref.read(userProvider.notifier).addXP(awardedXP);

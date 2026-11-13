@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/constants/brand.dart';
 import '../../../core/constants/xp_constants.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_semantic_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/theme_mode_provider.dart';
@@ -19,6 +19,8 @@ import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
 import '../../../features/feed/providers/srs_provider.dart';
 import '../../../features/gamification/providers/gamification_provider.dart';
+import '../../../shared/widgets/app_badge.dart';
+import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_section_card.dart';
 
 // ---------------------------------------------------------------------------
@@ -143,7 +145,15 @@ class _ProfileHeader extends StatelessWidget {
                   // Guests get a tappable Sign-in CTA in place of the
                   // username — sends them through the auth flow but
                   // preserves their local progress on return.
-                  _SignInButton()
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: AppButton(
+                      label: 'Sign in / Create account',
+                      icon: Icons.login_rounded,
+                      expand: false,
+                      onPressed: () => context.push(AppRoutes.onboardingWelcome),
+                    ),
+                  )
                 else ...[
                   Text(
                     user.name ?? 'User',
@@ -163,44 +173,11 @@ class _ProfileHeader extends StatelessWidget {
                   ],
                 ],
                 const SizedBox(height: 8),
-                _LevelPill(level: level, title: title),
+                AppBadge(label: 'Level $level · $title', color: context.sem.xpGold),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Compact pill button shown in the profile header for guest users. Routes
-/// to the welcome screen so the user can sign in or register; their local
-/// progress is preserved and merged into the cloud profile on return.
-class _SignInButton extends StatelessWidget {
-  // ignore: unused_element_parameter
-  const _SignInButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: ElevatedButton.icon(
-        onPressed: () => context.push(AppRoutes.onboardingWelcome),
-        icon: const Icon(Icons.login_rounded, size: 18),
-        label: const Text('Sign in / Create account'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.ctaAmber,
-          foregroundColor: AppColors.inkBlack,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(999),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-          elevation: 0,
-        ),
       ),
     );
   }
@@ -217,13 +194,14 @@ class _Avatar extends StatelessWidget {
     // Signed-in users with a photoUrl get their Google avatar. Guests or
     // users whose photo failed to load fall back to a primary-tinted
     // circle with their initial.
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
     final fallback = CircleAvatar(
       radius: 36,
-      backgroundColor: AppColors.primary,
+      backgroundColor: cs.primary,
       child: Text(
         initial,
-        style: const TextStyle(
-          fontSize: 28,
+        style: tt.headlineSmall?.copyWith(
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -239,37 +217,6 @@ class _Avatar extends StatelessWidget {
         fit: BoxFit.cover,
         placeholder: (_, _) => fallback,
         errorWidget: (_, _, _) => fallback,
-      ),
-    );
-  }
-}
-
-class _LevelPill extends StatelessWidget {
-  const _LevelPill({required this.level, required this.title});
-
-  final int level;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.ctaAmber.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.ctaAmber.withValues(alpha: 0.45),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        'Level $level · $title',
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: AppColors.ctaAmber,
-          letterSpacing: 0.2,
-        ),
       ),
     );
   }
@@ -306,9 +253,8 @@ class _XpProgressCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  fontSize: 16,
                 ),
               ),
               Text(
@@ -323,7 +269,9 @@ class _XpProgressCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             'Level $level → Level ${level + 1}: $nextTitle',
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 10),
           ClipRRect(
@@ -338,7 +286,9 @@ class _XpProgressCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '$xpToNext XP to next level',
-            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -407,7 +357,7 @@ class _StatItem extends StatelessWidget {
         message: '$label: $value',
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 24)),
+            Text(emoji, style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -417,9 +367,8 @@ class _StatItem extends StatelessWidget {
                 children: [
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      fontSize: 18,
                       height: 1.1,
                     ),
                     maxLines: 1,
@@ -427,8 +376,7 @@ class _StatItem extends StatelessWidget {
                   ),
                   Text(
                     label,
-                    style: TextStyle(
-                      fontSize: 11,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       height: 1.2,
                       color: cs.onSurfaceVariant,
                     ),
@@ -509,7 +457,9 @@ class _DayDot extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: cs.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 4),
         Container(
@@ -575,7 +525,7 @@ class _BadgesSection extends StatelessWidget {
                 child: Text(
                   'View all',
                   style: tt.labelLarge?.copyWith(
-                    color: AppColors.primary,
+                    color: cs.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -670,7 +620,7 @@ class _BadgeChip extends StatelessWidget {
       case BadgeRarity.uncommon:
         return sem.success;
       case BadgeRarity.rare:
-        return AppColors.primary;
+        return cs.primary;
       case BadgeRarity.legendary:
         return sem.xpGold;
     }
@@ -697,7 +647,7 @@ class _BadgeChip extends StatelessWidget {
                   : null,
             ),
             alignment: Alignment.center,
-            child: Text(badge.emoji, style: const TextStyle(fontSize: 22)),
+            child: Text(badge.emoji, style: tt.titleLarge),
           ),
           const SizedBox(height: 4),
           SizedBox(
@@ -708,7 +658,6 @@ class _BadgeChip extends StatelessWidget {
                 color: isEarned ? null : cs.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.2,
-                fontSize: 9,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -742,7 +691,7 @@ class _BadgeTile extends StatelessWidget {
       case BadgeRarity.uncommon:
         return sem.success;
       case BadgeRarity.rare:
-        return AppColors.primary;
+        return cs.primary;
       case BadgeRarity.legendary:
         return sem.xpGold;
     }
@@ -752,6 +701,7 @@ class _BadgeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final sem = context.sem;
+    final tt = Theme.of(context).textTheme;
     final color = _rarityColor(context);
     Widget tile = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -773,7 +723,7 @@ class _BadgeTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(badge.emoji, style: const TextStyle(fontSize: 26)),
+          Text(badge.emoji, style: tt.headlineMedium),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -782,9 +732,8 @@ class _BadgeTile extends StatelessWidget {
               children: [
                 Text(
                   badge.name,
-                  style: const TextStyle(
+                  style: tt.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    fontSize: 12,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -802,21 +751,7 @@ class _BadgeTile extends StatelessWidget {
             ),
           ),
           if (isEarned)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              decoration: BoxDecoration(
-                color: sem.success.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                'EARNED',
-                style: TextStyle(
-                  fontSize: 8,
-                  fontWeight: FontWeight.w800,
-                  color: sem.success,
-                ),
-              ),
-            ),
+            AppBadge.micro(label: 'EARNED', color: sem.success),
         ],
       ),
     );
@@ -900,11 +835,11 @@ class _StreakFreezeRewardTileState
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.16),
+                color: cs.primary.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
-              child: const Text('❄️', style: TextStyle(fontSize: 22)),
+              child: Text('❄️', style: tt.titleLarge),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -933,34 +868,12 @@ class _StreakFreezeRewardTileState
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
-            ElevatedButton.icon(
-              onPressed:
-                  (atCap || _watching) ? null : _watchAdForFreeze,
-              icon: _watching
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.play_circle_outline_rounded, size: 18),
-              label: Text(_watching ? 'Loading' : 'Watch ad'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-                elevation: 0,
-              ),
+            AppButton(
+              label: _watching ? 'Loading' : 'Watch ad',
+              icon: _watching ? null : Icons.play_circle_outline_rounded,
+              loading: _watching,
+              expand: false,
+              onPressed: atCap ? null : _watchAdForFreeze,
             ),
           ],
         ),
@@ -998,7 +911,6 @@ class _SettingsGroup extends StatelessWidget {
             style: tt.labelMedium?.copyWith(
               color: cs.onSurfaceVariant,
               letterSpacing: 1.2,
-              fontSize: 11,
             ),
           ),
         ),
@@ -1027,7 +939,6 @@ class _GroupSubheader extends StatelessWidget {
         style: tt.labelMedium?.copyWith(
           color: cs.onSurfaceVariant,
           letterSpacing: 1.2,
-          fontSize: 10.5,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -1072,7 +983,9 @@ class _NavTile extends StatelessWidget {
           ? null
           : Text(
               subtitle!,
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
             ),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: onTap,
@@ -1092,18 +1005,18 @@ class _PushSwitchTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SwitchListTile(
       title: const Text('News push notifications'),
-      subtitle: const Text('Breaking AI news from the 60 Second AI team.'),
+      subtitle: Text(Brand.pushFromLine),
       secondary: const Icon(Icons.campaign_rounded),
       value: user.pushNotificationsEnabled,
       onChanged: (v) async {
         final ok = await ref.read(userProvider.notifier).setPushEnabled(v);
         if (v && !ok && context.mounted) {
           // Permission denied — Android 13+ won't show the dialog again.
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              'Push notifications are blocked. Enable them in Settings → Apps → 60 Second AI → Notifications.',
+              'Push notifications are blocked. Enable them in Settings → Apps → ${Brand.name} → Notifications.',
             ),
-            duration: Duration(seconds: 6),
+            duration: const Duration(seconds: 6),
           ));
         }
       },
@@ -1126,11 +1039,11 @@ class _ReminderSwitchTile extends ConsumerWidget {
             await ref.read(userProvider.notifier).setNotificationsEnabled(v);
         if (v && !ok && context.mounted) {
           // Permission permanently denied — Android 13+ won't re-prompt.
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              'Notifications are blocked. Enable them in Settings → Apps → 60 Second AI → Notifications.',
+              'Notifications are blocked. Enable them in Settings → Apps → ${Brand.name} → Notifications.',
             ),
-            duration: Duration(seconds: 6),
+            duration: const Duration(seconds: 6),
           ));
         }
       },
@@ -1153,7 +1066,7 @@ class _ReminderTimeTile extends ConsumerWidget {
         _formatMinutes(user.reminderMinutesSinceMidnight),
         style: TextStyle(
           color: user.notificationsEnabled
-              ? AppColors.primary
+              ? cs.primary
               : cs.onSurfaceVariant,
           fontWeight: FontWeight.w700,
         ),
@@ -1193,12 +1106,14 @@ class _ReviewCapTile extends ConsumerWidget {
       title: const Text('Daily review cap'),
       subtitle: Text(
         'Max number of spaced-repetition reviews per day',
-        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: cs.onSurfaceVariant,
+        ),
       ),
       trailing: Text(
         '${user.dailyReviewCap}',
-        style: const TextStyle(
-          color: AppColors.primary,
+        style: TextStyle(
+          color: cs.primary,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -1229,9 +1144,9 @@ class _ReviewCapTile extends ConsumerWidget {
               ListTile(
                 title: Text('$n reviews / day'),
                 trailing: n == current
-                    ? const Icon(
+                    ? Icon(
                         Icons.check_rounded,
-                        color: AppColors.primary,
+                        color: Theme.of(sheetCtx).colorScheme.primary,
                       )
                     : null,
                 onTap: () => Navigator.of(sheetCtx).pop(n),
@@ -1449,7 +1364,6 @@ class _DangerZone extends ConsumerWidget {
             style: tt.labelMedium?.copyWith(
               color: cs.error,
               letterSpacing: 1.2,
-              fontSize: 11,
             ),
           ),
         ),
@@ -1576,7 +1490,9 @@ class _DangerTile extends StatelessWidget {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: cs.onSurfaceVariant,
+        ),
       ),
       onTap: onTap,
     );
@@ -1631,9 +1547,9 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
     await SharePlus.instance.share(
       ShareParams(
         text:
-            'I\'m learning AI in 60s on AIScroll. Use my code $code when you '
-            'sign up and we both get a streak freeze. https://aiscroll.app',
-        subject: 'Join me on AIScroll',
+            'I\'m learning AI in 60s on ${Brand.name}. Use my code $code when you '
+            'sign up and we both get a streak freeze. ${Brand.shareUrl}',
+        subject: 'Join me on ${Brand.name}',
       ),
     );
   }
@@ -1687,9 +1603,9 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.card_giftcard_rounded,
-                  color: AppColors.ctaAmber,
+                  color: cs.secondary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
@@ -1764,9 +1680,11 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  FilledButton(
+                  AppButton(
+                    label: 'Redeem',
+                    loading: _redeeming,
+                    expand: false,
                     onPressed: _redeeming ? null : _redeem,
-                    child: Text(_redeeming ? '...' : 'Redeem'),
                   ),
                 ],
               ),
@@ -1774,7 +1692,7 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 '✓ You redeemed code ${widget.user.redeemedInviteCode}',
-                style: tt.bodySmall?.copyWith(color: AppColors.accent),
+                style: tt.bodySmall?.copyWith(color: context.sem.success),
               ),
             ],
           ],

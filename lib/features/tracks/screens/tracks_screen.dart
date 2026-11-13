@@ -4,10 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_semantic_colors.dart';
 import '../../../data/models/card_model.dart';
 import '../../../data/models/track_model.dart';
 import '../../../data/providers/cards_provider.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../shared/widgets/app_badge.dart';
+import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/search_field.dart';
 
 // ---------------------------------------------------------------------------
@@ -74,15 +77,12 @@ class TracksScreen extends ConsumerWidget {
           if (filtered.isEmpty)
             SliverFillRemaining(
               hasScrollBody: false,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    query.isEmpty
-                        ? 'No tracks match this filter'
-                        : 'No tracks match "$query"',
-                  ),
-                ),
+              child: AppEmptyState(
+                icon: Icons.search_off_rounded,
+                title: query.isEmpty ? 'No tracks here yet' : 'No matches',
+                message: query.isEmpty
+                    ? 'Try a different difficulty filter.'
+                    : 'Nothing matches "$query". Try another search.',
               ),
             )
           else
@@ -256,9 +256,15 @@ class _Medallion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+    final cs = Theme.of(context).colorScheme;
+    final sem = context.sem;
+    final tt = Theme.of(context).textTheme;
+    return Semantics(
+      button: true,
+      label: 'Open track',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 84,
         height: 84,
@@ -271,9 +277,9 @@ class _Medallion extends StatelessWidget {
               child: CircularProgressIndicator(
                 value: isCompleted ? 1.0 : progress,
                 strokeWidth: 5,
-                backgroundColor: AppColors.inkSurface2,
+                backgroundColor: cs.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  isCompleted ? AppColors.xpGold : accent,
+                  isCompleted ? sem.xpGold : accent,
                 ),
               ),
             ),
@@ -281,12 +287,12 @@ class _Medallion extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.inkSurface,
+                color: sem.sectionSurface,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.inkHairline),
+                border: Border.all(color: sem.hairline),
               ),
               alignment: Alignment.center,
-              child: Text(emoji, style: const TextStyle(fontSize: 32)),
+              child: Text(emoji, style: tt.headlineLarge),
             ),
             if (isCompleted)
               Positioned(
@@ -295,21 +301,22 @@ class _Medallion extends StatelessWidget {
                 child: Container(
                   width: 22,
                   height: 22,
-                  decoration: const BoxDecoration(
-                    color: AppColors.xpGold,
+                  decoration: BoxDecoration(
+                    color: sem.xpGold,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: const Icon(
+                  child: Icon(
                     Icons.check_rounded,
                     size: 14,
-                    color: AppColors.inkBlack,
+                    color: cs.surface,
                   ),
                 ),
               ),
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -338,15 +345,17 @@ class _StationLabel extends StatelessWidget {
         : inProgress
             ? '$completed / ${track.totalCards} cards'
             : '${track.totalCards} cards';
+    final cs = Theme.of(context).colorScheme;
+    final sem = context.sem;
     final statusColor =
-        isCompleted ? AppColors.xpGold : AppColors.textMutedOnInk;
+        isCompleted ? sem.xpGold : cs.onSurfaceVariant;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           track.name,
           style: tt.titleMedium?.copyWith(
-            color: AppColors.textPrimary,
+            color: cs.onSurface,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.2,
           ),
@@ -357,7 +366,7 @@ class _StationLabel extends StatelessWidget {
         Text(
           track.description,
           style: tt.bodySmall?.copyWith(
-            color: AppColors.textMutedOnInk,
+            color: cs.onSurfaceVariant,
             height: 1.4,
           ),
           maxLines: 2,
@@ -366,11 +375,7 @@ class _StationLabel extends StatelessWidget {
         const SizedBox(height: 6),
         Row(
           children: [
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
-            ),
+            AppStatusDot(color: accent),
             const SizedBox(width: 6),
             Text(
               status,
@@ -392,6 +397,7 @@ class _DashedTrail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sem = context.sem;
     return SizedBox(
       width: 4,
       height: 28,
@@ -402,8 +408,8 @@ class _DashedTrail extends StatelessWidget {
           (_) => Container(
             width: 4,
             height: 4,
-            decoration: const BoxDecoration(
-              color: AppColors.inkHairline,
+            decoration: BoxDecoration(
+              color: sem.hairline,
               shape: BoxShape.circle,
             ),
           ),

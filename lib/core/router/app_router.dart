@@ -15,6 +15,7 @@ import '../../features/news/screens/news_screen.dart';
 import '../../features/onboarding/screens/daily_goal_screen.dart';
 import '../../features/onboarding/screens/knowledge_level_screen.dart';
 import '../../features/onboarding/screens/login_screen.dart';
+import '../../features/onboarding/screens/onboarding_done_screen.dart';
 import '../../features/onboarding/screens/persona_screen.dart';
 import '../../features/onboarding/screens/register_screen.dart';
 import '../../features/onboarding/screens/splash_screen.dart';
@@ -42,6 +43,7 @@ class AppRoutes {
   static const onboardingLevel = '/onboarding/level';
   static const onboardingTopics = '/onboarding/topics';
   static const onboardingGoal = '/onboarding/goal';
+  static const onboardingDone = '/onboarding/done';
 
   static const news = '/news';
 
@@ -178,6 +180,7 @@ final appRouter = GoRouter(
       AppRoutes.onboardingWelcome,
       AppRoutes.onboardingLogin,
       AppRoutes.onboardingRegister,
+      AppRoutes.onboardingDone,
     };
     if (alwaysOpen.contains(loc)) return null;
 
@@ -238,6 +241,11 @@ final appRouter = GoRouter(
           path: 'goal',
           name: 'onboarding_goal',
           builder: (context, state) => const DailyGoalScreen(),
+        ),
+        GoRoute(
+          path: 'done',
+          name: 'onboarding_done',
+          builder: (context, state) => const OnboardingDoneScreen(),
         ),
       ],
     ),

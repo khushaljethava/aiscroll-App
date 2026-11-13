@@ -33,7 +33,7 @@ class AuthFailed implements Exception {
 ///     App Attest provider on iOS (debug provider in debug builds).
 ///  2. On first request, `AuthService.getValidToken()` asks Firebase for an
 ///     App Check token, posts `{ appCheckToken, guestId }` to
-///     `/api/client/token`, and receives a signed 60 Second AI client JWT that
+///     `/api/client/token`, and receives a signed Brevio client JWT that
 ///     middleware accepts on every `/api/news`, `/api/content/*`, and
 ///     `/api/events/*` request.
 ///  3. The JWT + its expiry are cached in SharedPreferences. We refresh
@@ -156,8 +156,8 @@ class AuthService {
     }
   }
 
-  /// Drops any cached token. Called on hard sign-out events — currently
-  /// unused in the app but wired for completeness.
+  /// Drops any cached token. Called by `UserNotifier.reset()` — the token's
+  /// subject is the guest id, so a new identity needs a new token.
   Future<void> clear() async {
     await _prefs.remove(_kTokenKey);
     await _prefs.remove(_kExpiresAtKey);

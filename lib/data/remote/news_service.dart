@@ -251,6 +251,10 @@ class NewsService {
       return FetchByIdSuccess(NewsArticle.fromMap(data));
     } on DioException catch (e) {
       debugPrint('NewsService.fetchById($id) DioException: ${e.message}');
+      // 401s now throw (so the interceptor can refresh + retry); one that
+      // survives the retry is still an auth failure, not a network one.
+      final code = e.response?.statusCode;
+      if (code == 401) return FetchByIdAuthError(code!);
       return FetchByIdNetworkError(e.message ?? e.type.name);
     } catch (e) {
       debugPrint('NewsService.fetchById($id) failed: $e');
@@ -261,6 +265,8 @@ class NewsService {
   Options _reqOptions() => Options(
         sendTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 15),
-        validateStatus: (s) => s != null && s < 500,
+        // 401 must surface as a DioException so the auth interceptor
+          // refreshes the token and retries.
+          validateStatus: (s) => s != null && s < 500 && s != 401,
       );
 }

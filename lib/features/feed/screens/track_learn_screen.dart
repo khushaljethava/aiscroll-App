@@ -15,6 +15,7 @@ import '../../../data/models/track_model.dart';
 import '../../../data/providers/cards_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
+import '../../../data/remote/consent_service.dart';
 import '../../../features/ads/widgets/native_ad_card.dart';
 import '../../../features/gamification/providers/gamification_provider.dart';
 import '../../../features/gamification/providers/quests_provider.dart';
@@ -201,12 +202,19 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
     // because `markCardRead` only writes the *daily* `readCardIdsToday`
     // (which resets at midnight). Idempotent — safe even if the user
     // also taps the explicit "Mark learned" button on the detail view.
-    await _userNotifier.markCardLearned(card.id);
-    await _userNotifier.addXP(
-      XPConstants.readCard,
-      source: 'read_card',
-    );
-    _gamificationNotifier.triggerXP(XPConstants.readCard);
+    final newlyLearned = await _userNotifier.markCardLearned(card.id);
+    // Track reading is how most users "learn" a card, so it must also feed
+    // the learn-new quest — the detail screen's button rarely fires first.
+    if (newlyLearned) {
+      await _questsNotifier.recordEvent(QuestType.learnNew);
+      // Read XP only on a card's first read — re-reading learned cards
+      // each day was free XP. Quest + SRS review below still count.
+      await _userNotifier.addXP(
+        XPConstants.readCard,
+        source: 'read_card',
+      );
+      _gamificationNotifier.triggerXP(XPConstants.readCard);
+    }
     await _questsNotifier.recordEvent(QuestType.readCards);
     await _srsNotifier.recordReview(card.id, 3);
   }
@@ -354,6 +362,20 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
                       child: XpPopupWidget(
                         xp: gamificationState.pendingXP,
                         visible: gamificationState.pendingXP > 0,
+                      ),
+                    ),
+                  if (gamificationState.showLevelUp ||
+                      gamificationState.showBadge)
+                    Positioned(
+                      top: AppSpacing.md + 48,
+                      right: AppSpacing.lg,
+                      child: XpPopupWidget(
+                        xp: 0,
+                        visible: true,
+                        label: gamificationState.showBadge
+                            ? '${BadgeDefinitions.findById(gamificationState.newBadgeId ?? '')?.emoji ?? '🏅'} '
+                                '${BadgeDefinitions.findById(gamificationState.newBadgeId ?? '')?.name ?? 'Badge'} unlocked'
+                            : 'Level ${gamificationState.newLevel}!',
                       ),
                     ),
                 ],

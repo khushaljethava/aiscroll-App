@@ -56,6 +56,7 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
   late final GamificationNotifier _gamificationNotifier;
   late final QuestsNotifier _questsNotifier;
   late final SRSNotifier _srsNotifier;
+  late final bool _wasLearnedOnOpen;
 
   @override
   void initState() {
@@ -65,6 +66,8 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
     _gamificationNotifier = ref.read(gamificationProvider.notifier);
     _questsNotifier = ref.read(questsProvider.notifier);
     _srsNotifier = ref.read(srsProvider.notifier);
+    _wasLearnedOnOpen =
+        ref.read(userProvider).learnedCardIds.contains(widget.cardId);
     // Record dwell start synchronously — no post-frame callback. The
     // StateNotifier is a container-scoped singleton, not a descendant of
     // this element, so calling `state = …` on it during initState is safe
@@ -95,10 +98,17 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
     // All notifiers are cached fields — safe to call even if the user
     // navigated away during the 15s dwell. They're container-scoped so
     // outlive the route.
+    if (card.expandedContent != null) {
+      await _userNotifier.recordExpandedView(card.id);
+    }
     final counted = await _userNotifier.markCardRead(card.id);
     if (!counted) return;
-    await _userNotifier.addXP(XPConstants.readCard, source: 'read_card');
-    _gamificationNotifier.triggerXP(XPConstants.readCard);
+    // Read XP is for a card's first read; re-reading an already-learned
+    // card every day was free XP. Streak, quest and SRS review still count.
+    if (!_wasLearnedOnOpen) {
+      await _userNotifier.addXP(XPConstants.readCard, source: 'read_card');
+      _gamificationNotifier.triggerXP(XPConstants.readCard);
+    }
     await _questsNotifier.recordEvent(QuestType.readCards);
     // Light familiarity rating — we've read it but not committed.
     await _srsNotifier.recordReview(card.id, 3);
@@ -167,12 +177,14 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
 
   Future<void> _share(LearningCard card) async {
     FeedbackService.light(ref);
-    await shareWidgetAsImage(
+    final shared = await shareWidgetAsImage(
       boundaryKey: _shareBoundaryKey,
       fallbackText:
           'Check out this AI concept: ${card.title}\n\n${card.takeaway}',
       subject: card.title,
     );
+    if (!shared) return; // dismissed sheet earns nothing
+    await _userNotifier.recordCardShared();
     await _questsNotifier.recordEvent(QuestType.shareCard);
   }
 

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// AdMob configuration. Production unit IDs come from the AdMob console
-/// for the 60 Second AI project; debug builds use Google's universal test
+/// for the Brevio project; debug builds use Google's universal test
 /// units so we never accrue policy strikes against real units while
 /// developing.
 class AdConfig {

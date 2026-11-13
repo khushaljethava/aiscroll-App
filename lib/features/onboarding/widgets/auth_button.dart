@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_spacing.dart';
+
 /// Pill-shaped wide button used across the auth screens (Welcome / Login /
 /// Register / Google / Apple). Centralised so visual changes only happen
 /// in one file.
@@ -28,7 +30,7 @@ class AuthButton extends StatelessWidget {
           foregroundColor: foregroundColor,
           padding: const EdgeInsets.symmetric(vertical: 15),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: AppRadius.input,
           ),
           elevation: 0,
         ),

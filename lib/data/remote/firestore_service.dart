@@ -134,10 +134,19 @@ class FirestoreService {
       isGuest: false,
       // Progress: max of scalars, union of sets.
       totalXP: max(local.totalXP, cloud.totalXP),
-      currentStreak: max(local.currentStreak, cloud.currentStreak),
+      // The streak belongs to whichever side was active most recently —
+      // max() resurrected a stale cloud streak the user had already broken.
+      currentStreak: _isAfter(local.lastActiveDate, cloud.lastActiveDate)
+          ? local.currentStreak
+          : _isAfter(cloud.lastActiveDate, local.lastActiveDate)
+              ? cloud.currentStreak
+              : max(local.currentStreak, cloud.currentStreak),
       longestStreak: max(local.longestStreak, cloud.longestStreak),
       totalCardsRead: max(local.totalCardsRead, cloud.totalCardsRead),
       quizzesPassed: max(local.quizzesPassed, cloud.quizzesPassed),
+      cardsShared: max(local.cardsShared, cloud.cardsShared),
+      expandedCardIds:
+          {...local.expandedCardIds, ...cloud.expandedCardIds}.toList(),
       bookmarkedCardIds: mergedBookmarks,
       learnedCardIds: mergedLearned,
       bookmarkedNewsIds: mergedNewsBookmarks,
@@ -168,7 +177,11 @@ class FirestoreService {
       reminderMinutesSinceMidnight: cloud.reminderMinutesSinceMidnight,
       pushNotificationsEnabled: cloud.pushNotificationsEnabled,
       dailyReviewCap: cloud.dailyReviewCap,
-      freezesAvailable: max(local.freezesAvailable, cloud.freezesAvailable),
+      // Cloud is the account's ledger. max() let sign-out (fresh guest with
+      // the default freeze) + sign-in mint a free freeze every time.
+      // ponytail: a freeze a guest earned (ad/referral) before signing in is
+      // dropped; track earned-vs-default if that ever matters.
+      freezesAvailable: cloud.freezesAvailable,
       freezesUsedTotal: max(local.freezesUsedTotal, cloud.freezesUsedTotal),
       // Local-only daily counters keep their local values; not in cloud.
       cardsReadToday: local.cardsReadToday,
@@ -177,6 +190,10 @@ class FirestoreService {
       lastActiveDate: _laterOf(local.lastActiveDate, cloud.lastActiveDate),
     );
   }
+
+  /// True when [a] is set and strictly later than [b] (or [b] is unset).
+  static bool _isAfter(DateTime? a, DateTime? b) =>
+      a != null && (b == null || a.isAfter(b));
 
   static DateTime? _laterOf(DateTime? a, DateTime? b) {
     if (a == null) return b;
