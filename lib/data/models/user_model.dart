@@ -69,6 +69,10 @@ class UserProfile {
   final int dailyGoal;
   final int totalCardsRead;
   final int quizzesPassed;
+  /// Completed external shares (Sharing is Caring badge).
+  final int cardsShared;
+  /// Distinct cards whose detail/deep-dive view was opened (Deep Thinker).
+  final List<String> expandedCardIds;
   final List<String> earnedBadgeIds;
   final List<String> bookmarkedCardIds;
   final List<String> learnedCardIds;
@@ -125,6 +129,8 @@ class UserProfile {
     this.dailyGoal = 5,
     this.totalCardsRead = 0,
     this.quizzesPassed = 0,
+    this.cardsShared = 0,
+    this.expandedCardIds = const [],
     this.earnedBadgeIds = const [],
     this.bookmarkedCardIds = const [],
     this.learnedCardIds = const [],
@@ -179,6 +185,8 @@ class UserProfile {
     int? dailyGoal,
     int? totalCardsRead,
     int? quizzesPassed,
+    int? cardsShared,
+    List<String>? expandedCardIds,
     List<String>? earnedBadgeIds,
     List<String>? bookmarkedCardIds,
     List<String>? learnedCardIds,
@@ -222,6 +230,8 @@ class UserProfile {
     dailyGoal: dailyGoal ?? this.dailyGoal,
     totalCardsRead: totalCardsRead ?? this.totalCardsRead,
     quizzesPassed: quizzesPassed ?? this.quizzesPassed,
+    cardsShared: cardsShared ?? this.cardsShared,
+    expandedCardIds: expandedCardIds ?? this.expandedCardIds,
     earnedBadgeIds: earnedBadgeIds ?? this.earnedBadgeIds,
     bookmarkedCardIds: bookmarkedCardIds ?? this.bookmarkedCardIds,
     learnedCardIds: learnedCardIds ?? this.learnedCardIds,
@@ -266,6 +276,8 @@ class UserProfile {
     'dailyGoal': dailyGoal,
     'totalCardsRead': totalCardsRead,
     'quizzesPassed': quizzesPassed,
+    'cardsShared': cardsShared,
+    'expandedCardIds': expandedCardIds,
     'earnedBadgeIds': earnedBadgeIds,
     'bookmarkedCardIds': bookmarkedCardIds,
     'learnedCardIds': learnedCardIds,
@@ -311,6 +323,9 @@ class UserProfile {
     dailyGoal: (m['dailyGoal'] as int?) ?? 5,
     totalCardsRead: (m['totalCardsRead'] as int?) ?? 0,
     quizzesPassed: (m['quizzesPassed'] as int?) ?? 0,
+    cardsShared: (m['cardsShared'] as int?) ?? 0,
+    expandedCardIds:
+        List<String>.from(m['expandedCardIds'] as List? ?? const []),
     earnedBadgeIds: List<String>.from(m['earnedBadgeIds'] as List? ?? []),
     bookmarkedCardIds:
         List<String>.from(m['bookmarkedCardIds'] as List? ?? []),

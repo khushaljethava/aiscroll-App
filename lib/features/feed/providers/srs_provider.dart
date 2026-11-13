@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/srs_model.dart';
@@ -57,11 +59,23 @@ final srsProvider =
   return SRSNotifier(ref);
 });
 
+/// Start of today; rebuilds itself at midnight so day-scoped providers
+/// (e.g. the due count) don't go stale when the app stays open overnight.
+final todayProvider = Provider<DateTime>((ref) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final timer = Timer(
+    today.add(const Duration(days: 1)).difference(now),
+    ref.invalidateSelf,
+  );
+  ref.onDispose(timer.cancel);
+  return today;
+});
+
 /// Reactive due-count for today. Useful in widgets that show a "N due" chip.
 final dueReviewCountProvider = Provider<int>((ref) {
   final reviews = ref.watch(srsProvider);
-  final today = DateTime.now();
-  final start = DateTime(today.year, today.month, today.day);
+  final start = ref.watch(todayProvider);
   var count = 0;
   for (final r in reviews.values) {
     if (r.isDue(start)) count++;

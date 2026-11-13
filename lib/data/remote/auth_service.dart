@@ -156,8 +156,8 @@ class AuthService {
     }
   }
 
-  /// Drops any cached token. Called on hard sign-out events — currently
-  /// unused in the app but wired for completeness.
+  /// Drops any cached token. Called by `UserNotifier.reset()` — the token's
+  /// subject is the guest id, so a new identity needs a new token.
   Future<void> clear() async {
     await _prefs.remove(_kTokenKey);
     await _prefs.remove(_kExpiresAtKey);

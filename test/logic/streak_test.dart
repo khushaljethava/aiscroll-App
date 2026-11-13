@@ -1,6 +1,7 @@
 import 'package:aiscroll/data/local/preferences_service.dart';
 import 'package:aiscroll/data/models/user_model.dart';
 import 'package:aiscroll/data/providers/user_provider.dart';
+import 'package:aiscroll/data/remote/firestore_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -56,6 +57,54 @@ void main() {
     final n = await notifierWith(daysAgo: 2, streak: 3);
     await n.markCardRead('c1');
     expect(n.state.currentStreak, 1);
+  });
+
+  group('guest → account merge', () {
+    final now = DateTime.now();
+    UserProfile merge(UserProfile local, UserProfile cloud) =>
+        FirestoreService.mergeForUpgrade(
+          local: local,
+          cloud: cloud,
+          uid: 'uid',
+          email: null,
+          displayName: null,
+          photoUrl: null,
+        );
+
+    test('streak comes from the most recently active side', () {
+      final merged = merge(
+        UserProfile(id: 'g', isGuest: true, currentStreak: 1, lastActiveDate: now),
+        UserProfile(
+          id: 'c',
+          isGuest: false,
+          currentStreak: 10,
+          lastActiveDate: now.subtract(const Duration(days: 5)),
+        ),
+      );
+      expect(merged.currentStreak, 1);
+    });
+
+    test('a fresh guest cannot mint a freeze on sign-in', () {
+      final merged = merge(
+        const UserProfile(id: 'g', isGuest: true, freezesAvailable: 1),
+        const UserProfile(id: 'c', isGuest: false, freezesAvailable: 0),
+      );
+      expect(merged.freezesAvailable, 0);
+    });
+  });
+
+  test('share and deep-dive badges unlock at 10 and 20', () async {
+    final n = await notifierWith(daysAgo: 1, streak: 1);
+    for (var i = 0; i < 10; i++) {
+      await n.recordCardShared();
+    }
+    for (var i = 0; i < 20; i++) {
+      await n.recordExpandedView('card-$i');
+      await n.recordExpandedView('card-$i'); // idempotent per card
+    }
+    expect(n.state.expandedCardIds, hasLength(20));
+    expect(n.state.earnedBadgeIds,
+        containsAll(['sharing_caring', 'deep_thinker']));
   });
 
   test('streak badges are granted from state', () async {

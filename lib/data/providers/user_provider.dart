@@ -9,6 +9,7 @@ import '../../core/constants/xp_constants.dart';
 import '../../core/notifications/notification_service.dart';
 import '../../core/referral/referral_code.dart';
 import '../../features/gamification/providers/gamification_provider.dart';
+import 'auth_provider.dart';
 import 'cards_provider.dart';
 import '../remote/firestore_service.dart';
 import '../remote/news_push_service.dart';
@@ -77,9 +78,6 @@ class UserNotifier extends StateNotifier<UserProfile> {
   /// Grants every badge whose condition the current state now meets and
   /// pops the first new one. Runs on every save, so any mutation that
   /// unlocks a badge is caught without per-call-site wiring.
-  /// ponytail: deep_thinker (expanded views) and sharing_caring (shares)
-  /// have no counters on UserProfile yet, so they can't be earned; add the
-  /// counters + rules here when those badges matter.
   void _awardBadges() {
     final s = state;
     final tracks = _ref?.read(allTracksProvider) ?? const [];
@@ -89,6 +87,8 @@ class UserNotifier extends StateNotifier<UserProfile> {
       'week_warrior': s.longestStreak >= 7,
       'month_master': s.longestStreak >= 30,
       'quiz_ace': s.quizzesPassed >= 10,
+      'deep_thinker': s.expandedCardIds.length >= 20,
+      'sharing_caring': s.cardsShared >= 10,
       'grandmaster': XPConstants.getLevelFromXP(s.totalXP) >=
           XPConstants.levelThresholds.length,
       'track_legend': tracks.any(
@@ -288,6 +288,9 @@ class UserNotifier extends StateNotifier<UserProfile> {
   Future<void> reset() async {
     final freshId = const Uuid().v4();
     await _prefs.saveGuestId(freshId);
+    // The cached client JWT is bound to the old guest id (its `sub`); drop
+    // it so the next request mints one for the fresh identity.
+    await _ref?.read(authServiceProvider).clear();
     state = UserProfile(
       id: freshId,
       isGuest: true,
@@ -345,6 +348,21 @@ class UserNotifier extends StateNotifier<UserProfile> {
     _telemetry?.logCardLearned(cardId,
         guestId: state.id, userId: _userIdForTelemetry);
     return true;
+  }
+
+  /// Counts a completed external share (not a dismissed share sheet).
+  Future<void> recordCardShared() async {
+    state = state.copyWith(cardsShared: state.cardsShared + 1);
+    _scheduleSave();
+  }
+
+  /// Idempotent per card: records that the deep-dive view was opened.
+  Future<void> recordExpandedView(String cardId) async {
+    if (state.expandedCardIds.contains(cardId)) return;
+    state = state.copyWith(
+      expandedCardIds: [...state.expandedCardIds, cardId],
+    );
+    _scheduleSave();
   }
 
   Future<void> toggleBookmark(String cardId) async {

@@ -5,9 +5,7 @@ class XPConstants {
   static const int learnedSwipe = 20;
   static const int quizPass = 30;
   static const int dailyQuest = 50;
-  static const int dailyStreakBase = 25;
   static const int trackComplete = 200;
-  static const int firstCardBonus = 40;
 
   static const List<int> levelThresholds = [
     0, 200, 500, 800, 1200, 1800, 2400, 3000, 4500, 6000,
@@ -35,7 +33,7 @@ class XPConstants {
 
   static const List<String> levelEmojis = [
     '🌱', '🔍', '📊', '💡', '🏋️', '⚡', '🔬', '🧠',
-    '🌊', '🎯', '⚙️', '🏆', '🌟', '💎', '🚀', '🏆',
+    '🌊', '🎯', '⚙️', '🏆', '🌟', '💎', '🚀', '👑',
   ];
 
   static int getLevelFromXP(int xp) {

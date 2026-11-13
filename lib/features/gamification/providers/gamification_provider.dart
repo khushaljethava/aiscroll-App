@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/user_model.dart';
 
@@ -119,31 +121,49 @@ class BadgeDefinitions {
 class GamificationNotifier extends StateNotifier<GamificationState> {
   GamificationNotifier() : super(const GamificationState());
 
+  // One hide-timer per popup kind. A new trigger cancels the previous
+  // timer, so a stale timer can't hide the newer popup early.
+  Timer? _xpTimer;
+  Timer? _levelTimer;
+  Timer? _badgeTimer;
+
   void triggerXP(int amount) {
     state = state.copyWith(pendingXP: amount);
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        state = state.copyWith(pendingXP: 0);
-      }
+    _xpTimer?.cancel();
+    _xpTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) state = state.copyWith(pendingXP: 0);
     });
   }
 
   void triggerLevelUp(int level) {
     state = state.copyWith(showLevelUp: true, newLevel: level);
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        state = state.copyWith(showLevelUp: false);
-      }
+    _levelTimer?.cancel();
+    _levelTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) state = state.copyWith(showLevelUp: false);
     });
   }
 
   void triggerBadge(String badgeId) {
     state = state.copyWith(showBadge: true, newBadgeId: badgeId);
-    Future.delayed(const Duration(seconds: 3), () {
+    _badgeTimer?.cancel();
+    _badgeTimer = Timer(const Duration(seconds: 3), () {
+      // copyWith can't null a field (`??`), so rebuild to clear the id.
       if (mounted) {
-        state = state.copyWith(showBadge: false, newBadgeId: null);
+        state = GamificationState(
+          pendingXP: state.pendingXP,
+          showLevelUp: state.showLevelUp,
+          newLevel: state.newLevel,
+        );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _xpTimer?.cancel();
+    _levelTimer?.cancel();
+    _badgeTimer?.cancel();
+    super.dispose();
   }
 }
 

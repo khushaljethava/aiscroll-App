@@ -15,6 +15,7 @@ import '../../../data/models/track_model.dart';
 import '../../../data/providers/cards_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
+import '../../../data/remote/consent_service.dart';
 import '../../../features/ads/widgets/native_ad_card.dart';
 import '../../../features/gamification/providers/gamification_provider.dart';
 import '../../../features/gamification/providers/quests_provider.dart';
@@ -206,12 +207,14 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
     // the learn-new quest — the detail screen's button rarely fires first.
     if (newlyLearned) {
       await _questsNotifier.recordEvent(QuestType.learnNew);
+      // Read XP only on a card's first read — re-reading learned cards
+      // each day was free XP. Quest + SRS review below still count.
+      await _userNotifier.addXP(
+        XPConstants.readCard,
+        source: 'read_card',
+      );
+      _gamificationNotifier.triggerXP(XPConstants.readCard);
     }
-    await _userNotifier.addXP(
-      XPConstants.readCard,
-      source: 'read_card',
-    );
-    _gamificationNotifier.triggerXP(XPConstants.readCard);
     await _questsNotifier.recordEvent(QuestType.readCards);
     await _srsNotifier.recordReview(card.id, 3);
   }
