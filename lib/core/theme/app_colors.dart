@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// Editorial design token palette.
 ///
 /// The app has converged on a single dark editorial look: `inkBlack` as the
-/// scaffold, `inkSurface` / `inkSurface2` as layered surfaces, and `ctaAmber`
+/// scaffold, `inkSurface` / `inkSurface2` as layered surfaces, and `ctaAccent`
 /// as the primary brand CTA. Indigo `primary` is retained as a feature accent
 /// (XP, topic chips) but should not be used as a background.
 ///
@@ -17,26 +17,32 @@ class AppColors {
 
   /// Indigo accent — retired as the primary action color; now kept only as a
   /// categorical accent (e.g. "rare" badge rarity, XP chips). Do NOT use for
-  /// buttons, links, or focus rings — use [brandCoral] instead.
+  /// buttons, links, or focus rings — use [brandAccent] instead.
   static const primary = Color(0xFF4F46E5);
   static const primaryMuted = Color(0x244F46E5); // primary @ 14%
   static const accent = Color(0xFF10B981);
   static const error = Color(0xFFC81E3A); // was 0xFFEF4444 — cooler/deeper
 
-  /// Brevio brand / action color (warm coral). Single action color: primary
-  /// buttons, links, focus, selected states, non-gamification accents.
-  static const brandCoral = Color(0xFFFF5A4D);
-  /// Darkened coral for pressed/active button states.
-  static const brandCoralPressed = Color(0xFFE64A3F);
+  /// AgentBuildLog brand / action color — "electric cobalt" from the Stitch
+  /// "Editorial Ink" design system shared with agentbuildlog.com. Single action
+  /// color: primary buttons, links, focus, selected states.
+  static const brandAccent = Color(0xFF2F5BFF);
+  /// Darkened cobalt for pressed/active button states.
+  static const brandAccentPressed = Color(0xFF2449D6);
 
-  /// Near-black warm ink for text/icons on coral fills (AA: ~6:1 on coral).
-  static const onCoral = Color(0xFF2A0B06);
+  /// White text/icons on cobalt fills (AA: ~5:1).
+  static const onBrand = Color(0xFFFFFFFF);
 
-  /// Amber CTA used on editorial surfaces (News, Learn header, Go-Pro tile).
-  static const ctaAmber = Color(0xFFF59E0B);
+  /// Lighter cobalt for dark surfaces (AA on [inkBlack]), with dark ink on it.
+  static const brandAccentOnInk = Color(0xFF7D98FF);
+  static const onBrandOnInk = Color(0xFF0A0F2E);
+
+  /// CTA accent on editorial surfaces (News, Learn header, Go-Pro tile).
+  /// One accent across the product, so this is the brand cobalt.
+  static const ctaAccent = brandAccent;
 
   /// Warning — genuinely an alarm state (stale cache, failed sync). Warmer
-  /// than [ctaAmber] so it reads differently.
+  /// than [ctaAccent] so it reads differently.
   static const warning = Color(0xFFEA580C);
 
   // --- Text on ink / paper --------------------------------------------------
@@ -59,32 +65,32 @@ class AppColors {
   // --- Editorial ink / paper ------------------------------------------------
 
   /// True-black editorial background. Scaffold for every screen in dark mode.
-  static const inkBlack = Color(0xFF0A0A0B);
+  static const inkBlack = Color(0xFF111110);
 
   /// Slightly lifted surface over [inkBlack] — cards, sheets, chips.
-  static const inkSurface = Color(0xFF141416);
+  static const inkSurface = Color(0xFF1A1A18);
 
   /// Second-level surface — pressed state, muted containers.
-  static const inkSurface2 = Color(0xFF1C1C20);
+  static const inkSurface2 = Color(0xFF262522);
 
   /// 1px hairline divider on dark editorial surfaces.
   static const inkHairline = Color(0x1FFFFFFF); // white @ 12%
 
   /// Warm paper background for light mode editorial layouts.
-  static const paper = Color(0xFFFBFAF7);
+  static const paper = Color(0xFFFBF9F5);
 
   /// Slightly darker paper — muted section backgrounds.
-  static const paperMuted = Color(0xFFF3F1EB);
+  static const paperMuted = Color(0xFFF0EEEA);
 
   /// 1px hairline on paper.
-  static const paperHairline = Color(0x1F000000); // black @ 12%
+  static const paperHairline = Color(0xFFE7E5E0); // Stitch hairline rule
 
   /// Near-black ink on paper, avoiding pure black so it doesn't feel harsh
   /// under a serif headline.
-  static const inkOnPaper = Color(0xFF15131A);
+  static const inkOnPaper = Color(0xFF141414);
 
   /// Secondary ink — meta rows, captions.
-  static const inkMutedOnPaper = Color(0xFF5F5A6B);
+  static const inkMutedOnPaper = Color(0xFF55534E);
 
   /// Secondary text on dark editorial surfaces.
   static const textMutedOnInk = Color(0xFFB5B3BA);

@@ -35,7 +35,7 @@ class CategoryFilterBar extends StatelessWidget {
           if (index == 0) {
             return _Chip(
               label: 'All',
-              accent: AppColors.ctaAmber,
+              accent: AppColors.ctaAccent,
               selected: selectedKey == null,
               onTap: () => onSelect(null),
             );

@@ -484,7 +484,7 @@ class _TrackTopBar extends StatelessWidget {
                 minHeight: 3,
                 backgroundColor: AppColors.inkSurface2,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.ctaAmber,
+                  AppColors.ctaAccent,
                 ),
               ),
             ),
@@ -606,7 +606,7 @@ class _TrackCompletionPage extends ConsumerWidget {
                     icon: const Icon(Icons.bolt_rounded, size: 18),
                     label: const Text('Take the boss quiz'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ctaAmber,
+                      backgroundColor: AppColors.ctaAccent,
                       foregroundColor: AppColors.inkBlack,
                       padding:
                           const EdgeInsets.symmetric(vertical: 14),

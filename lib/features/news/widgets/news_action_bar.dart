@@ -44,7 +44,7 @@ class NewsActionBar extends StatelessWidget {
                       ? Icons.bookmark_rounded
                       : Icons.bookmark_outline_rounded,
                   label: isBookmarked ? 'Saved' : 'Save',
-                  color: isBookmarked ? AppColors.ctaAmber : null,
+                  color: isBookmarked ? AppColors.ctaAccent : null,
                   onTap: onBookmark,
                 ),
               ),

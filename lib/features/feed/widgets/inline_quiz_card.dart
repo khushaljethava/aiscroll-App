@@ -70,13 +70,13 @@ class _InlineQuizCardState extends ConsumerState<InlineQuizCard> {
           color: AppColors.inkSurface,
           borderRadius: AppRadius.card,
           border: Border.all(
-            color: AppColors.ctaAmber.withValues(alpha: 0.6),
+            color: AppColors.ctaAccent.withValues(alpha: 0.6),
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(height: 3, color: AppColors.ctaAmber),
+            Container(height: 3, color: AppColors.ctaAccent),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.xl,
@@ -90,12 +90,12 @@ class _InlineQuizCardState extends ConsumerState<InlineQuizCard> {
                   Row(
                     children: [
                       const Icon(Icons.bolt_rounded,
-                          size: 18, color: AppColors.ctaAmber),
+                          size: 18, color: AppColors.ctaAccent),
                       const SizedBox(width: 6),
                       Text(
                         'Quick Quiz',
                         style: tt.labelLarge?.copyWith(
-                          color: AppColors.ctaAmber,
+                          color: AppColors.ctaAccent,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.6,
                         ),
