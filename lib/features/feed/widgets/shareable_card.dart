@@ -35,7 +35,7 @@ class ShareableCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.ctaAmber,
+                      color: AppColors.ctaAccent,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
@@ -117,7 +117,7 @@ class ShareableCard extends StatelessWidget {
                   Text(
                     '→ ${Brand.name}',
                     style: TextStyle(
-                      color: AppColors.ctaAmber,
+                      color: AppColors.ctaAccent,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),

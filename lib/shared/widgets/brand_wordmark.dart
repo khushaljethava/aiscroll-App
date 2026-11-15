@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/brand.dart';
 
-/// The Brevio wordmark, set in the theme's editorial serif (Newsreader via
+/// The AgentBuildLog wordmark, set in the theme's editorial serif (Newsreader via
 /// `displaySmall`/`headlineMedium`).
 class BrandWordmark extends StatelessWidget {
   /// Hero size for Splash / Welcome (`displaySmall`).

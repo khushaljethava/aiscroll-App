@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
+import '../../../data/remote/consent_service.dart';
 
 /// Compact native ad slot for inline editorial content.
-class InlineNativeAd extends StatefulWidget {
+class InlineNativeAd extends ConsumerStatefulWidget {
   const InlineNativeAd({super.key});
 
   @override
-  State<InlineNativeAd> createState() => _InlineNativeAdState();
+  ConsumerState<InlineNativeAd> createState() => _InlineNativeAdState();
 }
 
-class _InlineNativeAdState extends State<InlineNativeAd> {
+class _InlineNativeAdState extends ConsumerState<InlineNativeAd> {
   NativeAd? _ad;
   bool _loaded = false;
   bool _failed = false;
@@ -21,6 +24,18 @@ class _InlineNativeAdState extends State<InlineNativeAd> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _loadAdIfAllowed();
+    });
+  }
+
+  void _loadAdIfAllowed() {
+    if (ref.read(userProvider).isPremium ||
+        !ConsentService.instance.canRequestAds) {
+      setState(() => _failed = true);
+      return;
+    }
     _loadAd();
   }
 

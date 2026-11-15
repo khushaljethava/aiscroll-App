@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../core/constants/brand.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/news_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/news_service.dart';
+import '../../../data/remote/consent_service.dart';
 import '../../ads/widgets/inline_native_ad.dart';
 import '../widgets/news_action_bar.dart';
 
@@ -148,6 +150,8 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
         article.coverImageUrl != null && article.coverImageUrl!.isNotEmpty;
     final readingMinutes = _estimateReadingMinutes(article.body);
     final articleParagraphs = _splitParagraphs(article.body);
+    final showAds = !user.isPremium &&
+        ConsentService.instance.canRequestAds;
 
     return Scaffold(
       extendBodyBehindAppBar: hasCover,
@@ -170,7 +174,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                     ref.read(userProvider.notifier).logNewsShare(article.id);
                     await SharePlus.instance.share(
                       ShareParams(
-                        text: '${article.headline}\n\n${article.sourceUrl}',
+                        text: '${article.headline}\n\n${Brand.newsUrl(article.id)}',
                         subject: article.headline,
                       ),
                     );
@@ -289,6 +293,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                       _ArticleBody(
                         paragraphs: articleParagraphs,
                         articleId: article.id,
+                        showAds: showAds,
                       ),
                     ],
                   ),
@@ -324,7 +329,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
           ref.read(userProvider.notifier).logNewsShare(article.id);
           await SharePlus.instance.share(
             ShareParams(
-              text: '${article.headline}\n\n${article.sourceUrl}',
+              text: '${article.headline}\n\n${Brand.newsUrl(article.id)}',
               subject: article.headline,
             ),
           );
@@ -511,10 +516,11 @@ class _PullQuote extends StatelessWidget {
 }
 
 class _ArticleBody extends StatelessWidget {
-  const _ArticleBody({required this.paragraphs, required this.articleId});
+  const _ArticleBody({required this.paragraphs, required this.articleId, required this.showAds});
 
   final List<String> paragraphs;
   final String articleId;
+  final bool showAds;
 
   @override
   Widget build(BuildContext context) {
@@ -537,7 +543,7 @@ class _ArticleBody extends StatelessWidget {
         ),
       );
 
-      if (i == 0) {
+      if (i == 0 && showAds) {
         children.addAll([
           const SizedBox(height: AppSpacing.xl),
           InlineNativeAd(key: ValueKey('article_inline_ad_$articleId')),

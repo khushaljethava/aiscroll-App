@@ -24,11 +24,12 @@ class AppSpacing {
 class AppRadius {
   AppRadius._();
 
-  static const double xs = 6;
-  static const double sm = 10;
-  static const double md = 14;
-  static const double lg = 18;
-  static const double xl = 22;
+  // Stitch "Editorial Ink": crisp, bookish corners (4px controls, 8px panels).
+  static const double xs = 4;
+  static const double sm = 4;
+  static const double md = 6;
+  static const double lg = 8;
+  static const double xl = 8;
   static const double pill = 999;
 
   static BorderRadius get card => BorderRadius.circular(xl);

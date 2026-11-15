@@ -30,7 +30,7 @@ Future<bool> shareWidgetAsImage({
   final file = XFile.fromData(
     pngBytes,
     mimeType: 'image/png',
-    name: 'brevio-card.png',
+    name: 'agentbuildlog-card.png',
     length: pngBytes.lengthInBytes,
   );
   return _share(ShareParams(

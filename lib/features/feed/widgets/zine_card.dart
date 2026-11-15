@@ -183,7 +183,7 @@ class _MetaRow extends StatelessWidget {
           onTap: onToggleBookmark,
           surface: cs.surfaceContainerHighest,
           outline: cs.outlineVariant,
-          activeColor: AppColors.ctaAmber,
+          activeColor: AppColors.ctaAccent,
           inactiveColor: cs.onSurfaceVariant,
         ),
       ],
@@ -312,7 +312,7 @@ class _ReadMoreRow extends StatelessWidget {
             Text(
               'Read more',
               style: tt.labelLarge?.copyWith(
-                color: AppColors.ctaAmber,
+                color: AppColors.ctaAccent,
                 letterSpacing: 0.3,
               ),
             ),
@@ -320,7 +320,7 @@ class _ReadMoreRow extends StatelessWidget {
             const Icon(
               Icons.arrow_forward_rounded,
               size: 14,
-              color: AppColors.ctaAmber,
+              color: AppColors.ctaAccent,
             ),
           ],
         ),

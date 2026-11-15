@@ -235,7 +235,7 @@ class _LearnDetailScreenState extends ConsumerState<LearnDetailScreen> {
               isBookmarked
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
-              color: isBookmarked ? AppColors.ctaAmber : null,
+              color: isBookmarked ? AppColors.ctaAccent : null,
             ),
             onPressed: () => _toggleBookmark(card),
           ),
@@ -408,13 +408,13 @@ class _SectionTitle extends StatelessWidget {
         Container(
           width: 16,
           height: 2,
-          color: AppColors.ctaAmber,
+          color: AppColors.ctaAccent,
         ),
         const SizedBox(width: AppSpacing.sm),
         Text(
           title.toUpperCase(),
           style: tt.labelMedium?.copyWith(
-            color: AppColors.ctaAmber,
+            color: AppColors.ctaAccent,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.2,
           ),
@@ -470,7 +470,7 @@ class _BottomBar extends StatelessWidget {
                 label: Text(isLearned ? 'Learned' : 'I know this'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      isLearned ? AppColors.accent : AppColors.ctaAmber,
+                      isLearned ? AppColors.accent : AppColors.ctaAccent,
                   foregroundColor: isLearned
                       ? Colors.white
                       : AppColors.inkBlack,

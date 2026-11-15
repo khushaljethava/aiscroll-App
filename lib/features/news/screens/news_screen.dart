@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../core/constants/brand.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,8 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/news_model.dart';
 import '../../../data/providers/news_provider.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../data/remote/ads_service.dart';
+import '../../../data/remote/consent_service.dart';
 import '../../../features/ads/widgets/native_ad_card.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 
@@ -23,17 +26,21 @@ class _FeedAdSlot {
 }
 
 const _adSlot = _FeedAdSlot();
-const _newsAdEvery = 4;
 
-/// Interleaves an ad sentinel into [items] after every 4 real news stories.
+/// Interleaves native ad sentinels using shared [AdConfig] cadence and
+/// warmup so news matches the learn feed's ad density.
 List<Object> interleaveAds<T extends Object>(List<T> items) {
-  if (items.length <= _newsAdEvery) return List<Object>.from(items);
+  if (items.isEmpty) return [];
   final out = <Object>[];
-  for (var i = 0; i < items.length; i++) {
-    out.add(items[i]);
-    final shown = i + 1;
-    if (shown % _newsAdEvery == 0) {
+  var concretes = 0;
+  var sinceAd = 0;
+  for (final item in items) {
+    out.add(item);
+    concretes++;
+    sinceAd++;
+    if (concretes > AdConfig.adWarmup && sinceAd >= AdConfig.adEvery) {
       out.add(_adSlot);
+      sinceAd = 0;
     }
   }
   return out;
@@ -117,7 +124,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     ref.read(userProvider.notifier).logNewsShare(article.id);
     await SharePlus.instance.share(
       ShareParams(
-        text: '${article.headline}\n\n${article.sourceUrl}',
+        text: '${article.headline}\n\n${Brand.newsUrl(article.id)}',
         subject: article.headline,
       ),
     );
@@ -176,7 +183,11 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     final state = ref.watch(newsProvider);
     final user = ref.watch(userProvider);
     final visible = state.visibleArticles;
-    final feedItems = interleaveAds<NewsArticle>(visible);
+    final showAds = !user.isPremium &&
+        ConsentService.instance.canRequestAds;
+    final feedItems = showAds
+        ? interleaveAds<NewsArticle>(visible)
+        : visible.cast<Object>();
     final selectedCategory = state.selectedCategoryKey;
     final categoryByKey = {for (final c in state.categories) c.key: c};
 
@@ -252,7 +263,7 @@ class _StaleBanner extends StatelessWidget {
     // the freshness label in the rail still hints at staleness.
     if (!severe) return const SizedBox.shrink();
 
-    final tone = severe ? AppColors.warning : AppColors.ctaAmber;
+    final tone = severe ? AppColors.warning : AppColors.ctaAccent;
     final prefix = last == null
         ? 'Couldn\'t load news'
         : severe
@@ -314,7 +325,7 @@ class _NewStoriesPill extends StatelessWidget {
       ),
       child: Center(
         child: Material(
-          color: AppColors.ctaAmber,
+          color: AppColors.ctaAccent,
           shape: const StadiumBorder(),
           child: InkWell(
             onTap: onTap,
@@ -388,7 +399,7 @@ class _CategoryRail extends StatelessWidget {
                 if (i == 0) {
                   return _RailChip(
                     label: 'For You',
-                    accent: AppColors.ctaAmber,
+                    accent: AppColors.ctaAccent,
                     selected: selectedKey == null,
                     onTap: () => onSelect(null),
                   );
@@ -717,7 +728,7 @@ class _StoryPage extends StatelessWidget {
                               color: Colors.black.withValues(alpha: 0.45),
                               borderRadius: BorderRadius.circular(999),
                               border: Border.all(
-                                color: AppColors.ctaAmber.withValues(
+                                color: AppColors.ctaAccent.withValues(
                                   alpha: 0.6,
                                 ),
                               ),
@@ -727,12 +738,12 @@ class _StoryPage extends StatelessWidget {
                               children: [
                                 Icon(Icons.push_pin_rounded,
                                     size: 12,
-                                    color: AppColors.ctaAmber),
+                                    color: AppColors.ctaAccent),
                                 SizedBox(width: 4),
                                 Text(
                                   'FEATURED',
                                   style: TextStyle(
-                                    color: AppColors.ctaAmber,
+                                    color: AppColors.ctaAccent,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 1.1,
@@ -905,7 +916,7 @@ class _StoryPage extends StatelessWidget {
                             ? Icons.bookmark_rounded
                             : Icons.bookmark_border_rounded,
                         active: isSaved,
-                        activeColor: AppColors.ctaAmber,
+                        activeColor: AppColors.ctaAccent,
                         tooltip:
                             isSaved ? 'Remove bookmark' : 'Save for later',
                         onTap: onBookmark,
@@ -1134,7 +1145,7 @@ class _RoundAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final fg = active ? (activeColor ?? AppColors.ctaAmber) : cs.onSurface;
+    final fg = active ? (activeColor ?? AppColors.ctaAccent) : cs.onSurface;
     final button = Material(
       color: cs.surfaceContainerHighest,
       shape: CircleBorder(

@@ -131,6 +131,8 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
     final trackQuizzes = allQuizzes
         .where((q) => trackCardIds.contains(q.parentCardId))
         .toList();
+    final showAds = !ref.read(userProvider).isPremium &&
+        ConsentService.instance.canRequestAds;
 
     final items = <dynamic>[];
     var quizIdx = 0;
@@ -148,7 +150,8 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
       // Drop a native ad slot every AdConfig.adEvery real items, after a
       // short warmup. Aligns with the news feed's cadence so ad density
       // is consistent across surfaces.
-      if (concretes > AdConfig.adWarmup &&
+      if (showAds &&
+          concretes > AdConfig.adWarmup &&
           cardsSinceAd >= AdConfig.adEvery) {
         items.add(_learnAdSlot);
         cardsSinceAd = 0;
@@ -481,7 +484,7 @@ class _TrackTopBar extends StatelessWidget {
                 minHeight: 3,
                 backgroundColor: AppColors.inkSurface2,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.ctaAmber,
+                  AppColors.ctaAccent,
                 ),
               ),
             ),
@@ -603,7 +606,7 @@ class _TrackCompletionPage extends ConsumerWidget {
                     icon: const Icon(Icons.bolt_rounded, size: 18),
                     label: const Text('Take the boss quiz'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ctaAmber,
+                      backgroundColor: AppColors.ctaAccent,
                       foregroundColor: AppColors.inkBlack,
                       padding:
                           const EdgeInsets.symmetric(vertical: 14),
