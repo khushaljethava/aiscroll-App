@@ -13,6 +13,8 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/news_model.dart';
 import '../../../data/providers/news_provider.dart';
 import '../../../data/providers/user_provider.dart';
+import '../../../data/remote/ads_service.dart';
+import '../../../data/remote/consent_service.dart';
 import '../../../features/ads/widgets/native_ad_card.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 
@@ -23,17 +25,21 @@ class _FeedAdSlot {
 }
 
 const _adSlot = _FeedAdSlot();
-const _newsAdEvery = 4;
 
-/// Interleaves an ad sentinel into [items] after every 4 real news stories.
+/// Interleaves native ad sentinels using shared [AdConfig] cadence and
+/// warmup so news matches the learn feed's ad density.
 List<Object> interleaveAds<T extends Object>(List<T> items) {
-  if (items.length <= _newsAdEvery) return List<Object>.from(items);
+  if (items.isEmpty) return [];
   final out = <Object>[];
-  for (var i = 0; i < items.length; i++) {
-    out.add(items[i]);
-    final shown = i + 1;
-    if (shown % _newsAdEvery == 0) {
+  var concretes = 0;
+  var sinceAd = 0;
+  for (final item in items) {
+    out.add(item);
+    concretes++;
+    sinceAd++;
+    if (concretes > AdConfig.adWarmup && sinceAd >= AdConfig.adEvery) {
       out.add(_adSlot);
+      sinceAd = 0;
     }
   }
   return out;
@@ -176,7 +182,11 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     final state = ref.watch(newsProvider);
     final user = ref.watch(userProvider);
     final visible = state.visibleArticles;
-    final feedItems = interleaveAds<NewsArticle>(visible);
+    final showAds = !user.isPremium &&
+        ConsentService.instance.canRequestAds;
+    final feedItems = showAds
+        ? interleaveAds<NewsArticle>(visible)
+        : visible.cast<Object>();
     final selectedCategory = state.selectedCategoryKey;
     final categoryByKey = {for (final c in state.categories) c.key: c};
 

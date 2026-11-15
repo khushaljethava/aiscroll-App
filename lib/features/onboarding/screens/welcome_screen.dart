@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/brand.dart';
+import '../../../core/constants/legal.dart';
+import '../../../core/utils/url_opener.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_semantic_colors.dart';
 import '../../../data/local/preferences_service.dart';
@@ -208,11 +210,14 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 ),
               ).animate().fadeIn(delay: 600.ms, duration: 350.ms),
               const SizedBox(height: 16),
-              Text(
-                'By continuing you agree to our Terms & Privacy Policy',
-                textAlign: TextAlign.center,
+              _LegalConsentLine(
                 style: tt.bodySmall?.copyWith(
                   color: cs.onSurfaceVariant.withValues(alpha: 0.6),
+                ),
+                linkStyle: tt.bodySmall?.copyWith(
+                  color: cs.primary,
+                  decoration: TextDecoration.underline,
+                  decorationColor: cs.primary.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 16),
@@ -220,6 +225,34 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class _LegalConsentLine extends StatelessWidget {
+  const _LegalConsentLine({required this.style, required this.linkStyle});
+
+  final TextStyle? style;
+  final TextStyle? linkStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text('By continuing you agree to our ', style: style),
+        GestureDetector(
+          onTap: () => openExternalUrl(Legal.termsOfServiceUrl),
+          child: Text('Terms', style: linkStyle),
+        ),
+        Text(' & ', style: style),
+        GestureDetector(
+          onTap: () => openExternalUrl(Legal.privacyPolicyUrl),
+          child: Text('Privacy Policy', style: linkStyle),
+        ),
+      ],
     );
   }
 }

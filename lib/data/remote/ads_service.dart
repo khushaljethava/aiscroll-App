@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'consent_service.dart';
+
 /// AdMob configuration. Production unit IDs come from the AdMob console
 /// for the Brevio project; debug builds use Google's universal test
 /// units so we never accrue policy strikes against real units while
@@ -13,7 +15,7 @@ class AdConfig {
 
   // ---- Native ----
   // Production native unit registered in AdMob console.
-  static const _nativeUnitProd = 'ca-app-pub-5206098172306110/8398969038';
+  static const _nativeUnitProd = 'ca-app-pub-1875938045281064/1015681615';
   // Google-published universal test unit for native ads.
   static const _nativeUnitTestAndroid =
       'ca-app-pub-3940256099942544/2247696110';
@@ -21,7 +23,7 @@ class AdConfig {
       'ca-app-pub-3940256099942544/3986624511';
 
   // ---- Rewarded ----
-  static const _rewardedUnitProd = 'ca-app-pub-5206098172306110/4268152330';
+  static const _rewardedUnitProd = 'ca-app-pub-1875938045281064/4515942923';
   static const _rewardedUnitTestAndroid =
       'ca-app-pub-3940256099942544/5224354917';
   static const _rewardedUnitTestIos =
@@ -62,6 +64,7 @@ class AdsService {
   /// likely to redeem one (e.g. profile screen) so the [showRewarded]
   /// call is instant.
   Future<void> preloadRewarded() async {
+    if (!ConsentService.instance.canRequestAds) return;
     if (_rewarded != null || _isLoading) return;
     _isLoading = true;
     try {
@@ -90,6 +93,7 @@ class AdsService {
   /// to completion and the reward callback fired. After every show (success
   /// or dismiss) we kick off a preload so the next attempt is fast.
   Future<bool> showRewarded() async {
+    if (!ConsentService.instance.canRequestAds) return false;
     final ad = _rewarded;
     if (ad == null) {
       // Nothing pre-loaded — try a one-shot load + show.

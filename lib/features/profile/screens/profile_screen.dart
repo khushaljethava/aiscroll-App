@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/brand.dart';
+import '../../../core/constants/legal.dart';
+import '../../../core/utils/url_opener.dart';
 import '../../../core/constants/xp_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_semantic_colors.dart';
@@ -17,6 +19,7 @@ import '../../../data/providers/analytics_provider.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/providers/user_provider.dart';
 import '../../../data/remote/ads_service.dart';
+import '../../../data/remote/consent_service.dart';
 import '../../../features/feed/providers/srs_provider.dart';
 import '../../../features/gamification/providers/gamification_provider.dart';
 import '../../../shared/widgets/app_badge.dart';
@@ -94,6 +97,10 @@ class ProfileScreen extends ConsumerWidget {
                   _SoundTile(user: user),
                   const _ThemedDivider(),
                   const _GroupSubheader(label: 'Privacy'),
+                  const _PrivacyPolicyTile(),
+                  const _ThemedDivider(),
+                  const _AdPrivacyOptionsTile(),
+                  const _ThemedDivider(),
                   const _AnalyticsTile(),
                 ],
               ),
@@ -788,6 +795,7 @@ class _StreakFreezeRewardTileState
     // Pre-load on mount so the tap-to-watch is instant most of the time.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      if (widget.user.isPremium) return;
       // ignore: discarded_futures
       ref.read(adsServiceProvider).preloadRewarded();
     });
@@ -857,8 +865,10 @@ class _StreakFreezeRewardTileState
                     atCap
                         ? 'You have ${widget.user.freezesAvailable}/$_freezeCap'
                             ' — at the cap.'
-                        : 'You have ${widget.user.freezesAvailable}/$_freezeCap.'
-                            ' Watch a short ad to earn one.',
+                        : widget.user.isPremium
+                            ? 'You have ${widget.user.freezesAvailable}/$_freezeCap.'
+                            : 'You have ${widget.user.freezesAvailable}/$_freezeCap.'
+                                ' Watch a short ad to earn one.',
                     style: tt.bodySmall?.copyWith(
                       color: cs.onSurfaceVariant,
                       height: 1.3,
@@ -873,7 +883,9 @@ class _StreakFreezeRewardTileState
               icon: _watching ? null : Icons.play_circle_outline_rounded,
               loading: _watching,
               expand: false,
-              onPressed: atCap ? null : _watchAdForFreeze,
+              onPressed: (atCap || widget.user.isPremium)
+                  ? null
+                  : _watchAdForFreeze,
             ),
           ],
         ),
@@ -1229,8 +1241,8 @@ class _AnalyticsTileState extends ConsumerState<_AnalyticsTile> {
     return SwitchListTile(
       title: const Text('Help improve the app'),
       subtitle: const Text(
-        'Anonymous usage analytics. We never share your name, email, or '
-        'reading history with third parties.',
+        'Anonymous usage analytics. Google AdMob may show ads and collect '
+        'device identifiers — see our Privacy Policy.',
       ),
       secondary: const Icon(Icons.bar_chart_rounded),
       value: _enabled,
@@ -1698,6 +1710,62 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
           ],
         ),
       ),
+    );
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// Legal & ad privacy entry points
+// ---------------------------------------------------------------------------
+
+class _PrivacyPolicyTile extends StatelessWidget {
+  const _PrivacyPolicyTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.privacy_tip_outlined),
+      title: const Text('Privacy Policy'),
+      subtitle: const Text('How we handle your data and ads'),
+      trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+      onTap: () => openExternalUrl(Legal.privacyPolicyUrl),
+    );
+  }
+}
+
+class _AdPrivacyOptionsTile extends ConsumerStatefulWidget {
+  const _AdPrivacyOptionsTile();
+
+  @override
+  ConsumerState<_AdPrivacyOptionsTile> createState() =>
+      _AdPrivacyOptionsTileState();
+}
+
+class _AdPrivacyOptionsTileState extends ConsumerState<_AdPrivacyOptionsTile> {
+  bool? _required;
+
+  @override
+  void initState() {
+    super.initState();
+    // ignore: discarded_futures
+    ConsentService.instance.isPrivacyOptionsRequired().then((v) {
+      if (!mounted) return;
+      setState(() => _required = v);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_required != true) return const SizedBox.shrink();
+    return ListTile(
+      leading: const Icon(Icons.ads_click_outlined),
+      title: const Text('Ad personalization'),
+      subtitle: const Text('Manage how ads use your data'),
+      onTap: () async {
+        await ConsentService.instance.showPrivacyOptionsForm();
+        await ConsentService.instance.refreshCanRequestAds();
+      },
     );
   }
 }

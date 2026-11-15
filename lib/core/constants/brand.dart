@@ -5,8 +5,9 @@ class Brand {
 
   static const String name = 'Brevio';
   static const String tagline = 'Learn AI Daily, in Seconds.';
-  /// Marketing/share URL. TODO(pre-launch): confirm domain ownership.
-  static const String shareUrl = 'https://brevio.app';
+  /// Google Play listing used for referral shares and invite links.
+  static const String shareUrl =
+      'https://play.google.com/store/apps/details?id=com.kj.aiscroll';
 
   /// App Store / Play copy. Subtitle must be <= 30 chars (Apple limit).
   static const String storeTitle = '$name: Learn AI Daily';

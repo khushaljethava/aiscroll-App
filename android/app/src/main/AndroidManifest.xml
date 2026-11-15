@@ -54,7 +54,7 @@
              or doesn't match the app ID configured in AdMob console. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5206098172306110~2380355593" />
+            android:value="ca-app-pub-1875938045281064~3394432942" />
         <!-- flutter_local_notifications: reschedule alarms after device reboot. -->
         <receiver
             android:exported="false"
