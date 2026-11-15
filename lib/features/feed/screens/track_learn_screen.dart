@@ -50,6 +50,7 @@ class TrackLearnScreen extends ConsumerStatefulWidget {
 
 class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
   static const _quizCadence = 4;
+  static const _learnAdEvery = 5;
 
   late final PageController _pageController;
   Timer? _dwellTimer;
@@ -145,14 +146,16 @@ class _TrackLearnScreenState extends ConsumerState<TrackLearnScreen> {
       final isCadenceHit = (i + 1) % _quizCadence == 0;
       if (isCadenceHit && quizIdx < trackQuizzes.length) {
         items.add(trackQuizzes[quizIdx++]);
+        cardsSinceAd++;
         concretes++;
       }
-      // Drop a native ad slot every AdConfig.adEvery real items, after a
-      // short warmup. Aligns with the news feed's cadence so ad density
-      // is consistent across surfaces.
+      // Drop a native ad slot every [_learnAdEvery] real items (cards +
+      // quizzes), after a short warmup. Denser than the news feed because
+      // tracks are short — at AdConfig.adEvery most tracks never hit a slot.
+      // ponytail: fixed cadence, move to remote config if fill/retention says so.
       if (showAds &&
           concretes > AdConfig.adWarmup &&
-          cardsSinceAd >= AdConfig.adEvery) {
+          cardsSinceAd >= _learnAdEvery) {
         items.add(_learnAdSlot);
         cardsSinceAd = 0;
       }
