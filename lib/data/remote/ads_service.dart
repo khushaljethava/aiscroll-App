@@ -7,7 +7,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'consent_service.dart';
 
 /// AdMob configuration. Production unit IDs come from the AdMob console
-/// for the Brevio project; debug builds use Google's universal test
+/// for the AgentBuildLog project; debug builds use Google's universal test
 /// units so we never accrue policy strikes against real units while
 /// developing.
 class AdConfig {

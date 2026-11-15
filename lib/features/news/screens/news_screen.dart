@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../core/constants/brand.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -123,7 +124,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     ref.read(userProvider.notifier).logNewsShare(article.id);
     await SharePlus.instance.share(
       ShareParams(
-        text: '${article.headline}\n\n${article.sourceUrl}',
+        text: '${article.headline}\n\n${Brand.newsUrl(article.id)}',
         subject: article.headline,
       ),
     );

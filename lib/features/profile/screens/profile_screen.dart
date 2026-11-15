@@ -96,6 +96,9 @@ class ProfileScreen extends ConsumerWidget {
                   const _ThemedDivider(),
                   _SoundTile(user: user),
                   const _ThemedDivider(),
+                  const _GroupSubheader(label: 'Learn more'),
+                  const _WebsiteTile(),
+                  const _ThemedDivider(),
                   const _GroupSubheader(label: 'Privacy'),
                   const _PrivacyPolicyTile(),
                   const _ThemedDivider(),
@@ -1718,6 +1721,21 @@ class _ReferralCardState extends ConsumerState<_ReferralCard> {
 // ---------------------------------------------------------------------------
 // Legal & ad privacy entry points
 // ---------------------------------------------------------------------------
+
+class _WebsiteTile extends StatelessWidget {
+  const _WebsiteTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.menu_book_outlined),
+      title: const Text('Tutorials & deep dives'),
+      subtitle: const Text('Hands-on guides on agentbuildlog.com'),
+      trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+      onTap: () => openExternalUrl(Brand.tutorialsUrl),
+    );
+  }
+}
 
 class _PrivacyPolicyTile extends StatelessWidget {
   const _PrivacyPolicyTile();

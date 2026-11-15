@@ -38,7 +38,7 @@ void main() async {
 
 /// Initialise Firebase + App Check. Both are required for the admin API
 /// auth flow (the Flutter client exchanges an App Check token for an
-/// Brevio client JWT in [AuthService]).
+/// client JWT in [AuthService]).
 ///
 /// Failures here are logged and swallowed — the app keeps running in
 /// offline-first mode with whatever is already in the cache. That's
